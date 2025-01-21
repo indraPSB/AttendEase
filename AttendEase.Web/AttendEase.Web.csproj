@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AttendEase.DB\AttendEase.DB.csproj" />
     <ProjectReference Include="..\AttendEase.Web.Client\AttendEase.Web.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.0" />
   </ItemGroup>
