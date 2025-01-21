@@ -21,6 +21,15 @@ builder.Services.AddSingleton<IFormFactor, FormFactor>();
 
 var app = builder.Build();
 
+// Ensure the database is created
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    await using (var context = scope.ServiceProvider.GetRequiredService<AttendEaseDbContext>())
+    {
+        await context.Database.EnsureCreatedAsync();
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
