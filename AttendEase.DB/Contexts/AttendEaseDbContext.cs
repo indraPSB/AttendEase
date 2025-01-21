@@ -31,6 +31,7 @@ public partial class AttendEaseDbContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Password).HasColumnName("password");
+            entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.Role).HasColumnName("role");
         });
 
