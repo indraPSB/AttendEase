@@ -78,6 +78,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddBlazorBootstrap();
+
 // Add device-specific services used by the AttendEase.Shared project
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
 
