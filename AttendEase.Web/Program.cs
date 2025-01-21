@@ -45,15 +45,21 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
 
             #endregion
 
+            #region Faker for User
+
             Faker<User> faker = new Faker<User>()
-                .UseSeed(17)
-                .RuleFor(u => u.Id, f => GenerateGuidV7(f.Random.Guid()))
-                .RuleFor(u => u.Name, f => f.Person.FullName)
-                .RuleFor(u => u.Password, f => f.Internet.Password())
-                .RuleFor(u => u.Email, f => f.Person.Email)
-                .RuleFor(u => u.Role, f => f.PickRandom("Admin", "User", "User")); // Higher chance of "User" than "Admin"
+                   .UseSeed(17)
+                   .RuleFor(u => u.Id, f => GenerateGuidV7(f.Random.Guid()))
+                   .RuleFor(u => u.Name, f => f.Person.FullName)
+                   .RuleFor(u => u.Password, f => f.Internet.Password())
+                   .RuleFor(u => u.Email, f => f.Person.Email)
+                   .RuleFor(u => u.Role, f => f.PickRandom("Admin", "User", "User")); // Higher chance of "User" than "Admin"
 
             List<User> users = faker.Generate(10);
+
+            #endregion
+
+            #region Add generated fake values to DB
 
             bool userExist = await context.Set<User>().ContainsAsync(users[0], ct);
             if (!userExist)
@@ -61,8 +67,12 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
                 await context.Set<User>().AddRangeAsync(users, ct);
                 await context.SaveChangesAsync(ct);
             }
+
+            #endregion
         });
 });
+
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
