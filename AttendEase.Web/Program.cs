@@ -1,10 +1,17 @@
+using AttendEase.DB.Contexts;
 using AttendEase.Shared.Services;
 using AttendEase.Web.Components;
 using AttendEase.Web.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
+{
+    optionsBuilder.UseNpgsql(builder.Configuration.GetConnectionString("AttendEaseDatabase"));
+});
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
