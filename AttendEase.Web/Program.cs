@@ -51,7 +51,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
                 .RuleFor(u => u.Name, f => f.Person.FullName)
                 .RuleFor(u => u.Password, f => f.Internet.Password())
                 .RuleFor(u => u.Email, f => f.Person.Email)
-                .RuleFor(u => u.Role, f => f.PickRandom("Admin", "User"));
+                .RuleFor(u => u.Role, f => f.PickRandom("Admin", "User", "User")); // Higher chance of "User" than "Admin"
 
             List<User> users = faker.Generate(10);
 
