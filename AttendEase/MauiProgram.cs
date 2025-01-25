@@ -1,5 +1,6 @@
 ﻿using AttendEase.Services;
 using AttendEase.Shared.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -23,7 +24,18 @@ namespace AttendEase
             // Add device-specific services used by the AttendEase.Shared project
             builder.Services.AddSingleton<IFormFactor, FormFactor>();
 
+            builder.Services.AddScoped<IUserService, UserService>();
+
             builder.Services.AddMauiBlazorWebView();
+
+            builder.Services.AddScoped(sp =>
+            {
+                string? apiBaseUrl = builder.Configuration["ApiBaseUrl"];
+                return new HttpClient
+                {
+                    BaseAddress = new Uri(apiBaseUrl ?? sp.GetRequiredService<NavigationManager>().BaseUri)
+                };
+            });
 
             builder.Services.AddBlazorBootstrap();
 
