@@ -2,6 +2,7 @@ using AttendEase.DB.Contexts;
 using AttendEase.DB.Models;
 using AttendEase.Shared.Services;
 using AttendEase.Web.Components;
+using AttendEase.Web.Endpoints;
 using AttendEase.Web.Services;
 using Bogus;
 using Microsoft.EntityFrameworkCore;
@@ -111,6 +112,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.MapUserEndpoints();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
