@@ -5,6 +5,7 @@ using AttendEase.Web.Components;
 using AttendEase.Web.Services;
 using Bogus;
 using Microsoft.EntityFrameworkCore;
+using UserWebService = AttendEase.Web.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,7 +73,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
         });
 });
 
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserService, UserWebService>();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
