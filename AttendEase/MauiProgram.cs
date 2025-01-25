@@ -1,5 +1,6 @@
 ﻿using AttendEase.Services;
 using AttendEase.Shared.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace AttendEase
@@ -9,6 +10,9 @@ namespace AttendEase
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+
+            builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
