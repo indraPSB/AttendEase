@@ -12,11 +12,21 @@ internal class UserService(ILogger<UserService> logger, AttendEaseDbContext cont
 
     public Task<IEnumerable<User>?> GetUsers(CancellationToken ct = default)
     {
+        if (ct == default)
+        {
+            ct = CancellationToken.None;
+        }
+
         return UserDBService.GetUsers(_logger, _context, ct);
     }
 
     public Task<User?> GetUser(Guid id, CancellationToken ct = default)
     {
+        if (ct == default)
+        {
+            ct = CancellationToken.None;
+        }
+
         return UserDBService.GetUser(_logger, _context, id, ct);
     }
 }
