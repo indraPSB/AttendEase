@@ -6,9 +6,9 @@ namespace AttendEase.Shared.Services;
 
 public interface IUserService
 {
-    Task<IEnumerable<User>?> GetUsers(CancellationToken ct = default);
+    Task<IEnumerable<User>?> GetUsers(CancellationToken cancellationToken = default);
 
-    Task<User?> GetUser(Guid id, CancellationToken ct = default);
+    Task<User?> GetUser(Guid id, CancellationToken cancellationToken = default);
 }
 
 public class UserService(ILogger<UserService> logger, HttpClient httpClient) : IUserService
@@ -16,11 +16,11 @@ public class UserService(ILogger<UserService> logger, HttpClient httpClient) : I
     private readonly ILogger<UserService> _logger = logger;
     private readonly HttpClient _httpClient = httpClient;
 
-    public async Task<IEnumerable<User>?> GetUsers(CancellationToken ct = default)
+    public async Task<IEnumerable<User>?> GetUsers(CancellationToken cancellationToken = default)
     {
-        if (ct == default)
+        if (cancellationToken == default)
         {
-            ct = CancellationToken.None;
+            cancellationToken = CancellationToken.None;
         }
 
         try
@@ -28,7 +28,7 @@ public class UserService(ILogger<UserService> logger, HttpClient httpClient) : I
             HttpResponseMessage response = await _httpClient.GetAsync("/api/users");
             if (response.IsSuccessStatusCode)
             {
-                IEnumerable<User>? users = await response.Content.ReadFromJsonAsync<IEnumerable<User>>(cancellationToken: ct);
+                IEnumerable<User>? users = await response.Content.ReadFromJsonAsync<IEnumerable<User>>(cancellationToken);
 
                 if (users is null)
                 {
@@ -49,11 +49,11 @@ public class UserService(ILogger<UserService> logger, HttpClient httpClient) : I
         return null;
     }
 
-    public async Task<User?> GetUser(Guid id, CancellationToken ct = default)
+    public async Task<User?> GetUser(Guid id, CancellationToken cancellationToken = default)
     {
-        if (ct == default)
+        if (cancellationToken == default)
         {
-            ct = CancellationToken.None;
+            cancellationToken = CancellationToken.None;
         }
 
         try
@@ -61,7 +61,7 @@ public class UserService(ILogger<UserService> logger, HttpClient httpClient) : I
             HttpResponseMessage response = await _httpClient.GetAsync($"/api/users/{id}");
             if (response.IsSuccessStatusCode)
             {
-                User? user = await response.Content.ReadFromJsonAsync<User>(cancellationToken: ct);
+                User? user = await response.Content.ReadFromJsonAsync<User>(cancellationToken);
 
                 if (user is null)
                 {

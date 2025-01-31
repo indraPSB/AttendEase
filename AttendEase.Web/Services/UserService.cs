@@ -10,23 +10,23 @@ internal class UserService(ILogger<UserService> logger, AttendEaseDbContext cont
     private readonly ILogger<UserService> _logger = logger;
     private readonly AttendEaseDbContext _context = context;
 
-    public Task<IEnumerable<User>?> GetUsers(CancellationToken ct = default)
+    public Task<IEnumerable<User>?> GetUsers(CancellationToken cancellationToken = default)
     {
-        if (ct == default)
+        if (cancellationToken == default)
         {
-            ct = CancellationToken.None;
+            cancellationToken = CancellationToken.None;
         }
 
-        return UserDBService.GetUsers(_logger, _context, ct);
+        return UserDBService.GetUsers(_logger, _context, cancellationToken);
     }
 
-    public Task<User?> GetUser(Guid id, CancellationToken ct = default)
+    public Task<User?> GetUser(Guid id, CancellationToken cancellationToken = default)
     {
-        if (ct == default)
+        if (cancellationToken == default)
         {
-            ct = CancellationToken.None;
+            cancellationToken = CancellationToken.None;
         }
 
-        return UserDBService.GetUser(_logger, _context, id, ct);
+        return UserDBService.GetUser(id, _logger, _context, cancellationToken);
     }
 }

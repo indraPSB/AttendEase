@@ -14,9 +14,9 @@ internal static class UserEndpoint
         return app;
     }
 
-    public static async Task<IResult> GetUsers(IUserService userService)
+    public static async Task<IResult> GetUsers(IUserService userService, CancellationToken cancellationToken)
     {
-        IEnumerable<User>? users = await userService.GetUsers();
+        IEnumerable<User>? users = await userService.GetUsers(cancellationToken);
 
         if (users is null)
         {
@@ -26,9 +26,9 @@ internal static class UserEndpoint
         return Results.Ok(users);
     }
 
-    public static async Task<IResult> GetUser(IUserService userService, Guid id)
+    public static async Task<IResult> GetUser(Guid id, IUserService userService, CancellationToken cancellationToken)
     {
-        User? user = await userService.GetUser(id);
+        User? user = await userService.GetUser(id, cancellationToken);
 
         if (user is null)
         {

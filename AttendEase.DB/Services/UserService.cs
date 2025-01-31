@@ -7,16 +7,16 @@ namespace AttendEase.DB.Services;
 
 internal static class UserService
 {
-    public static async Task<IEnumerable<User>?> GetUsers<T>(ILogger<T> logger, AttendEaseDbContext context, CancellationToken ct = default)
+    public static async Task<IEnumerable<User>?> GetUsers<T>(ILogger<T> logger, AttendEaseDbContext context, CancellationToken cancellationToken = default)
     {
-        if (ct == default)
+        if (cancellationToken == default)
         {
-            ct = CancellationToken.None;
+            cancellationToken = CancellationToken.None;
         }
 
         try
         {
-            return await context.Users.ToListAsync(ct);
+            return await context.Users.ToListAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -26,16 +26,16 @@ internal static class UserService
         return null;
     }
 
-    public static async Task<User?> GetUser<T>(ILogger<T> logger, AttendEaseDbContext context, Guid id, CancellationToken ct = default)
+    public static async Task<User?> GetUser<T>(Guid id, ILogger<T> logger, AttendEaseDbContext context, CancellationToken cancellationToken = default)
     {
-        if (ct == default)
+        if (cancellationToken == default)
         {
-            ct = CancellationToken.None;
+            cancellationToken = CancellationToken.None;
         }
 
         try
         {
-            return await context.Users.SingleOrDefaultAsync(u => u.Id == id, ct);
+            return await context.Users.SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
         }
         catch (Exception ex)
         {
