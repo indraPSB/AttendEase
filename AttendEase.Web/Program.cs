@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UserWebService = AttendEase.Web.Services.UserService;
 
+const int Seed = 17;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -53,7 +55,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
             #region Faker for User
 
             Faker<User> faker = new Faker<User>()
-                   .UseSeed(17)
+                   .UseSeed(Seed)
                    .RuleFor(u => u.Id, f => GenerateGuidV7(f.Random.Guid()))
                    .RuleFor(u => u.Name, f => f.Person.FullName)
                    .RuleFor(u => u.Password, f => f.Internet.Password())
