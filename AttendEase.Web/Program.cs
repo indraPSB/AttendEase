@@ -117,7 +117,15 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
 {
     await using (AttendEaseDbContext context = scope.ServiceProvider.GetRequiredService<AttendEaseDbContext>())
     {
-        await context.Database.EnsureCreatedAsync();
+        if (await context.Database.CanConnectAsync())
+        {
+            await context.Database.EnsureCreatedAsync();
+        }
+        else
+        {
+            scope.ServiceProvider.GetRequiredService<ILogger<Program>>()
+                .LogWarning("Cannot connect to the database.");
+        }
     }
 }
 
