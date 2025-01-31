@@ -5,7 +5,10 @@ using AttendEase.Web.Components;
 using AttendEase.Web.Endpoints;
 using AttendEase.Web.Services;
 using Bogus;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using UserWebService = AttendEase.Web.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -85,6 +88,26 @@ builder.Services.AddBlazorBootstrap();
 // Add device-specific services used by the AttendEase.Shared project
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtBearer:Issuer"] ?? throw new InvalidOperationException("The issuer is missing from the configuration."),
+            ValidAudience = builder.Configuration["JwtBearer:Audience"] ?? throw new InvalidOperationException("The audience is missing from the configuration."),
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(
+                    builder.Configuration["JwtBearer:IssuerSigningKey"] ?? throw new InvalidOperationException("The signing key is missing from the configuration.")))
+        };
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddEndpointsApiExplorer();
+
 var app = builder.Build();
 
 // Ensure the database is created
@@ -112,6 +135,9 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapUserEndpoints();
 
