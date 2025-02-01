@@ -24,6 +24,7 @@ namespace AttendEase
             // Add device-specific services used by the AttendEase.Shared project
             builder.Services.AddSingleton<IFormFactor, FormFactor>();
 
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddMauiBlazorWebView();
