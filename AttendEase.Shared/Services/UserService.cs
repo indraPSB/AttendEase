@@ -26,6 +26,7 @@ public class UserService(ILogger<UserService> logger, HttpClient httpClient) : I
         try
         {
             HttpResponseMessage response = await _httpClient.GetAsync("/api/users");
+
             if (response.IsSuccessStatusCode)
             {
                 IEnumerable<User>? users = await response.Content.ReadFromJsonAsync<IEnumerable<User>>(cancellationToken);
@@ -46,6 +47,7 @@ public class UserService(ILogger<UserService> logger, HttpClient httpClient) : I
         {
             _logger.LogError(ex, "Error in Shared GetUsers with message, '{message}'.", ex.Message);
         }
+
         return null;
     }
 
@@ -59,6 +61,7 @@ public class UserService(ILogger<UserService> logger, HttpClient httpClient) : I
         try
         {
             HttpResponseMessage response = await _httpClient.GetAsync($"/api/users/{id}");
+
             if (response.IsSuccessStatusCode)
             {
                 User? user = await response.Content.ReadFromJsonAsync<User>(cancellationToken);
@@ -79,6 +82,7 @@ public class UserService(ILogger<UserService> logger, HttpClient httpClient) : I
         {
             _logger.LogError(ex, "Error in Shared GetUser with message, '{message}'.", ex.Message);
         }
+
         return null;
     }
 }

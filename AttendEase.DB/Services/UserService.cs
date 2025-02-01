@@ -39,7 +39,26 @@ internal static class UserService
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error in DB GetUser with message, '{message}'.", ex.Message);
+            logger.LogError(ex, "Error in DB GetUser(Id) with message, '{message}'.", ex.Message);
+        }
+
+        return null;
+    }
+
+    public static async Task<User?> GetUser<T>(string email, string password, ILogger<T> logger, AttendEaseDbContext context, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        try
+        {
+            return await context.Users.SingleOrDefaultAsync(u => u.Email == email && u.Password == password, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in DB GetUser(Email, Password) with message, '{message}'.", ex.Message);
         }
 
         return null;

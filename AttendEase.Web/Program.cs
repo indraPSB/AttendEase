@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using AuthWebService = AttendEase.Web.Services.AuthService;
 using UserWebService = AttendEase.Web.Services.UserService;
 
 const int Seed = 17;
@@ -79,6 +80,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
         });
 });
 
+builder.Services.AddScoped<IAuthService, AuthWebService>();
 builder.Services.AddScoped<IUserService, UserWebService>();
 
 builder.Services.AddRazorComponents()
@@ -149,6 +151,7 @@ app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapAuthEndpoints();
 app.MapUserEndpoints();
 
 app.MapRazorComponents<App>()
