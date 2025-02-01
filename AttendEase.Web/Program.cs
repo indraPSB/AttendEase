@@ -84,8 +84,7 @@ builder.Services.AddScoped<IAuthService, AuthWebService>();
 builder.Services.AddScoped<IUserService, UserWebService>();
 
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents()
-    .AddInteractiveWebAssemblyComponents();
+    .AddInteractiveServerComponents();
 
 builder.Services.AddBlazorBootstrap();
 
@@ -132,11 +131,7 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseWebAssemblyDebugging();
-}
-else
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -156,9 +151,7 @@ app.MapUserEndpoints();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(
-        typeof(AttendEase.Shared._Imports).Assembly,
-        typeof(AttendEase.Web.Client._Imports).Assembly);
+        typeof(AttendEase.Shared._Imports).Assembly);
 
 app.Run();
