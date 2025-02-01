@@ -1,0 +1,24 @@
+﻿@AttendEase.Web_HostAddress = https://localhost:7200
+@AttendEase.Api_AuthorizationHeader = Bearer token
+
+###
+
+@AttendEase.Api_Email = ""
+@AttendEase.Api_Password = ""
+POST {{AttendEase.Web_HostAddress}}/api/auth/login
+Content-Type: application/json
+{
+  "Email": {{AttendEase.Api_Email}},
+  "Password": {{AttendEase.Api_Password}}
+}
+
+###
+
+GET {{AttendEase.Web_HostAddress}}/api/users
+
+###
+
+@AttendEase.Api_UserId = 0
+GET {{AttendEase.Web_HostAddress}}/api/users/{{AttendEase.Api_UserId}}
+
+###
