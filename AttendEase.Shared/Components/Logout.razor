@@ -1,0 +1,17 @@
+﻿@using AttendEase.Shared.Providers
+@inject IAuthService AuthService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<Button Type="ButtonType.Button" Color="ButtonColor.Secondary" @onclick="HandleOnLogout">Logout</Button>
+
+@code {
+    public async Task HandleOnLogout()
+    {
+        await AuthService.Logout();
+
+        if (AuthenticationStateProvider is AttendEaseAuthenticationStateProvider attendEaseAuthenticationStateProvider)
+        {
+            attendEaseAuthenticationStateProvider.NotifyAuthenticationStateChanged();
+        }
+    }
+}
