@@ -15,10 +15,12 @@ Content-Type: application/json
 ###
 
 GET {{AttendEase.Web_HostAddress}}/api/users
+Authorization: {{AttendEase.Api_AuthorizationHeader}}
 
 ###
 
 @AttendEase.Api_UserId = 0
 GET {{AttendEase.Web_HostAddress}}/api/users/{{AttendEase.Api_UserId}}
+Authorization: {{AttendEase.Api_AuthorizationHeader}}
 
 ###
