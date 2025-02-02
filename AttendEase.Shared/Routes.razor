@@ -1,6 +1,30 @@
-﻿<Router AppAssembly="typeof(Layout.MainLayout).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
-</Router>
+﻿@using AttendEase.Shared.Layout
+@using AttendEase.Shared.Pages
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(MainLayout).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <p role="alert">Determining session state, please wait...</p>
+                </Authorizing>
+                <NotAuthorized>
+                    <AuthorizeView Roles="Admin,User" Context="viewerContext">
+                        <Authorized>
+                            <p role="alert">Sorry, you're not authorized to view this page.</p>
+                        </Authorized>
+                        <NotAuthorized>
+                            <p role="alert">You have to login to view this page.</p>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
