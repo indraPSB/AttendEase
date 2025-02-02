@@ -76,8 +76,18 @@ internal class AuthService(ILogger<AuthService> logger, AttendEaseDbContext cont
             cancellationToken = CancellationToken.None;
         }
 
-        ProtectedBrowserStorageResult<string> token = await _protectedLocalStorage.GetAsync<string>(Key);
-        return token.Value;
+        try
+        {
+            ProtectedBrowserStorageResult<string> token = await _protectedLocalStorage.GetAsync<string>(Key);
+
+            return token.Value;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Web AuthService.GetToken with message, '{message}'.", ex.Message);
+        }
+
+        return null;
     }
 
     public async Task<bool> Login(LoginRequest request, CancellationToken cancellationToken = default)
@@ -97,8 +107,16 @@ internal class AuthService(ILogger<AuthService> logger, AttendEaseDbContext cont
             }
             else
             {
-                await _protectedLocalStorage.SetAsync(Key, token);
-                return true;
+                try
+                {
+                    await _protectedLocalStorage.SetAsync(Key, token);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error in Web AuthService.Login with message, '{message}'.", ex.Message);
+                }
             }
         }
         catch (Exception ex)
@@ -116,7 +134,14 @@ internal class AuthService(ILogger<AuthService> logger, AttendEaseDbContext cont
             cancellationToken = CancellationToken.None;
         }
 
-        await _protectedLocalStorage.DeleteAsync(Key);
+        try
+        {
+            await _protectedLocalStorage.DeleteAsync(Key);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Web AuthService.Logout with message, '{message}'.", ex.Message);
+        }
     }
 
     public async Task<User?> GetUser(CancellationToken cancellationToken = default)
@@ -124,14 +149,18 @@ internal class AuthService(ILogger<AuthService> logger, AttendEaseDbContext cont
         string? token = await GetToken(cancellationToken);
 
         if (string.IsNullOrEmpty(token))
+        {
             return null;
+        }
 
         JwtSecurityTokenHandler tokenHandler = new();
         JwtSecurityToken jwtToken = tokenHandler.ReadJwtToken(token);
 
         // Check if token has expired
         if (jwtToken.ValidTo < DateTime.UtcNow)
+        {
             return null;
+        }
 
         string roleClaimName = tokenHandler.OutboundClaimTypeMap[ClaimTypes.Role];
 

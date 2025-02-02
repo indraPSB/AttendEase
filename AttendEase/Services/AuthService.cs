@@ -21,7 +21,18 @@ internal class AuthService(ILogger<AuthService> logger, HttpClient httpClient) :
             cancellationToken = CancellationToken.None;
         }
 
-        return await SecureStorage.GetAsync(Key);
+        string? token = null;
+
+        try
+        {
+            token = await SecureStorage.GetAsync(Key);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in MAUI AuthService.GetToken with message, '{message}'.", ex.Message);
+        }
+
+        return token;
     }
 
     public async Task<bool> Login(LoginRequest request, CancellationToken cancellationToken = default)
@@ -61,7 +72,7 @@ internal class AuthService(ILogger<AuthService> logger, HttpClient httpClient) :
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error in MAUI Login with message, '{message}'.", ex.Message);
+            _logger.LogError(ex, "Error in MAUI AuthService.Login with message, '{message}'.", ex.Message);
         }
 
         return false;
@@ -74,8 +85,15 @@ internal class AuthService(ILogger<AuthService> logger, HttpClient httpClient) :
             cancellationToken = CancellationToken.None;
         }
 
-        SecureStorage.Remove(Key);
-        _httpClient.DefaultRequestHeaders.Authorization = null;
+        try
+        {
+            SecureStorage.Remove(Key);
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in MAUI AuthService.Logout with message, '{message}'.", ex.Message);
+        }
 
         return Task.CompletedTask;
     }
@@ -85,14 +103,18 @@ internal class AuthService(ILogger<AuthService> logger, HttpClient httpClient) :
         string? token = await GetToken(cancellationToken);
 
         if (string.IsNullOrEmpty(token))
+        {
             return null;
+        }
 
         JwtSecurityTokenHandler tokenHandler = new();
         JwtSecurityToken jwtToken = tokenHandler.ReadJwtToken(token);
 
         // Check if token has expired
         if (jwtToken.ValidTo < DateTime.UtcNow)
+        {
             return null;
+        }
 
         string roleClaimName = tokenHandler.OutboundClaimTypeMap[ClaimTypes.Role];
 
