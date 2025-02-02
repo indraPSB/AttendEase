@@ -1,14 +1,17 @@
 ﻿@page "/"
-@using AttendEase.Shared.Services
-@inject IFormFactor FormFactor
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<AuthorizeView>
+    <Authorized>
+        <h1>Home Page</h1>
 
-Welcome to your new app running on <em>@factor</em> using <em>@platform</em>.
+        Home page coming soon!
+    </Authorized>
 
-@code {
-    private string factor => FormFactor.GetFormFactor();
-    private string platform => FormFactor.GetPlatform();
-}
+    <NotAuthorized>
+        <h1>Welcome to AttendEase!</h1>
+
+        <Login />
+    </NotAuthorized>
+</AuthorizeView>
