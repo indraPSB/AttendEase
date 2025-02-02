@@ -1,6 +1,8 @@
 ﻿using AttendEase.Services;
+using AttendEase.Shared.Providers;
 using AttendEase.Shared.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -21,13 +23,14 @@ namespace AttendEase
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
+            builder.Services.AddAuthorizationCore();
+
             // Add device-specific services used by the AttendEase.Shared project
             builder.Services.AddSingleton<IFormFactor, FormFactor>();
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUserService, UserService>();
-
-            builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddScoped<AuthenticationStateProvider, AttendEaseAuthenticationStateProvider>();
 
             builder.Services.AddScoped(sp =>
             {
@@ -39,6 +42,8 @@ namespace AttendEase
             });
 
             builder.Services.AddBlazorBootstrap();
+
+            builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

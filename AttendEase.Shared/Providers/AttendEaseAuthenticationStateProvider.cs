@@ -31,7 +31,7 @@ public class AttendEaseAuthenticationStateProvider(ILogger<AttendEaseAuthenticat
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting authentication state with message '{0}.", ex.Message);
+            _logger.LogError(ex, "Error getting authentication state with message, '{message}.", ex.Message);
         }
 
         return new AuthenticationState(principal ?? new ClaimsPrincipal(new ClaimsIdentity()));
