@@ -31,16 +31,17 @@ internal class AuthService(ILogger<AuthService> logger, AttendEaseDbContext cont
             if (request is { Email: not null, Password: not null })
             {
                 User? user = await UserDBService.GetUser(request.Email, request.Password, _logger, _context, cancellationToken);
-                if (user is { Email: not null, Role: not null })
+                if (user is { Name: not null, Email: not null, Role: not null })
                 {
                     JwtSecurityTokenHandler tokenHandler = new();
                     byte[] key = Encoding.UTF8.GetBytes(_config["JwtBearer:IssuerSigningKey"] ?? throw new InvalidOperationException("The signing key is missing from the configuration."));
                     SecurityTokenDescriptor tokenDescriptor = new()
                     {
                         Subject = new ClaimsIdentity([
-                            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                            new Claim(ClaimTypes.Name, user.Email),
-                            new Claim(ClaimTypes.Role, user.Role)]),
+                            new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
+                            new Claim(JwtRegisteredClaimNames.Name, user.Name),
+                            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                            new Claim(tokenHandler.OutboundClaimTypeMap[ClaimTypes.Role], user.Role)]),
                         Expires = DateTime.UtcNow.AddHours(1),
                         Issuer = _config["JwtBearer:Issuer"] ?? throw new InvalidOperationException("The issuer is missing from the configuration."),
                         Audience = _config["JwtBearer:Audience"] ?? throw new InvalidOperationException("The audience is missing from the configuration."),
@@ -116,5 +117,38 @@ internal class AuthService(ILogger<AuthService> logger, AttendEaseDbContext cont
         }
 
         await _protectedLocalStorage.DeleteAsync(Key);
+    }
+
+    public async Task<User?> GetUser(CancellationToken cancellationToken = default)
+    {
+        string? token = await GetToken(cancellationToken);
+
+        if (string.IsNullOrEmpty(token))
+            return null;
+
+        JwtSecurityTokenHandler tokenHandler = new();
+        JwtSecurityToken jwtToken = tokenHandler.ReadJwtToken(token);
+
+        // Check if token has expired
+        if (jwtToken.ValidTo < DateTime.UtcNow)
+            return null;
+
+        string roleClaimName = tokenHandler.OutboundClaimTypeMap[ClaimTypes.Role];
+
+        if (Guid.TryParse(jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value, out Guid id)
+            && jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value is string name
+            && jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value is string email
+            && jwtToken.Claims.FirstOrDefault(c => c.Type == roleClaimName)?.Value is string role)
+        {
+            return new User()
+            {
+                Id = id,
+                Name = name,
+                Email = email,
+                Role = role
+            };
+        }
+
+        return null;
     }
 }

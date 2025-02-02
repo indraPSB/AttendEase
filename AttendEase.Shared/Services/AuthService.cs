@@ -1,4 +1,6 @@
-﻿namespace AttendEase.Shared.Services;
+﻿using AttendEase.DB.Models;
+
+namespace AttendEase.Shared.Services;
 
 public interface IAuthService
 {
@@ -7,6 +9,8 @@ public interface IAuthService
     Task<bool> Login(LoginRequest request, CancellationToken cancellationToken = default);
 
     Task Logout(CancellationToken cancellationToken = default);
+
+    Task<User?> GetUser(CancellationToken cancellationToken = default);
 }
 
 public class LoginRequest

@@ -1,6 +1,9 @@
-﻿using AttendEase.Shared.Services;
+﻿using AttendEase.DB.Models;
+using AttendEase.Shared.Services;
 using Microsoft.Extensions.Logging;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
+using System.Security.Claims;
 
 namespace AttendEase.Services;
 
@@ -75,5 +78,38 @@ internal class AuthService(ILogger<AuthService> logger, HttpClient httpClient) :
         _httpClient.DefaultRequestHeaders.Authorization = null;
 
         return Task.CompletedTask;
+    }
+
+    public async Task<User?> GetUser(CancellationToken cancellationToken = default)
+    {
+        string? token = await GetToken(cancellationToken);
+
+        if (string.IsNullOrEmpty(token))
+            return null;
+
+        JwtSecurityTokenHandler tokenHandler = new();
+        JwtSecurityToken jwtToken = tokenHandler.ReadJwtToken(token);
+
+        // Check if token has expired
+        if (jwtToken.ValidTo < DateTime.UtcNow)
+            return null;
+
+        string roleClaimName = tokenHandler.OutboundClaimTypeMap[ClaimTypes.Role];
+
+        if (Guid.TryParse(jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value, out Guid id)
+            && jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value is string name
+            && jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value is string email
+            && jwtToken.Claims.FirstOrDefault(c => c.Type == roleClaimName)?.Value is string role)
+        {
+            return new User()
+            {
+                Id = id,
+                Name = name,
+                Email = email,
+                Role = role
+            };
+        }
+
+        return null;
     }
 }
