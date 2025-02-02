@@ -7,8 +7,15 @@
 
     <main>
         <div class="top-row px-4">
+            <AuthorizeView>
+                <Authorized>
+                    <div class="me-2 link-primary">Welcome, @(context?.User?.Identity?.Name ?? "to AttendEase")</div>
+
+                    <Logout />
+                </Authorized>
+            </AuthorizeView>
+
             <ThemeSwitcher />
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
         </div>
 
         <article class="content px-4">
