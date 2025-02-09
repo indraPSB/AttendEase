@@ -14,4 +14,6 @@ public partial class User
     public string? Email { get; set; }
 
     public string? Role { get; set; }
+
+    public virtual ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 }
