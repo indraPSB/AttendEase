@@ -36,7 +36,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthorization();
 
 builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
 {
