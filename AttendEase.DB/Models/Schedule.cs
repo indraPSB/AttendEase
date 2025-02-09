@@ -24,4 +24,6 @@ public partial class Schedule
     public bool Repeat { get; set; }
 
     public virtual ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
+
+    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }
