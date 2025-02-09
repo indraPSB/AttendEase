@@ -11,11 +11,11 @@
     <link rel="stylesheet" href="@Assets["_content/AttendEase.Shared/app.css"]" />
     <link rel="stylesheet" href="AttendEase.Web.styles.css" />
     <link rel="icon" type="image/png" href="@Assets["_content/AttendEase.Shared/favicon.png"]" />
-    <HeadOutlet @rendermode="InteractiveServer" />
+    <HeadOutlet @rendermode="new InteractiveServerRenderMode(false)" />
 </head>
 
 <body>
-    <Routes @rendermode="InteractiveServer" />
+    <Routes @rendermode="new InteractiveServerRenderMode(false)" />
     <script src="_framework/blazor.web.js"></script>
     <script src="@Assets["_content/AttendEase.Shared/js/bootstrap.bundle.min.js"]"></script>
     <script src="@Assets["_content/AttendEase.Shared/js/chart.umd.js"]"></script>
