@@ -17,6 +17,10 @@ public partial class Schedule
 
     public string? DaysOfWeek { get; set; }
 
+    public decimal? Latitude { get; set; }
+
+    public decimal? Longitude { get; set; }
+
     public int AttendanceStartBefore { get; set; }
 
     public int AbsentAfter { get; set; }

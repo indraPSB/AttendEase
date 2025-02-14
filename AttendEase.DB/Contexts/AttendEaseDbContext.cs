@@ -20,6 +20,8 @@ internal partial class AttendEaseDbContext : DbContext
 
     public virtual DbSet<Schedule> Schedules { get; set; }
 
+    public virtual DbSet<SpecialDay> SpecialDays { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -66,9 +68,30 @@ internal partial class AttendEaseDbContext : DbContext
             entity.Property(e => e.DaysOfWeek).HasColumnName("days_of_week");
             entity.Property(e => e.EndDate).HasColumnName("end_date");
             entity.Property(e => e.EndTime).HasColumnName("end_time");
+            entity.Property(e => e.Latitude)
+                .HasPrecision(10, 8)
+                .HasColumnName("latitude");
+            entity.Property(e => e.Longitude)
+                .HasPrecision(11, 8)
+                .HasColumnName("longitude");
             entity.Property(e => e.Repeat).HasColumnName("repeat");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.StartTime).HasColumnName("start_time");
+        });
+
+        modelBuilder.Entity<SpecialDay>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("special_days_pkey");
+
+            entity.ToTable("special_days");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.Date).HasColumnName("date");
+            entity.Property(e => e.Recursive)
+                .HasDefaultValue(false)
+                .HasColumnName("recursive");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -98,6 +121,7 @@ internal partial class AttendEaseDbContext : DbContext
                     {
                         j.HasKey("UserId", "ScheduleId").HasName("assignment_pkey");
                         j.ToTable("assignment");
+                        j.HasIndex(new[] { "ScheduleId" }, "IX_assignment_schedule_id");
                         j.IndexerProperty<Guid>("UserId").HasColumnName("user_id");
                         j.IndexerProperty<Guid>("ScheduleId").HasColumnName("schedule_id");
                     });
