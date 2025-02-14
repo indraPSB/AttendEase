@@ -45,7 +45,14 @@ namespace AttendEase
             builder.Services.AddScoped(sp =>
             {
                 string? apiBaseUrl = builder.Configuration["ApiBaseUrl"];
-                return new HttpClient
+
+                // Allow insecure HTTPS connections to the API
+                HttpClientHandler handler = new()
+                {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+
+                return new HttpClient(handler)
                 {
                     BaseAddress = new Uri(apiBaseUrl ?? sp.GetRequiredService<NavigationManager>().BaseUri)
                 };
