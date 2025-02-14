@@ -1,7 +1,8 @@
 using AttendEase.DB.Contexts;
 using AttendEase.DB.Models;
-using AttendEase.Shared.Services;
+using AttendEase.Shared.Models;
 using AttendEase.Shared.Providers;
+using AttendEase.Shared.Services;
 using AttendEase.Web.Components;
 using AttendEase.Web.Endpoints;
 using AttendEase.Web.Services;
@@ -45,10 +46,13 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
         {
             #region Generate deterministic GUID v7
 
-            static Guid GenerateGuidV7(Guid guid)
+            static Guid GenerateGuidV7(Guid guid, long timestamp = default)
             {
-                // Generate a 64-bit timestamp for the first 6 bytes of the GUID
-                long timestamp = new DateTimeOffset(2025, 1, 14, 0, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
+                if (timestamp == default)
+                {
+                    // Generate a 64-bit timestamp for the first 6 bytes of the GUID
+                    timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
+                }
 
                 // Convert the GUID to a span for manipulation
                 Span<byte> guidBytes = stackalloc byte[16];
@@ -76,15 +80,109 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
 
             #region Faker for User
 
-            Faker<User> faker = new Faker<User>()
-                   .UseSeed(Seed)
-                   .RuleFor(u => u.Id, f => GenerateGuidV7(f.Random.Guid()))
-                   .RuleFor(u => u.Name, f => f.Person.FullName)
-                   .RuleFor(u => u.Password, f => f.Internet.Password())
-                   .RuleFor(u => u.Email, f => f.Person.Email)
-                   .RuleFor(u => u.Role, f => f.PickRandom("Admin", "User", "User")); // Higher chance of "User" than "Admin"
+            Faker<User> userFaker = new Faker<User>()
+                .UseSeed(Seed)
+                .RuleFor(u => u.Id, f => GenerateGuidV7(f.Random.Guid()))
+                .RuleFor(u => u.Name, f => f.Person.FullName)
+                .RuleFor(u => u.Password, f => f.Internet.Password())
+                .RuleFor(u => u.Email, f => f.Person.Email)
+                .RuleFor(u => u.Role, f => UserRole.Standard);
 
-            List<User> users = faker.Generate(10);
+            List<User> users = userFaker.Generate(20);
+            users[0].Role = UserRole.Admin;
+            users[1].Role = UserRole.Business;
+
+            #endregion
+
+            #region Faker for Schedule
+
+            Faker<Schedule> userSchedule = new Faker<Schedule>()
+                .UseSeed(Seed)
+                .RuleFor(s => s.Id, f => GenerateGuidV7(f.Random.Guid()));
+
+            List<Schedule> schedules = userSchedule.Generate(2);
+            schedules[0].StartDate = null;
+            schedules[0].EndDate = null;
+            schedules[0].StartTime = new TimeOnly(9, 0, 0);
+            schedules[0].EndTime = new TimeOnly(18, 0, 0);
+            schedules[0].DaysOfWeek = DaysOfWeek.Weekdays.ToString();
+            schedules[0].AttendanceStartBefore = 15;
+            schedules[0].AbsentAfter = 15;
+            schedules[0].Repeat = true;
+            schedules[1].StartDate = new DateOnly(2025, 2, 1);
+            schedules[1].EndDate = new DateOnly(2025, 2, 28);
+            schedules[1].StartTime = new TimeOnly(9, 0, 0);
+            schedules[1].EndTime = new TimeOnly(13, 0, 0);
+            schedules[1].DaysOfWeek = DaysOfWeek.Weekends.ToString();
+            schedules[1].AttendanceStartBefore = 15;
+            schedules[1].AbsentAfter = 30;
+            schedules[1].Repeat = false;
+
+            #endregion
+
+            #region Faker for Assignment
+
+            int count = 0;
+
+            foreach (User user in users.Where(u => u.Role == UserRole.Standard))
+            {
+                if (count++ < 5)
+                {
+                    user.Schedules.Add(schedules[1]);
+                }
+                else if (count < 15)
+                {
+                    user.Schedules.Add(schedules[0]);
+                }
+                else
+                {
+                    user.Schedules.Add(schedules[0]);
+                    user.Schedules.Add(schedules[1]);
+                }
+            }
+
+            #endregion
+
+            #region Faker for Attendance
+
+            Faker<Attendance> attendanceFaker = new Faker<Attendance>()
+                .UseSeed(Seed)
+                .RuleFor(a => a.Id, f => f.Random.Guid());
+
+            List<Attendance> attendances = [];
+            IEnumerator<Attendance> attendanceEnumerator = attendanceFaker.GenerateForever().GetEnumerator();
+            DateOnly date = new(2025, 1, 1);
+            DateOnly endDate = new(2025, 3, 9);
+
+            while (true)
+            {
+                if (date > endDate)
+                {
+                    break;
+                }
+
+                foreach (User user in users.Where(u => u.Role != "Admin"))
+                {
+                    foreach (Schedule schedule in user.Schedules)
+                    {
+                        attendanceEnumerator.MoveNext();
+
+                        TimeOnly time = schedule.StartTime ?? new(0, 0, 0);
+                        Attendance attendance = attendanceEnumerator.Current;
+                        attendance.Timestamp = new DateTimeOffset(date, time, TimeSpan.Zero);
+                        attendance.Id = GenerateGuidV7(attendance.Id, attendance.Timestamp.ToUnixTimeMilliseconds());
+                        attendance.UserId = user.Id;
+                        attendance.ScheduleId = schedule.Id;
+                        attendance.Attended = true;
+                        attendance.Schedule = schedule;
+                        attendance.User = user;
+
+                        attendances.Add(attendance);
+                    }
+                }
+
+                date = date.AddDays(1);
+            }
 
             #endregion
 
@@ -94,6 +192,8 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
             if (!userExist)
             {
                 await context.Set<User>().AddRangeAsync(users, ct);
+                await context.Set<Schedule>().AddRangeAsync(schedules, ct);
+                await context.Set<Attendance>().AddRangeAsync(attendances, ct);
                 await context.SaveChangesAsync(ct);
             }
 
@@ -124,6 +224,7 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
     {
         if (await context.Database.CanConnectAsync())
         {
+            //await context.Database.EnsureDeletedAsync();
             await context.Database.EnsureCreatedAsync();
         }
         else
