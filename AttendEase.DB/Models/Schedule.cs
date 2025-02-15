@@ -21,6 +21,8 @@ public partial class Schedule
 
     public decimal? Longitude { get; set; }
 
+    public float LocationTolerance { get; set; }
+
     public int AttendanceStartBefore { get; set; }
 
     public int AbsentAfter { get; set; }
