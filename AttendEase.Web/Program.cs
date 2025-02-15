@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 using System.Text;
 using AuthWebService = AttendEase.Web.Services.AuthService;
 using UserWebService = AttendEase.Web.Services.UserService;
@@ -257,6 +258,7 @@ app.MapAuthEndpoints();
 app.MapUserEndpoints();
 
 app.MapOpenApi();
+app.MapScalarApiReference();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
