@@ -209,6 +209,8 @@ builder.Services.AddBlazorBootstrap();
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddOpenApi();
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -253,6 +255,8 @@ app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapUserEndpoints();
+
+app.MapOpenApi();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
