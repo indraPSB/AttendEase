@@ -10,8 +10,8 @@
     <ProjectReference Include="..\AttendEase.DB\AttendEase.DB.csproj" />
     <ProjectReference Include="..\AttendEase.Shared\AttendEase.Shared.csproj" />
     <PackageReference Include="Bogus" Version="35.6.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.2" />
   </ItemGroup>
 
 </Project>
