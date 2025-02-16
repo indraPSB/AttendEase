@@ -71,13 +71,13 @@ internal partial class AttendEaseDbContext : DbContext
             entity.Property(e => e.Latitude)
                 .HasPrecision(10, 8)
                 .HasColumnName("latitude");
+            entity.Property(e => e.LocationTolerance).HasColumnName("location_tolerance");
             entity.Property(e => e.Longitude)
                 .HasPrecision(11, 8)
                 .HasColumnName("longitude");
             entity.Property(e => e.Repeat).HasColumnName("repeat");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.StartTime).HasColumnName("start_time");
-            entity.Property(e => e.LocationTolerance).HasColumnName("location_tolerance");
         });
 
         modelBuilder.Entity<SpecialDay>(entity =>
