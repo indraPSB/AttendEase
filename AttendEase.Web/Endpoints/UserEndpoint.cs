@@ -1,4 +1,5 @@
 ﻿using AttendEase.DB.Models;
+using AttendEase.Shared.Models;
 using AttendEase.Shared.Services;
 using Microsoft.AspNetCore.Authorization;
 
@@ -9,10 +10,10 @@ internal static class UserEndpoint
     public static WebApplication MapUserEndpoints(this WebApplication app)
     {
         app.MapGet("api/users", GetUsers)
-            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin" });
+            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
 
         app.MapGet("api/users/{id:guid}", GetUser)
-            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin" });
+            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
 
         return app;
     }
