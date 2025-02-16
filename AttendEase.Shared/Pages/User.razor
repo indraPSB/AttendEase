@@ -1,9 +1,13 @@
-﻿@page "/user"
+﻿@using AttendEase.Shared.Components.Users
+
+@page "/user"
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>User</PageTitle>
 
 <h1>User Management</h1>
+
+<ListUsers />
 
 @code {
 
