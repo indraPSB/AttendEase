@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace AttendEase.Services;
 
-internal class AuthService(ILogger<AuthService> logger, HttpClient httpClient) : IAuthService
+internal class AuthService(ILogger<AuthService> logger, [FromKeyedServices("NoAuth")] HttpClient httpClient) : IAuthService
 {
     const string Key = "jwt_token";
 
@@ -100,6 +100,11 @@ internal class AuthService(ILogger<AuthService> logger, HttpClient httpClient) :
 
     public async Task<User?> GetUser(CancellationToken cancellationToken = default)
     {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
         string? token = await GetToken(cancellationToken);
 
         if (string.IsNullOrEmpty(token))

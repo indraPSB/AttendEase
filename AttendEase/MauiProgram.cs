@@ -1,4 +1,5 @@
-﻿using AttendEase.Services;
+﻿using AttendEase.Handlers;
+using AttendEase.Services;
 using AttendEase.Shared.Providers;
 using AttendEase.Shared.Services;
 using Microsoft.AspNetCore.Components;
@@ -38,10 +39,32 @@ namespace AttendEase
             // Add device-specific services used by the AttendEase.Shared project
             builder.Services.AddSingleton<IFormFactor, FormFactor>();
 
+            // Add keyed services for the HttpClient with no authentication for IAuthService
+            builder.Services.AddKeyedScoped("NoAuth", (sp, key) =>
+            {
+                string? apiBaseUrl = builder.Configuration["ApiBaseUrl"];
+
+                // Allow insecure HTTPS connections to the API
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+
+                HttpClient httpClient = new(handler)
+                {
+                    BaseAddress = new Uri(apiBaseUrl ?? sp.GetRequiredService<NavigationManager>().BaseUri)
+                };
+
+                return httpClient;
+            });
+
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<AuthenticationStateProvider, AttendEaseAuthenticationStateProvider>();
 
+            builder.Services.AddScoped<BearerTokenHandler>();
+
+            // Add non-keyed services for the HttpClient with authentication for all other services
             builder.Services.AddScoped(sp =>
             {
                 string? apiBaseUrl = builder.Configuration["ApiBaseUrl"];
@@ -52,10 +75,15 @@ namespace AttendEase
                     ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
                 };
 
-                return new HttpClient(handler)
+                BearerTokenHandler? bearerHandler = sp.GetRequiredService<BearerTokenHandler>();
+                bearerHandler.InnerHandler = handler;
+
+                HttpClient httpClient = new(bearerHandler)
                 {
                     BaseAddress = new Uri(apiBaseUrl ?? sp.GetRequiredService<NavigationManager>().BaseUri)
                 };
+
+                return httpClient;
             });
 
             builder.Services.AddBlazorBootstrap();
