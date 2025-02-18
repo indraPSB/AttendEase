@@ -9,8 +9,8 @@
     <DataAnnotationsValidator />
 
     <div class="form-floating mb-3">
-        <InputText id="login-email" type="email" class="form-control" placeholder="Email" @bind-Value="@login.Email" />
-        <label for="login-email">Email</label>
+        <InputText id="login-email" type="email" class="form-control" placeholder="E-Mail" @bind-Value="@login.Email" />
+        <label for="login-email">E-Mail</label>
     </div>
 
     <div class="form-floating @(string.IsNullOrEmpty(message) ? "" : "mb-3")">
