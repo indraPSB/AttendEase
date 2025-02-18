@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
 using AuthWebService = AttendEase.Web.Services.AuthService;
+using ScheduleWebService = AttendEase.Web.Services.ScheduleService;
 using UserWebService = AttendEase.Web.Services.UserService;
 
 const int Seed = 17;
@@ -209,6 +210,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
 });
 
 builder.Services.AddScoped<IAuthService, AuthWebService>();
+builder.Services.AddScoped<IScheduleService, ScheduleWebService>();
 builder.Services.AddScoped<IUserService, UserWebService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AttendEaseAuthenticationStateProvider>();
 
