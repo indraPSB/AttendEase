@@ -1,5 +1,44 @@
-﻿<h3>Upcoming Schedules</h3>
+﻿@using AttendEase.DB.Models
+
+<div class="d-flex flex-wrap gap-2">
+    @if (schedules is null)
+    {
+        <em>Fetching upcoming schedules...</em>
+    }
+    else if (schedules.Any())
+    {
+        foreach (var schedule in schedules)
+        {
+            <Card Style="width:18rem;">
+                <CardBody>
+                    <CardTitle>@schedule.DaysOfWeek</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">@schedule.StartDate - @schedule.EndDate</CardSubTitle>
+                    <CardSubTitle Class="mb-2 text-muted">@schedule.StartTime - @schedule.EndTime </CardSubTitle>
+                    <CardText>@@@schedule.Latitude,@schedule.Longitude</CardText>
+                </CardBody>
+            </Card>
+        }
+    }
+    else
+    {
+        <em>No upcoming schedules.</em>
+    }
+
+</div>
 
 @code {
+    [Inject] public IAuthService _authService { get; set; } = default!;
+    [Inject] public IScheduleService _scheduleService { get; set; } = default!;
 
+    private IEnumerable<Schedule>? schedules = default!;
+
+    override protected async Task OnInitializedAsync()
+    {
+        User? user = await _authService.GetUser();
+
+        if (user is not null)
+        {
+            schedules = await _scheduleService.GetSchedules(user.Id);
+        }
+    }
 }
