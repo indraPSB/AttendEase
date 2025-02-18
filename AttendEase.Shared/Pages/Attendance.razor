@@ -1,9 +1,16 @@
 ﻿@page "/attendance"
+@using AttendEase.Shared.Components.Standard
 @attribute [Authorize(Roles = "Standard")]
 
 <PageTitle>Attendance</PageTitle>
 
 <h1>Attendance Dashboard</h1>
+
+<hr />
+
+<h2>Upcoming Schedules</h2>
+
+<UpcomingSchedules />
 
 @code {
 
