@@ -1,5 +1,79 @@
-﻿<h3>List Schedules</h3>
+﻿@using AttendEase.DB.Models
+@using Microsoft.Extensions.Logging
+
+<Grid TItem="Schedule"
+      Class="table table-hover table-bordered table-striped"
+      DataProvider="SchedulesDataProvider"
+      AllowFiltering="true"
+      AllowPaging="true"
+      PageSize="10"
+      AllowSorting="true"
+      AllowSelection="true"
+      SelectionMode="GridSelectionMode.Multiple"
+      SelectedItemsChanged="OnSelectedItemsChanged"
+      Responsive="true">
+
+    <GridColumns>
+        <GridColumn TItem="Schedule" HeaderText="Id" PropertyName="Id" SortKeySelector="item => item.Id">
+            @context.Id
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Start Date" PropertyName="StartDate" SortKeySelector="item => item.StartDate">
+            @context.StartDate
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="End Date" PropertyName="EndDate" SortKeySelector="item => item.EndDate">
+            @context.EndDate
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Start Time" PropertyName="StartTime" SortKeySelector="item => item.StartTime">
+            @context.StartTime
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="End Time" PropertyName="EndTime" SortKeySelector="item => item.EndTime">
+            @context.EndTime
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Days Of Week" PropertyName="DaysOfWeek" SortKeySelector="item => item.DaysOfWeek">
+            @context.DaysOfWeek
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Latitude" PropertyName="Latitude" SortKeySelector="item => item.Latitude">
+            @context.Latitude
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Longitude" PropertyName="Longitude" SortKeySelector="item => item.Longitude">
+            @context.Longitude
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Location Tolerance (Meters)" PropertyName="LocationTolerance" SortKeySelector="item => item.LocationTolerance">
+            @context.LocationTolerance
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Attendance Start Before (Minutes)" PropertyName="AttendanceStartBefore" SortKeySelector="item => item.AttendanceStartBefore">
+            @context.AttendanceStartBefore
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Absent After (Minutes)" PropertyName="AbsentAfter" SortKeySelector="item => item.AbsentAfter">
+            @context.AbsentAfter
+        </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Repeat" PropertyName="Repeat" SortKeySelector="item => item.Repeat">
+            @context.Repeat
+        </GridColumn>
+    </GridColumns>
+</Grid>
 
 @code {
+    [Inject] public ILogger<ListSchedules> _logger { get; set; } = default!;
+    [Inject] public IScheduleService _scheduleService { get; set; } = default!;
 
+    private IEnumerable<Schedule> schedules = default!;
+
+    private HashSet<Schedule> selectedSchedules = new();
+
+    private async Task<GridDataProviderResult<Schedule>> SchedulesDataProvider(GridDataProviderRequest<Schedule> request)
+    {
+        if (schedules is null)
+        {
+            schedules = await _scheduleService.GetSchedules() ?? Enumerable.Empty<Schedule>();
+        }
+
+        return await Task.FromResult(request.ApplyTo(schedules));
+    }
+
+    private Task OnSelectedItemsChanged(HashSet<Schedule> schedules)
+    {
+        selectedSchedules = schedules is not null && schedules.Any() ? schedules : new();
+        return Task.CompletedTask;
+    }
 }
