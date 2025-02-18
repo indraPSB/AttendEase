@@ -12,8 +12,8 @@ internal static class ScheduleEndpoint
         app.MapGet("api/schedules", GetSchedules)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
 
-        app.MapGet("api/schedules/{id:guid}", GetSchedule)
-            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
+        app.MapGet("api/schedules/user/{userId:guid}", GetSchedulesForUser)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business},{UserRole.Standard}" });
 
         return app;
     }
@@ -30,15 +30,15 @@ internal static class ScheduleEndpoint
         return Results.Ok(schedules);
     }
 
-    public static async Task<IResult> GetSchedule(Guid id, IScheduleService scheduleService, CancellationToken cancellationToken)
+    public static async Task<IResult> GetSchedulesForUser(Guid userId, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        Schedule? schedule = await scheduleService.GetSchedule(id, cancellationToken);
+        IEnumerable<Schedule>? schedules = await scheduleService.GetSchedules(userId, cancellationToken);
 
-        if (schedule is null)
+        if (schedules is null)
         {
             return Results.NotFound();
         }
 
-        return Results.Ok(schedule);
+        return Results.Ok(schedules);
     }
 }

@@ -22,13 +22,13 @@ internal class ScheduleService(ILogger<ScheduleService> logger, AttendEaseDbCont
         return ScheduleDBService.GetSchedules(_logger, _context, cancellationToken);
     }
 
-    public Task<Schedule?> GetSchedule(Guid id, CancellationToken cancellationToken = default)
+    public Task<IEnumerable<Schedule>?> GetSchedules(Guid id, CancellationToken cancellationToken = default)
     {
         if (cancellationToken == default)
         {
             cancellationToken = CancellationToken.None;
         }
 
-        return ScheduleDBService.GetSchedule(id, _logger, _context, cancellationToken);
+        return ScheduleDBService.GetSchedules(id, _logger, _context, cancellationToken);
     }
 }

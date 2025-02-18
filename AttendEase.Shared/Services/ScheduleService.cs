@@ -8,7 +8,7 @@ public interface IScheduleService
 {
     Task<IEnumerable<Schedule>?> GetSchedules(CancellationToken cancellationToken = default);
 
-    Task<Schedule?> GetSchedule(Guid id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Schedule>?> GetSchedules(Guid userId, CancellationToken cancellationToken = default);
 }
 
 public class ScheduleService(ILogger<ScheduleService> logger, HttpClient httpClient) : IScheduleService
@@ -51,7 +51,7 @@ public class ScheduleService(ILogger<ScheduleService> logger, HttpClient httpCli
         return null;
     }
 
-    public async Task<Schedule?> GetSchedule(Guid id, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Schedule>?> GetSchedules(Guid userId, CancellationToken cancellationToken = default)
     {
         if (cancellationToken == default)
         {
@@ -60,27 +60,27 @@ public class ScheduleService(ILogger<ScheduleService> logger, HttpClient httpCli
 
         try
         {
-            HttpResponseMessage response = await _httpClient.GetAsync($"/api/schedules/{id}");
+            HttpResponseMessage response = await _httpClient.GetAsync($"/api/schedules/user/{userId}");
 
             if (response.IsSuccessStatusCode)
             {
-                Schedule? schedule = await response.Content.ReadFromJsonAsync<Schedule>(cancellationToken);
+                IEnumerable<Schedule>? schedules = await response.Content.ReadFromJsonAsync<IEnumerable<Schedule>>(cancellationToken);
 
-                if (schedule is null)
+                if (schedules is null)
                 {
-                    _logger.LogWarning("No schedule found.");
+                    _logger.LogWarning("No schedules found for user.");
                 }
                 else
                 {
-                    _logger.LogInformation("Schedule retrieved successfully.");
+                    _logger.LogInformation("Schedules for user retrieved successfully.");
                 }
 
-                return schedule;
+                return schedules;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error in Shared GetSchedule with message, '{message}'.", ex.Message);
+            _logger.LogError(ex, "Error in Shared GetSchedules(Guid) with message, '{message}'.", ex.Message);
         }
 
         return null;

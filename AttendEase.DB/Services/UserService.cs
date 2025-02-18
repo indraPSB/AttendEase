@@ -16,6 +16,7 @@ internal static class UserService
 
         try
         {
+            // SELECT * FROM user;
             return await context.Users.ToListAsync(cancellationToken);
         }
         catch (Exception ex)
@@ -35,6 +36,7 @@ internal static class UserService
 
         try
         {
+            // SELECT * FROM user WHERE id = @id;
             return await context.Users.SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
         }
         catch (Exception ex)

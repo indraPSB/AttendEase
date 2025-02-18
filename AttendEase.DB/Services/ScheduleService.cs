@@ -16,6 +16,7 @@ internal static class ScheduleService
 
         try
         {
+            // SELECT * FROM schedule;
             return await context.Schedules.ToListAsync(cancellationToken);
         }
         catch (Exception ex)
@@ -26,7 +27,7 @@ internal static class ScheduleService
         return null;
     }
 
-    public static async Task<Schedule?> GetSchedule<T>(Guid id, ILogger<T> logger, AttendEaseDbContext context, CancellationToken cancellationToken = default)
+    public static async Task<IEnumerable<Schedule>?> GetSchedules<T>(Guid userId, ILogger<T> logger, AttendEaseDbContext context, CancellationToken cancellationToken = default)
     {
         if (cancellationToken == default)
         {
@@ -35,11 +36,17 @@ internal static class ScheduleService
 
         try
         {
-            return await context.Schedules.SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
+            // SELECT s.*
+            // FROM schedule s
+            // JOIN assignment a ON s.id = a.schedule_id
+            // WHERE a.user_id = @userId;
+            return await context.Schedules
+                .Where(s => s.Users.Any(u => u.Id == userId))
+                .ToListAsync(cancellationToken);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error in DB GetSchedule(Id) with message, '{message}'.", ex.Message);
+            logger.LogError(ex, "Error in DB GetSchedules(Guid) with message, '{message}'.", ex.Message);
         }
 
         return null;
