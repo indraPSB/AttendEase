@@ -1,9 +1,12 @@
 ﻿@page "/schedule"
+@using AttendEase.Shared.Components.Schedules
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Schedule</PageTitle>
 
 <h1>Schedule Management</h1>
+
+<ListSchedules />
 
 @code {
 
