@@ -264,6 +264,7 @@ app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapUserEndpoints();
+app.MapScheduleEndpoints();
 
 app.MapOpenApi();
 app.MapScalarApiReference();
