@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Net;
+using System.Net.Security;
 using System.Text;
 using AuthWebService = AttendEase.Web.Services.AuthService;
 using ScheduleWebService = AttendEase.Web.Services.ScheduleService;
@@ -226,6 +228,18 @@ builder.Services.AddRazorComponents()
 
 // Add device-specific services used by the AttendEase.Shared project
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
+
+// Configure certificate validation callback
+ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, errors) =>
+{
+    // For local development, allow all certificates.
+    if (builder.Environment.IsDevelopment())
+    {
+        return true;
+    }
+
+    return errors == SslPolicyErrors.None;
+};
 
 var app = builder.Build();
 
