@@ -210,6 +210,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
 });
 
 builder.Services.AddScoped<IAuthService, AuthWebService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IScheduleService, ScheduleWebService>();
 builder.Services.AddScoped<IUserService, UserWebService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AttendEaseAuthenticationStateProvider>();
