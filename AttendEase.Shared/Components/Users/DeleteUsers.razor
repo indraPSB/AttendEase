@@ -1,5 +1,66 @@
-﻿<h3>Delete Users</h3>
+﻿@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
+@using System.ComponentModel.DataAnnotations
+@inject IUserService UserService
+
+@if (Users is null)
+{
+    <Alert Color="AlertColor.Warning">
+        No users were found
+    </Alert>
+}
+else
+{
+    <span>The following users will be deleted:</span>
+    <ol>
+        @foreach (var user in Users)
+        {
+            <li>@user.Name</li>
+        }
+    </ol>
+
+    <Button Color="ButtonColor.Primary" @onclick="OnDelete">Delete</Button>
+}
 
 @code {
+    [Parameter] public EventCallback<DeleteUsersModel> DeletedUsers { get; set; }
+    [Parameter] public IEnumerable<User> Users { get; set; } = default!;
 
+    private DeleteUsersModel deleteUsersModel = new();
+    private string message = string.Empty;
+
+    private async Task OnDelete()
+    {
+        bool success = Users.Count() == 1
+            ? await UserService.DeleteUser(Users.First().Id)
+            : await UserService.DeleteUsers(Users.Select(u => u.Id));
+
+        if (success)
+        {
+            DeleteUsersModel usersModel = new()
+            {
+                Users = Users
+            };
+
+            await DeletedUsers.InvokeAsync(usersModel);
+        }
+        else
+        {
+            message = "Failed to delete users";
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Users is not null)
+        {
+            deleteUsersModel.Users = Users;
+        }
+    }
+
+    public class DeleteUsersModel
+    {
+        public IEnumerable<User> Users { get; set; } = default!;
+    }
 }
