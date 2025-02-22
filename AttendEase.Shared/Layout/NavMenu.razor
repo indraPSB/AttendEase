@@ -21,14 +21,32 @@
         <AuthorizeView Roles="Admin">
             <Authorized>
                 <div class="nav-item px-3">
-                    <NavLink class="ps-3 nav-link" href="user">
+                    <NavLink class="ps-3 nav-link" href="users">
                         <Icon Name="IconName.PeopleFill" Size="IconSize.x5" Class="pe-2" />User
                     </NavLink>
                 </div>
 
                 <div class="nav-item px-3">
-                    <NavLink class="ps-3 nav-link" href="schedule">
+                    <NavLink class="ps-3 nav-link" href="schedules">
                         <Icon Name="IconName.Calendar3" Size="IconSize.x5" Class="pe-2" />Schedule
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="ps-3 nav-link" href="assignments">
+                        <Icon Name="IconName.JournalText" Size="IconSize.x5" Class="pe-2" />Assignment
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="ps-3 nav-link" href="attendances">
+                        <Icon Name="IconName.ListTask" Size="IconSize.x5" Class="pe-2" />Attendance
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="ps-3 nav-link" href="contacts">
+                        <Icon Name="IconName.EnvelopeOpenFill" Size="IconSize.x5" Class="pe-2" />Contact
                     </NavLink>
                 </div>
             </Authorized>
@@ -42,6 +60,21 @@
                     </NavLink>
                 </div>
             </Authorized>
+        </AuthorizeView>
+
+        <AuthorizeView>
+            <NotAuthorized>
+                <div class="nav-item px-3">
+                    <NavLink class="ps-3 nav-link" href="" Match="NavLinkMatch.All">
+                        <Icon Name="IconName.HouseLockFill" Size="IconSize.x5" Class="pe-2" />Login
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="ps-3 nav-link" href="contact">
+                        <Icon Name="IconName.EnvelopeFill" Size="IconSize.x5" Class="pe-2" />Contact
+                    </NavLink>
+                </div>
+            </NotAuthorized>
         </AuthorizeView>
     </nav>
 </div>
