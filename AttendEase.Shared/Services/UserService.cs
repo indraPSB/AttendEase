@@ -93,4 +93,108 @@ public class UserService(ILogger<UserService> logger, HttpClient httpClient) : I
 
         return null;
     }
+
+    public async Task<bool> AddUser(User user, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/users", user, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("User added successfully.");
+
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Shared AddUser with message, '{message}'.", ex.Message);
+        }
+
+        return false;
+    }
+
+    public async Task<bool> UpdateUser(User user, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"/api/users/{user.Id}", user, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("User updated successfully.");
+
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Shared UpdateUser with message, '{message}'.", ex.Message);
+        }
+
+        return false;
+    }
+
+    public async Task<bool> DeleteUser(Guid id, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.DeleteAsync($"/api/users/{id}", cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("User deleted successfully.");
+
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Shared DeleteUser with message, '{message}'.", ex.Message);
+        }
+
+        return false;
+    }
+
+    public async Task<bool> DeleteUsers(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/users/delete", ids, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Users deleted successfully.");
+
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Shared DeleteUsers with message, '{message}'.", ex.Message);
+        }
+
+        return false;
+    }
 }
