@@ -6,6 +6,8 @@
     </div>
 
     <main>
+        <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" Delay="10000" StackLength="10" />
+
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
@@ -29,3 +31,7 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    List<ToastMessage> messages = new List<ToastMessage>();
+}
