@@ -24,3 +24,12 @@ GET {{AttendEase.Web_HostAddress}}/api/users/{{AttendEase.Api_UserId}}
 Authorization: {{AttendEase.Api_AuthorizationHeader}}
 
 ###
+
+GET {{AttendEase.Web_HostAddress}}/api/schedules
+Authorization: {{AttendEase.Api_AuthorizationHeader}}
+
+###
+
+@AttendEase.Api_SchedulesUserId = 0
+GET {{AttendEase.Web_HostAddress}}/api/schedules/user/{{AttendEase.Api_SchedulesUserId}}
+Authorization: {{AttendEase.Api_AuthorizationHeader}}
