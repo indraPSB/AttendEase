@@ -15,6 +15,18 @@ internal static class UserEndpoint
         app.MapGet("api/users/{id:guid}", GetUser)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
 
+        app.MapPost("api/users", AddUser)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
+
+        app.MapPut("api/users", UpdateUser)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
+
+        app.MapDelete("api/users/{id:guid}", DeleteUser)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
+
+        app.MapPost("api/users/delete", DeleteUsers)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
+
         return app;
     }
 
@@ -40,5 +52,45 @@ internal static class UserEndpoint
         }
 
         return Results.Ok(user);
+    }
+
+    public static async Task<IResult> AddUser(User user, IUserService userService, CancellationToken cancellationToken)
+    {
+        if (await userService.AddUser(user, cancellationToken))
+        {
+            return Results.Created($"/api/users/{user.Id}", user);
+        }
+
+        return Results.BadRequest();
+    }
+
+    public static async Task<IResult> UpdateUser(User user, IUserService userService, CancellationToken cancellationToken)
+    {
+        if (await userService.UpdateUser(user, cancellationToken))
+        {
+            return Results.Ok(user);
+        }
+
+        return Results.BadRequest();
+    }
+
+    public static async Task<IResult> DeleteUser(Guid id, IUserService userService, CancellationToken cancellationToken)
+    {
+        if (await userService.DeleteUser(id, cancellationToken))
+        {
+            return Results.NoContent();
+        }
+
+        return Results.BadRequest();
+    }
+
+    public static async Task<IResult> DeleteUsers(IEnumerable<Guid> ids, IUserService userService, CancellationToken cancellationToken)
+    {
+        if (await userService.DeleteUsers(ids, cancellationToken))
+        {
+            return Results.NoContent();
+        }
+
+        return Results.BadRequest();
     }
 }
