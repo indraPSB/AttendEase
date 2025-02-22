@@ -63,18 +63,27 @@
     </BodyTemplate>
 </Modal>
 
+<Modal @ref="editUserModal" title="Edit User" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
+    <BodyTemplate>
+        <EditUser />
+    </BodyTemplate>
+</Modal>
+
 @code {
     [Inject] ToastService ToastService { get; set; } = default!;
 
+    private HashSet<DBUser> selectedUsers = new();
     private ListUsers listUsers = default!;
     private Collapse userHelp = default!;
     private Modal addUserModal = default!;
+    private Modal editUserModal = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
     private int selectedUsersCount = 0;
 
     private void OnSelectedItemsChanged(HashSet<DBUser> selectedUsers)
     {
+        this.selectedUsers = selectedUsers;
         string countMessage = $"({selectedUsers.Count}{(selectedUsers.Count == 1 ? $" - {selectedUsers.First().Name}" : string.Empty)})";
         isEditDisabled = selectedUsers.Count != 1;
         isDeleteDisabled = selectedUsers.Count < 1;
@@ -99,11 +108,51 @@
         ToastService.Notify(message);
 
         await listUsers.RefreshUsers();
+
+        //await addUserModal.HideAsync();
     }
 
-    private void OnEditUser()
+    private async Task OnEditUser()
     {
+        if (selectedUsers.Count == 1)
+        {
+            DBUser user = selectedUsers.First();
+            Dictionary<string, object>? parameters = new()
+            {
+                { "User", user },
+                { "EditedUser", EventCallback.Factory.Create<EditUser.EditUserModel>(this, OnEditedUser) }
+            };
+            await editUserModal.ShowAsync<EditUser>($"Edit User '{user.Name}'", parameters: parameters);
+        }
+        else
+        {
+            ToastMessage message = new()
+            {
+                Type = ToastType.Warning,
+                Title = "Cannot Edit User",
+                HelpText = $"{DateTimeOffset.Now:G}",
+                AutoHide = true,
+                Message = "Exactly one user must be selected to be edited."
+            };
+            ToastService.Notify(message);
+        }
+    }
 
+    private async Task OnEditedUser(EditUser.EditUserModel user)
+    {
+        ToastMessage message = new()
+        {
+            Type = ToastType.Success,
+            Title = "User Edited",
+            HelpText = $"{DateTimeOffset.Now:G}",
+            AutoHide = true,
+            Message = $"User '{user.Name}' edited successfully."
+        };
+        ToastService.Notify(message);
+
+        await listUsers.RefreshUsers();
+
+        //await editUserModal.HideAsync();
     }
 
     private void OnDeleteUsers()
