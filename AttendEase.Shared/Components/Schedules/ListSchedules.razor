@@ -54,8 +54,7 @@
 </Grid>
 
 @code {
-    [Inject] public ILogger<ListSchedules> _logger { get; set; } = default!;
-    [Inject] public IScheduleService _scheduleService { get; set; } = default!;
+    [Inject] public IScheduleService ScheduleService { get; set; } = default!;
 
     private IEnumerable<Schedule> schedules = default!;
 
@@ -65,7 +64,7 @@
     {
         if (schedules is null)
         {
-            schedules = await _scheduleService.GetSchedules() ?? Enumerable.Empty<Schedule>();
+            schedules = await ScheduleService.GetSchedules() ?? Enumerable.Empty<Schedule>();
         }
 
         return await Task.FromResult(request.ApplyTo(schedules));

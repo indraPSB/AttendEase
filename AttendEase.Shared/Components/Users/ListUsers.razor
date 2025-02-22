@@ -30,8 +30,7 @@
 </Grid>
 
 @code {
-    [Inject] public ILogger<ListUsers> _logger { get; set; } = default!;
-    [Inject] public IUserService _userService { get; set; } = default!;
+    [Inject] public IUserService UserService { get; set; } = default!;
 
     private IEnumerable<User> users = default!;
 
@@ -41,7 +40,7 @@
     {
         if (users is null)
         {
-            users = await _userService.GetUsers() ?? Enumerable.Empty<User>();
+            users = await UserService.GetUsers() ?? Enumerable.Empty<User>();
         }
 
         return await Task.FromResult(request.ApplyTo(users));

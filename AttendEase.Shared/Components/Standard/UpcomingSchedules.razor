@@ -27,18 +27,18 @@
 </div>
 
 @code {
-    [Inject] public IAuthService _authService { get; set; } = default!;
-    [Inject] public IScheduleService _scheduleService { get; set; } = default!;
+    [Inject] public IAuthService AuthService { get; set; } = default!;
+    [Inject] public IScheduleService ScheduleService { get; set; } = default!;
 
     private IEnumerable<Schedule>? schedules = default!;
 
     override protected async Task OnInitializedAsync()
     {
-        User? user = await _authService.GetUser();
+        User? user = await AuthService.GetUser();
 
         if (user is not null)
         {
-            schedules = await _scheduleService.GetSchedules(user.Id);
+            schedules = await ScheduleService.GetSchedules(user.Id);
         }
     }
 }
