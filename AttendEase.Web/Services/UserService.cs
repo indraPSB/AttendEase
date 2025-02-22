@@ -29,4 +29,44 @@ internal class UserService(ILogger<UserService> logger, AttendEaseDbContext cont
 
         return UserDBService.GetUser(id, _logger, _context, cancellationToken);
     }
+
+    public Task<bool> AddUser(User user, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        return UserDBService.AddUser(user, _logger, _context, cancellationToken);
+    }
+
+    public Task<bool> UpdateUser(User user, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        return UserDBService.UpdateUser(user, _logger, _context, cancellationToken);
+    }
+
+    public Task<bool> DeleteUser(Guid id, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        return UserDBService.DeleteUser(id, _logger, _context, cancellationToken);
+    }
+
+    public Task<bool> DeleteUsers(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        return UserDBService.DeleteUsers(ids, _logger, _context, cancellationToken);
+    }
 }
