@@ -9,6 +9,14 @@ public interface IUserService
     Task<IEnumerable<User>?> GetUsers(CancellationToken cancellationToken = default);
 
     Task<User?> GetUser(Guid id, CancellationToken cancellationToken = default);
+
+    Task<bool> AddUser(User user, CancellationToken cancellationToken = default);
+
+    Task<bool> UpdateUser(User user, CancellationToken cancellationToken = default);
+
+    Task<bool> DeleteUser(Guid id, CancellationToken cancellationToken = default);
+
+    Task<bool> DeleteUsers(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
 }
 
 public class UserService(ILogger<UserService> logger, HttpClient httpClient) : IUserService
