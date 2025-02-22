@@ -1,16 +1,19 @@
 ﻿@using AttendEase.DB.Models
 @using Microsoft.Extensions.Logging
 
-<Grid TItem="User"
+<Grid TItem="User" @ref="grid"
       Class="table table-hover table-bordered table-striped"
       DataProvider="UsersDataProvider"
       AllowFiltering="true"
       AllowPaging="true"
-      PageSize="@pageSize"
+      PageSizeSelectorItems="@([10, 25, 50, 100])"
+      PageSizeSelectorVisible="true"
+      ItemsPerPageText="Users per page"
       AllowSorting="true"
       AllowSelection="true"
       SelectionMode="GridSelectionMode.Multiple"
       SelectedItemsChanged="OnSelectedItemsChanged"
+      EmptyText="No users to display"
       Responsive="true">
 
     <GridColumns>
@@ -29,24 +32,14 @@
     </GridColumns>
 </Grid>
 
-<div class="form-floating mb-3" style="width: 9rem;">
-    <select class="form-select" id="list-users-page-size" @bind=@pageSize>
-        <option value="10" selected>10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-    </select>
-    <label for="list-users-page-size">Users Per Page</label>
-</div>
-
 @code {
     [Inject] public IUserService UserService { get; set; } = default!;
 
     [Parameter] public EventCallback<HashSet<User>> SelectedUsersChanged { get; set; }
 
+    private Grid<User> grid = default!;
     private IEnumerable<User> users = default!;
     private HashSet<User> selectedUsers = new();
-    private int pageSize = 10;
 
     private async Task<GridDataProviderResult<User>> UsersDataProvider(GridDataProviderRequest<User> request)
     {
