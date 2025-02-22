@@ -6,7 +6,7 @@
       DataProvider="UsersDataProvider"
       AllowFiltering="true"
       AllowPaging="true"
-      PageSize="10"
+      PageSize="@pageSize"
       AllowSorting="true"
       AllowSelection="true"
       SelectionMode="GridSelectionMode.Multiple"
@@ -29,6 +29,16 @@
     </GridColumns>
 </Grid>
 
+<div class="form-floating mb-3" style="width: 12rem;">
+    <select class="form-select" id="list-users-page-size" @bind=@pageSize>
+        <option value="10" selected>10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+    </select>
+    <label for="list-users-page-size">Users Per Page</label>
+</div>
+
 @code {
     [Inject] public IUserService UserService { get; set; } = default!;
 
@@ -36,6 +46,7 @@
 
     private IEnumerable<User> users = default!;
     private HashSet<User> selectedUsers = new();
+    private int pageSize = 10;
 
     private async Task<GridDataProviderResult<User>> UsersDataProvider(GridDataProviderRequest<User> request)
     {
