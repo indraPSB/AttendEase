@@ -69,6 +69,12 @@
     </BodyTemplate>
 </Modal>
 
+<Modal @ref="deleteUserModal" title="Delete Users" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
+    <BodyTemplate>
+        <DeleteUsers />
+    </BodyTemplate>
+</Modal>
+
 @code {
     [Inject] ToastService ToastService { get; set; } = default!;
 
@@ -77,6 +83,7 @@
     private Collapse userHelp = default!;
     private Modal addUserModal = default!;
     private Modal editUserModal = default!;
+    private Modal deleteUserModal = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
     private int selectedUsersCount = 0;
@@ -155,9 +162,49 @@
         //await editUserModal.HideAsync();
     }
 
-    private void OnDeleteUsers()
+    private async Task OnDeleteUsers()
     {
+        if (selectedUsers.Count > 0)
+        {
+            Dictionary<string, object>? parameters = new()
+            {
+                { "Users", selectedUsers },
+                { "DeletedUsers", EventCallback.Factory.Create<DeleteUsers.DeleteUsersModel>(this, OnDeletedUsers) }
+            };
+            await deleteUserModal.ShowAsync<DeleteUsers>("Delete Users", parameters: parameters);
+        }
+        else
+        {
+            ToastMessage message = new()
+            {
+                Type = ToastType.Warning,
+                Title = "Cannot Edit User",
+                HelpText = $"{DateTimeOffset.Now:G}",
+                AutoHide = true,
+                Message = "Exactly one user must be selected to be edited."
+            };
+            ToastService.Notify(message);
+        }
+    }
 
+    private async Task OnDeletedUsers(DeleteUsers.DeleteUsersModel users)
+    {
+        int count = users.Users.Count();
+        ToastMessage message = new()
+        {
+            Type = ToastType.Success,
+            Title = "User Edited",
+            HelpText = $"{DateTimeOffset.Now:G}",
+            AutoHide = true,
+            Message = count == 1
+                ? $"User '{users.Users.First().Name}' deleted successfully."
+                : $"'{count}' user{(count == 1 ? " " : "s ")}deleted successfully."
+        };
+        ToastService.Notify(message);
+
+        await listUsers.RefreshUsers();
+
+        //await deleteUserModal.HideAsync();
     }
 
     private async Task OnHiding()
