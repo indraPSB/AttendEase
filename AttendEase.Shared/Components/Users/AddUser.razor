@@ -1,5 +1,96 @@
-﻿<h3>Add User</h3>
+﻿@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
+@using System.ComponentModel.DataAnnotations
+@inject IUserService UserService
+
+<EditForm EditContext="@editContext" OnValidSubmit="HandleOnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-floating mb-3">
+        <InputText id="add-user-name" type="text" class="form-control" placeholder="Name" @bind-Value="@addUserModel.Name" />
+        <label for="add-user-name">Name</label>
+    </div>
+
+    <div class="form-floating mb-3">
+        <InputText id="add-user-email" type="email" class="form-control" placeholder="E-Mail" @bind-Value="@addUserModel.Email" />
+        <label for="add-user-email">E-Mail</label>
+    </div>
+
+    <div class="form-floating mb-3">
+        <InputSelect class="form-select" id="add-user-role" @bind-Value="@addUserModel.Role">
+            <option value="@UserRole.Admin">Admin</option>
+            <option value="@UserRole.Business">Business</option>
+            <option value="@UserRole.Standard" selected>Standard</option>
+        </InputSelect>
+        <label for="list-users-page-size">Role</label>
+    </div>
+
+    <ValidationMessage For="@(() => addUserModel.Name)" class="validation-message mt-3" />
+    <ValidationMessage For="@(() => addUserModel.Email)" />
+    <ValidationMessage For="@(() => addUserModel.Role)" />
+    @((MarkupString)message)
+
+    <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Add</Button>
+    <Button Type="ButtonType.Reset" Color="ButtonColor.Secondary" Class="mt-3" @onclick="Clear">Clear</Button>
+</EditForm>
 
 @code {
+    [Parameter] public EventCallback<AddUserModel> AddedUser { get; set; }
 
+    private AddUserModel addUserModel = new();
+    private EditContext? editContext;
+    private string message = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Clear();
+    }
+
+    private void Clear()
+    {
+        addUserModel = new();
+        editContext = new EditContext(addUserModel);
+    }
+
+    public async Task HandleOnValidSubmit()
+    {
+        if (editContext?.Validate() ?? false)
+        {
+            User user = new()
+            {
+                Name = addUserModel.Name!,
+                Email = addUserModel.Email!,
+                Role = addUserModel.Role!
+            };
+            bool success = await UserService.AddUser(user);
+
+            if (success)
+            {
+                await AddedUser.InvokeAsync(addUserModel);
+            }
+            else
+            {
+                message = "<div class='validation-message'>Unable to add user.</div>";
+            }
+        }
+        else
+        {
+            message = "<div class='validation-message'>Unable to validate form.</div>";
+        }
+
+        StateHasChanged();
+    }
+
+    public class AddUserModel
+    {
+        [Required(ErrorMessage = "'Name' is required.")]
+        public string? Name { get; set; }
+
+        [Required(ErrorMessage = "'Email' is required.")]
+        public string? Email { get; set; }
+
+        [Required(ErrorMessage = "'Role' is required.")]
+        public string? Role { get; set; } = UserRole.Standard;
+    }
 }
