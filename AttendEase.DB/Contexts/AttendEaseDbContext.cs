@@ -18,6 +18,8 @@ internal partial class AttendEaseDbContext : DbContext
 
     public virtual DbSet<Attendance> Attendances { get; set; }
 
+    public virtual DbSet<Contact> Contacts { get; set; }
+
     public virtual DbSet<Schedule> Schedules { get; set; }
 
     public virtual DbSet<SpecialDay> SpecialDays { get; set; }
@@ -54,6 +56,22 @@ internal partial class AttendEaseDbContext : DbContext
                 .HasConstraintName("attendance_user_id_fkey");
         });
 
+        modelBuilder.Entity<Contact>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("contact_pkey");
+
+            entity.ToTable("contact");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.MessageSystem).HasColumnName("message_system");
+            entity.Property(e => e.MessageUser).HasColumnName("message_user");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.Subject).HasColumnName("subject");
+            entity.Property(e => e.Timestamp).HasColumnName("timestamp");
+        });
+
         modelBuilder.Entity<Schedule>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("schedule_pkey");
@@ -75,6 +93,7 @@ internal partial class AttendEaseDbContext : DbContext
             entity.Property(e => e.Longitude)
                 .HasPrecision(11, 8)
                 .HasColumnName("longitude");
+            entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Repeat).HasColumnName("repeat");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.StartTime).HasColumnName("start_time");
