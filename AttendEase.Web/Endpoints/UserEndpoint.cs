@@ -84,7 +84,7 @@ internal static class UserEndpoint
         return Results.BadRequest();
     }
 
-    public static async Task<IResult> DeleteUsers(IEnumerable<Guid> ids, IUserService userService, CancellationToken cancellationToken)
+    public static async Task<IResult> DeleteUsers(List<Guid> ids, IUserService userService, CancellationToken cancellationToken)
     {
         if (await userService.DeleteUsers(ids, cancellationToken))
         {
