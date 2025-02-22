@@ -7,8 +7,8 @@
 
 <h1>User Management</h1>
 
-<Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await addInfo.ToggleAsync())"><Icon Name="IconName.PatchQuestion" Size="IconSize.x5" /></Button>
-<Collapse @ref="addInfo">
+<Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await userHelp.ToggleAsync())"><Icon Name="IconName.PatchQuestion" Size="IconSize.x5" /></Button>
+<Collapse @ref="userHelp">
     <Callout Heading="Help">
         <Accordion>
             <AccordionItem Title="How to add users" Name="AccordionItem1">
@@ -55,10 +55,20 @@
     </Button>
 </div>
 
-<ListUsers SelectedUsersChanged="OnSelectedItemsChanged" />
+<ListUsers @ref="listUsers" SelectedUsersChanged="OnSelectedItemsChanged" />
+
+<Modal @ref="addUserModal" title="Add New User" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
+    <BodyTemplate>
+        <AddUser AddedUser="OnAddedUser" />
+    </BodyTemplate>
+</Modal>
 
 @code {
-    private Collapse addInfo = default!;
+    [Inject] ToastService ToastService { get; set; } = default!;
+
+    private ListUsers listUsers = default!;
+    private Collapse userHelp = default!;
+    private Modal addUserModal = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
     private int selectedUsersCount = 0;
@@ -71,9 +81,24 @@
         selectedUsersCount = selectedUsers.Count;
     }
 
-    private void OnAddUser()
+    private async Task OnAddUser()
     {
+        await addUserModal.ShowAsync();
+    }
 
+    private async Task OnAddedUser(AddUser.AddUserModel user)
+    {
+        ToastMessage message = new()
+        {
+            Type = ToastType.Success,
+            Title = "User Added",
+            HelpText = $"{DateTimeOffset.Now:G}",
+            AutoHide = true,
+            Message = $"User '{user.Name}' added successfully."
+        };
+        ToastService.Notify(message);
+
+        await listUsers.RefreshUsers();
     }
 
     private void OnEditUser()
@@ -84,5 +109,10 @@
     private void OnDeleteUsers()
     {
 
+    }
+
+    private async Task OnHiding()
+    {
+        await listUsers.RefreshUsers();
     }
 }

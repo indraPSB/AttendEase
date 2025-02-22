@@ -41,6 +41,12 @@
     private IEnumerable<User> users = default!;
     private HashSet<User> selectedUsers = new();
 
+    public async Task RefreshUsers()
+    {
+        await grid.RefreshDataAsync();
+        StateHasChanged();
+    }
+
     private async Task<GridDataProviderResult<User>> UsersDataProvider(GridDataProviderRequest<User> request)
     {
         if (users is null)
