@@ -32,8 +32,9 @@
 @code {
     [Inject] public IUserService UserService { get; set; } = default!;
 
-    private IEnumerable<User> users = default!;
+    [Parameter] public EventCallback<HashSet<User>> SelectedUsersChanged { get; set; }
 
+    private IEnumerable<User> users = default!;
     private HashSet<User> selectedUsers = new();
 
     private async Task<GridDataProviderResult<User>> UsersDataProvider(GridDataProviderRequest<User> request)
@@ -46,9 +47,10 @@
         return await Task.FromResult(request.ApplyTo(users));
     }
 
-    private Task OnSelectedItemsChanged(HashSet<User> users)
+    private async Task OnSelectedItemsChanged(HashSet<User> users)
     {
         selectedUsers = users is not null && users.Any() ? users : new();
-        return Task.CompletedTask;
+
+        await SelectedUsersChanged.InvokeAsync(selectedUsers);
     }
 }
