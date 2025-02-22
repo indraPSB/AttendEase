@@ -1,13 +1,51 @@
 ﻿@page "/user"
 @using AttendEase.Shared.Components.Users
+@using DBUser = AttendEase.DB.Models.User
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>User</PageTitle>
 
 <h1>User Management</h1>
 
-<ListUsers />
+<div class="my-2">
+    <Button Class="me-1 my-1" Color="ButtonColor.Primary" @onclick="OnAddUser">Add User</Button>
+    <Button Class="me-1 my-1" Color="ButtonColor.Primary" @onclick="OnEditUser" Disabled="isEditDisabled">
+        Edit User
+        <Badge Color="@(isEditDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedUsersCount</Badge>
+    </Button>
+    <Button Class="me-0 my-1" Color="ButtonColor.Primary" @onclick="OnDeleteUsers" Disabled="isDeleteDisabled">
+        Delete User
+        <Badge Color="@(isDeleteDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedUsersCount</Badge>
+    </Button>
+</div>
+
+<ListUsers SelectedUsersChanged="OnSelectedItemsChanged" />
 
 @code {
+    private bool isEditDisabled = true;
+    private bool isDeleteDisabled = true;
+    private int selectedUsersCount = 0;
 
+    private void OnSelectedItemsChanged(HashSet<DBUser> selectedUsers)
+    {
+        string countMessage = $"({selectedUsers.Count}{(selectedUsers.Count == 1 ? $" - {selectedUsers.First().Name}" : string.Empty)})";
+        isEditDisabled = selectedUsers.Count != 1;
+        isDeleteDisabled = selectedUsers.Count < 1;
+        selectedUsersCount = selectedUsers.Count;
+    }
+
+    private void OnAddUser()
+    {
+
+    }
+
+    private void OnEditUser()
+    {
+
+    }
+
+    private void OnDeleteUsers()
+    {
+
+    }
 }
