@@ -31,7 +31,7 @@ internal class UserService(ILogger<UserService> logger, AttendEaseDbContext cont
         return UserDBService.GetUser(id, _logger, _context, cancellationToken);
     }
 
-    public Task<bool> AddUser(User user, CancellationToken cancellationToken = default)
+    public async Task<bool> AddUser(User user, CancellationToken cancellationToken = default)
     {
         if (cancellationToken == default)
         {
@@ -41,7 +41,14 @@ internal class UserService(ILogger<UserService> logger, AttendEaseDbContext cont
         user.Id = Guid.CreateVersion7();
         user.Password = new Faker().Internet.Password();
 
-        return UserDBService.AddUser(user, _logger, _context, cancellationToken);
+        bool result = await UserDBService.AddUser(user, _logger, _context, cancellationToken);
+
+        if (result)
+        {
+            // Send email to user
+        }
+
+        return result;
     }
 
     public Task<bool> UpdateUser(User user, CancellationToken cancellationToken = default)
