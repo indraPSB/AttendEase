@@ -65,6 +65,7 @@ internal partial class AttendEaseDbContext : DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
+            entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.MessageSystem).HasColumnName("message_system");
             entity.Property(e => e.MessageUser).HasColumnName("message_user");
             entity.Property(e => e.Status).HasColumnName("status");

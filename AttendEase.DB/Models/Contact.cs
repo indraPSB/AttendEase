@@ -9,9 +9,11 @@ public partial class Contact
 
     public DateTimeOffset Timestamp { get; set; }
 
+    public string Email { get; set; } = null!;
+
     public string Subject { get; set; } = null!;
 
-    public string MessageUser { get; set; } = null!;
+    public string? MessageUser { get; set; }
 
     public string? MessageSystem { get; set; }
 
