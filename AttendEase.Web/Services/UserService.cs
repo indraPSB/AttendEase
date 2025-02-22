@@ -1,6 +1,7 @@
 ﻿using AttendEase.DB.Contexts;
 using AttendEase.DB.Models;
 using AttendEase.Shared.Services;
+using Bogus;
 using UserDBService = AttendEase.DB.Services.UserService;
 
 namespace AttendEase.Web.Services;
@@ -36,6 +37,9 @@ internal class UserService(ILogger<UserService> logger, AttendEaseDbContext cont
         {
             cancellationToken = CancellationToken.None;
         }
+
+        user.Id = Guid.CreateVersion7();
+        user.Password = new Faker().Internet.Password();
 
         return UserDBService.AddUser(user, _logger, _context, cancellationToken);
     }
