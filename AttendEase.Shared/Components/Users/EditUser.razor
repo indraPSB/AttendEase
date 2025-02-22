@@ -1,5 +1,120 @@
-﻿<h3>Edit User</h3>
+﻿@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
+@using System.ComponentModel.DataAnnotations
+@inject IUserService UserService
+
+@if (User is null)
+{
+    <Alert Color="AlertColor.Warning">
+        No user was found
+    </Alert>
+}
+else
+{
+    <EditForm EditContext="@editContext" OnValidSubmit="HandleOnValidSubmit">
+        <DataAnnotationsValidator />
+
+        <div class="form-floating mb-3">
+            <InputText id="add-user-name" type="text" class="form-control" placeholder="Name" @bind-Value="@editUserModel.Name" />
+            <label for="add-user-name">Name</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputText id="add-user-email" type="email" class="form-control" placeholder="E-Mail" @bind-Value="@editUserModel.Email" />
+            <label for="add-user-email">E-Mail</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputSelect class="form-select" id="add-user-role" @bind-Value="@editUserModel.Role">
+                <option value="@UserRole.Admin">Admin</option>
+                <option value="@UserRole.Business">Business</option>
+                <option value="@UserRole.Standard">Standard</option>
+            </InputSelect>
+            <label for="list-users-page-size">Role</label>
+        </div>
+
+        <ValidationMessage For="@(() => editUserModel.Name)" class="validation-message mt-3" />
+        <ValidationMessage For="@(() => editUserModel.Email)" />
+        <ValidationMessage For="@(() => editUserModel.Role)" />
+        @((MarkupString)message)
+
+        <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Edit</Button>
+        <Button Type="ButtonType.Reset" Color="ButtonColor.Secondary" Class="mt-3" @onclick="Reset">Reset</Button>
+    </EditForm>
+}
 
 @code {
+    [Parameter] public EventCallback<EditUserModel> EditedUser { get; set; }
+    [Parameter] public User User { get; set; } = default!;
 
+    private EditUserModel editUserModel = new();
+    private EditContext? editContext;
+    private string message = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Reset();
+    }
+
+    private void Reset()
+    {
+        editUserModel = new()
+        {
+            Name = User.Name,
+            Email = User.Email,
+            Role = User.Role
+        };
+        editContext = new EditContext(editUserModel);
+    }
+
+    public async Task HandleOnValidSubmit()
+    {
+        if (editContext?.Validate() ?? false)
+        {
+            User.Name = editUserModel.Name!;
+            User.Email = editUserModel.Email!;
+            User.Role = editUserModel.Role!;
+
+            bool success = await UserService.UpdateUser(User);
+
+            if (success)
+            {
+                await EditedUser.InvokeAsync(editUserModel);
+            }
+            else
+            {
+                message = "<div class='validation-message'>Unable to edit user.</div>";
+            }
+        }
+        else
+        {
+            message = "<div class='validation-message'>Unable to validate form.</div>";
+        }
+
+        StateHasChanged();
+    }
+
+    override protected void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (User is not null)
+        {
+            editUserModel.Name = User.Name;
+            editUserModel.Email = User.Email;
+            editUserModel.Role = User.Role;
+        }
+    }
+
+    public class EditUserModel
+    {
+        [Required(ErrorMessage = "'Name' is required.")]
+        public string? Name { get; set; }
+
+        [Required(ErrorMessage = "'Email' is required.")]
+        public string? Email { get; set; }
+
+        [Required(ErrorMessage = "'Role' is required.")]
+        public string? Role { get; set; } = UserRole.Standard;
+    }
 }

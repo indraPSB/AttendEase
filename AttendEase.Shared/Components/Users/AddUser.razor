@@ -20,7 +20,7 @@
         <InputSelect class="form-select" id="add-user-role" @bind-Value="@addUserModel.Role">
             <option value="@UserRole.Admin">Admin</option>
             <option value="@UserRole.Business">Business</option>
-            <option value="@UserRole.Standard" selected>Standard</option>
+            <option value="@UserRole.Standard">Standard</option>
         </InputSelect>
         <label for="list-users-page-size">Role</label>
     </div>
@@ -31,7 +31,7 @@
     @((MarkupString)message)
 
     <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Add</Button>
-    <Button Type="ButtonType.Reset" Color="ButtonColor.Secondary" Class="mt-3" @onclick="Clear">Clear</Button>
+    <Button Type="ButtonType.Reset" Color="ButtonColor.Secondary" Class="mt-3" @onclick="Reset">Reset</Button>
 </EditForm>
 
 @code {
@@ -44,10 +44,10 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Clear();
+        Reset();
     }
 
-    private void Clear()
+    private void Reset()
     {
         addUserModel = new();
         editContext = new EditContext(addUserModel);
@@ -63,6 +63,7 @@
                 Email = addUserModel.Email!,
                 Role = addUserModel.Role!
             };
+
             bool success = await UserService.AddUser(user);
 
             if (success)
