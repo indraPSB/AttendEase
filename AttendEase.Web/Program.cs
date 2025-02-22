@@ -105,6 +105,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
                 .RuleFor(s => s.Id, f => GenerateGuidV7(f.Random.Guid()));
 
             List<Schedule> schedules = userSchedule.Generate(2);
+            schedules[0].Name = "Normal Ops";
             schedules[0].StartDate = null;
             schedules[0].EndDate = null;
             schedules[0].StartTime = new TimeOnly(9, 0, 0);
@@ -116,6 +117,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
             schedules[0].AttendanceStartBefore = 15;
             schedules[0].AbsentAfter = 15;
             schedules[0].Repeat = true;
+            schedules[1].Name = "Feb Special Proj";
             schedules[1].StartDate = new DateOnly(2025, 2, 1);
             schedules[1].EndDate = new DateOnly(2025, 2, 28);
             schedules[1].StartTime = new TimeOnly(9, 0, 0);
