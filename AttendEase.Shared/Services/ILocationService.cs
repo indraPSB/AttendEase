@@ -35,7 +35,7 @@ public interface ILocationService
         // https://en.wikipedia.org/wiki/Haversine_formula
         // The haversine formula determines the great-circle distance between two points on a sphere given their longitudes and latitudes.
 
-        // φ1,φ2
+        // φ1, φ2
         // λ1, λ2
         (double phi1, double phi2) = (latitude1, latitude2);
         (double lambda1, double lambda2) = (longitude1, longitude2);
