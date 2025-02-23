@@ -6,11 +6,18 @@
 
 <h1>Attendance Dashboard</h1>
 
-<hr />
-
-<h2>Upcoming Schedules</h2>
-
-<UpcomingSchedules />
+<Tabs>
+    <Tab Title="Upcoming Schedules" Active="true">
+        <Content>
+            <br />
+            <UpcomingSchedules />
+        </Content>
+    </Tab>
+    <Tab Title="Past Schedules">
+        <Content>
+        </Content>
+    </Tab>
+</Tabs>
 
 @code {
 
