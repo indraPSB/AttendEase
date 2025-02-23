@@ -51,7 +51,6 @@
     {
         <em>No upcoming schedules.</em>
     }
-
 </div>
 
 @code {
@@ -94,11 +93,11 @@
                 }
 
                 UpcomingSchedulesModel upcomingSchedulesModel = new UpcomingSchedulesModel
-                    {
-                        Schedule = schedule,
-                        IsLocationServiceAvailable = isLocationServiceAvailable,
-                        IsWithinPremise = isWithinPremises
-                    };
+                {
+                    Schedule = schedule,
+                    IsLocationServiceAvailable = isLocationServiceAvailable,
+                    IsWithinPremise = isWithinPremises
+                };
 
                 scheduleModels.Add(upcomingSchedulesModel);
             }
