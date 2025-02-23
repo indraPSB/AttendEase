@@ -38,8 +38,10 @@ else
         <ValidationMessage For="@(() => editUserModel.Role)" />
         @((MarkupString)message)
 
-        <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Edit</Button>
-        <Button Type="ButtonType.Reset" Color="ButtonColor.Secondary" Class="mt-3" @onclick="Reset">Reset</Button>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Edit</Button>
+            <Button Type="ButtonType.Reset" Color="ButtonColor.Secondary" Class="mt-3" @onclick="Reset">Reset</Button>
+        </div>
     </EditForm>
 }
 

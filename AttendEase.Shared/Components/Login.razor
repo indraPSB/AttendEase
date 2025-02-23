@@ -22,7 +22,9 @@
     <ValidationMessage For="@(() => login.Password)" />
     @((MarkupString)message)
 
-    <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Login</Button>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Login</Button>
+    </div>
 </EditForm>
 
 @code {
