@@ -4,6 +4,7 @@
 @using System.ComponentModel.DataAnnotations
 @inject IAuthService AuthService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 <EditForm EditContext="@editContext" OnValidSubmit="HandleOnValidSubmit">
     <DataAnnotationsValidator />
@@ -47,6 +48,8 @@
             if (success && AuthenticationStateProvider is AttendEaseAuthenticationStateProvider attendEaseAuthenticationStateProvider)
             {
                 attendEaseAuthenticationStateProvider.NotifyAuthenticationStateChanged();
+
+                NavigationManager.NavigateTo("/");
             }
             else
             {
