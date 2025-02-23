@@ -321,7 +321,10 @@ app.MapUserEndpoints();
 app.MapScheduleEndpoints();
 
 app.MapOpenApi();
-app.MapScalarApiReference();
+app.MapScalarApiReference("scalar", options =>
+{
+    options.WithTitle("AttendEase API Reference");
+});
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
