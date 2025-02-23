@@ -113,7 +113,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
             schedules[0].DaysOfWeek = DaysOfWeek.Weekdays.ToString();
             schedules[0].Latitude = 1.2912078M;
             schedules[0].Longitude = 103.8575408M;
-            schedules[0].LocationTolerance = 30F;
+            schedules[0].LocationTolerance = 50F;
             schedules[0].AttendanceStartBefore = 15;
             schedules[0].AbsentAfter = 15;
             schedules[0].Repeat = true;
@@ -123,9 +123,9 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
             schedules[1].StartTime = new TimeOnly(9, 0, 0);
             schedules[1].EndTime = new TimeOnly(13, 0, 0);
             schedules[1].DaysOfWeek = DaysOfWeek.Weekends.ToString();
-            schedules[1].Latitude = 1.2912078M;
-            schedules[1].Longitude = 103.8575408M;
-            schedules[1].LocationTolerance = 30F;
+            schedules[1].Latitude = null;
+            schedules[1].Longitude = null;
+            schedules[1].LocationTolerance = null;
             schedules[1].AttendanceStartBefore = 15;
             schedules[1].AbsentAfter = 30;
             schedules[1].Repeat = false;
@@ -204,7 +204,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
                 .UseSeed(Seed)
                 .RuleFor(c => c.Id, f => f.Random.Guid())
                 .RuleFor(c => c.Email, f => f.Person.Email)
-                .RuleFor(c => c.Subject, f => f.PickRandom("Others"))
+                .RuleFor(c => c.Subject, f => f.PickRandom("General Feedback", "Others"))
                 .RuleFor(c => c.MessageUser, f => null)
                 .RuleFor(c => c.MessageSystem, f => f.Lorem.Paragraph())
                 .RuleFor(c => c.Status, f => f.PickRandom("Open", "Close"))
