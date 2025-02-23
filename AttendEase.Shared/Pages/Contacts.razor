@@ -3,8 +3,26 @@
 
 <PageTitle>Contacts</PageTitle>
 
-<h1>Contact Management</h1>
+<div class="header-help">
+    <h1>Contact Management</h1>
+
+    <Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await contactsHelp.ToggleAsync())"><Icon Name="IconName.PatchQuestionFill" Size="IconSize.x5" /></Button>
+</div>
+
+<Collapse @ref="contactsHelp">
+    <Callout Heading="Contact Management Help">
+        <Accordion>
+            <AccordionItem Title="Help coming soon...">
+                <Content>
+                    <ol>
+                        <li>Help coming soon...</li>
+                    </ol>
+                </Content>
+            </AccordionItem>
+        </Accordion>
+    </Callout>
+</Collapse>
 
 @code {
-
+    private Collapse contactsHelp = default!;
 }

@@ -4,7 +4,25 @@
 
 <PageTitle>Attendance</PageTitle>
 
-<h1>Attendance Dashboard</h1>
+<div class="header-help">
+    <h1>Attendance Dashboard</h1>
+
+    <Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await attendanceHelp.ToggleAsync())"><Icon Name="IconName.PatchQuestionFill" Size="IconSize.x5" /></Button>
+</div>
+
+<Collapse @ref="attendanceHelp">
+    <Callout Heading="Attendance Dashboard Help">
+        <Accordion>
+            <AccordionItem Title="Help coming soon...">
+                <Content>
+                    <ol>
+                        <li>Help coming soon...</li>
+                    </ol>
+                </Content>
+            </AccordionItem>
+        </Accordion>
+    </Callout>
+</Collapse>
 
 <Tabs EnableFadeEffect="true">
     <Tab Title="Upcoming Schedules" Active="true">
@@ -22,5 +40,5 @@
 </Tabs>
 
 @code {
-
+    private Collapse attendanceHelp = default!;
 }

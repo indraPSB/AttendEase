@@ -5,37 +5,41 @@
 
 <PageTitle>Users</PageTitle>
 
-<h1>User Management</h1>
+<div class="header-help">
+    <h1>User Management</h1>
 
-<Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await userHelp.ToggleAsync())"><Icon Name="IconName.PatchQuestion" Size="IconSize.x5" /></Button>
-<Collapse @ref="userHelp">
-    <Callout Heading="Help">
+    <Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await usersHelp.ToggleAsync())"><Icon Name="IconName.PatchQuestionFill" Size="IconSize.x5" /></Button>
+</div>
+
+<Collapse @ref="usersHelp">
+    <Callout Heading="User Management Help">
         <Accordion>
-            <AccordionItem Title="How to add users" Name="AccordionItem1">
+            <AccordionItem Title="How to add users">
                 <Content>
                     <ol>
                         <li>Click on the "Add User" button.</li>
                         <li>Fill in the user's details.</li>
-                        <li>Click on the "Save" button.</li>
+                        <li>Click on the "Add" button.</li>
                     </ol>
                 </Content>
             </AccordionItem>
-            <AccordionItem Title="How to edit users" Name="AccordionItem2">
+            <AccordionItem Title="How to edit users">
                 <Content>
                     <ol>
                         <li>Select a user from the list.</li>
                         <li>Click on the "Edit User" button.</li>
                         <li>Update the user's details.</li>
-                        <li>Click on the "Save" button.</li>
+                        <li>Click on the "Edit" button.</li>
                     </ol>
                 </Content>
             </AccordionItem>
-            <AccordionItem Title="How to delete users" Name="AccordionItem3">
+            <AccordionItem Title="How to delete users">
                 <Content>
                     <ol>
                         <li>Select one or more users from the list.</li>
                         <li>Click on the "Delete User" button.</li>
-                        <li>Confirm the deletion.</li>
+                        <li>Confirm the list of users.</li>
+                        <li>Click on the "Delete" button.</li>
                     </ol>
                 </Content>
             </AccordionItem>
@@ -80,7 +84,7 @@
 
     private HashSet<DBUser> selectedUsers = new();
     private ListUsers listUsers = default!;
-    private Collapse userHelp = default!;
+    private Collapse usersHelp = default!;
     private Modal addUserModal = default!;
     private Modal editUserModal = default!;
     private Modal deleteUserModal = default!;

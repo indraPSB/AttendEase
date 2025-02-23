@@ -3,8 +3,26 @@
 
 <PageTitle>Attendances</PageTitle>
 
-<h1>Attendance Management</h1>
+<div class="header-help">
+    <h1>Attendance Management</h1>
+
+    <Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await attendancesHelp.ToggleAsync())"><Icon Name="IconName.PatchQuestionFill" Size="IconSize.x5" /></Button>
+</div>
+
+<Collapse @ref="attendancesHelp">
+    <Callout Heading="Attendance Management Help">
+        <Accordion>
+            <AccordionItem Title="Help coming soon...">
+                <Content>
+                    <ol>
+                        <li>Help coming soon...</li>
+                    </ol>
+                </Content>
+            </AccordionItem>
+        </Accordion>
+    </Callout>
+</Collapse>
 
 @code {
-
+    private Collapse attendancesHelp = default!;
 }

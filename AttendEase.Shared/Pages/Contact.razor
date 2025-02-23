@@ -2,8 +2,26 @@
 
 <PageTitle>Contact</PageTitle>
 
-<h1>Contact Us</h1>
+<div class="header-help">
+    <h1>Contact Us</h1>
+
+    <Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await contactHelp.ToggleAsync())"><Icon Name="IconName.PatchQuestionFill" Size="IconSize.x5" /></Button>
+</div>
+
+<Collapse @ref="contactHelp">
+    <Callout Heading="Contact Us Help">
+        <Accordion>
+            <AccordionItem Title="Help coming soon...">
+                <Content>
+                    <ol>
+                        <li>Help coming soon...</li>
+                    </ol>
+                </Content>
+            </AccordionItem>
+        </Accordion>
+    </Callout>
+</Collapse>
 
 @code {
-
+    private Collapse contactHelp = default!;
 }

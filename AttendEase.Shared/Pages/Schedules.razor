@@ -4,10 +4,28 @@
 
 <PageTitle>Schedules</PageTitle>
 
-<h1>Schedule Management</h1>
+<div class="header-help">
+    <h1>Schedule Management</h1>
+
+    <Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await schedulesHelp.ToggleAsync())"><Icon Name="IconName.PatchQuestionFill" Size="IconSize.x5" /></Button>
+</div>
+
+<Collapse @ref="schedulesHelp">
+    <Callout Heading="Schedule Management Help">
+        <Accordion>
+            <AccordionItem Title="Help coming soon...">
+                <Content>
+                    <ol>
+                        <li>Help coming soon...</li>
+                    </ol>
+                </Content>
+            </AccordionItem>
+        </Accordion>
+    </Callout>
+</Collapse>
 
 <ListSchedules />
 
 @code {
-
+    private Collapse schedulesHelp = default!;
 }
