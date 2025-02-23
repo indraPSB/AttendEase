@@ -1,20 +1,48 @@
 ﻿@using AttendEase.DB.Models
 
 <div class="d-flex flex-wrap gap-2">
-    @if (schedules is null)
+    @if (scheduleModels is null)
     {
         <em>Fetching upcoming schedules...</em>
     }
-    else if (schedules.Any())
+    else if (scheduleModels.Any())
     {
-        foreach (var schedule in schedules)
+        foreach (UpcomingSchedulesModel model in scheduleModels)
         {
-            <Card Style="width:18rem;">
+            <Card Style="width: 18rem;">
+                <CardHeader>@model.Schedule.Name</CardHeader>
                 <CardBody>
-                    <CardTitle>@schedule.DaysOfWeek</CardTitle>
-                    <CardSubTitle Class="mb-2 text-muted">@schedule.StartDate - @schedule.EndDate</CardSubTitle>
-                    <CardSubTitle Class="mb-2 text-muted">@schedule.StartTime - @schedule.EndTime </CardSubTitle>
-                    <CardText>@@@schedule.Latitude,@schedule.Longitude</CardText>
+                    <CardTitle>@model.Schedule.DaysOfWeek</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">@model.Schedule.StartDate - @model.Schedule.EndDate</CardSubTitle>
+                    <CardSubTitle Class="mb-2 text-muted">@model.Schedule.StartTime - @model.Schedule.EndTime </CardSubTitle>
+                    <CardText>
+                        @if (model.Schedule is { Latitude: decimal, Longitude: decimal, LocationTolerance: float })
+                        {
+                            <span>@@@model.Schedule.Latitude,@model.Schedule.Longitude</span>
+                            if (model.IsLocationServiceAvailable)
+                            {
+                                if (model.IsWithinPremise.HasValue)
+                                {
+                                    if (model.IsWithinPremise.Value)
+                                    {
+                                        <Badge Color="BadgeColor.Success" IndicatorType="BadgeIndicatorType.RoundedPill">You are within the premises</Badge>
+                                    }
+                                    else
+                                    {
+                                        <Badge Color="BadgeColor.Danger" IndicatorType="BadgeIndicatorType.RoundedPill">You are not within the premises</Badge>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <Badge Color="BadgeColor.Warning" IndicatorType="BadgeIndicatorType.RoundedPill">Location service not available</Badge>
+                            }
+                        }
+                        else
+                        {
+                            <Badge Color="BadgeColor.Secondary" IndicatorType="BadgeIndicatorType.RoundedPill">Schedule doesn't require location tracking</Badge>
+                        }
+                    </CardText>
                 </CardBody>
             </Card>
         }
@@ -28,17 +56,64 @@
 
 @code {
     [Inject] public IAuthService AuthService { get; set; } = default!;
+    [Inject] public ILocationService LocationService { get; set; } = default!;
     [Inject] public IScheduleService ScheduleService { get; set; } = default!;
 
-    private IEnumerable<Schedule>? schedules = default!;
+    private IEnumerable<UpcomingSchedulesModel>? scheduleModels = default!;
+    private PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
 
     override protected async Task OnInitializedAsync()
+    {
+        while (await timer.WaitForNextTickAsync())
+        {
+            await UpdateLocationAsync();
+        }
+    }
+
+    private async Task UpdateLocationAsync()
     {
         User? user = await AuthService.GetUser();
 
         if (user is not null)
         {
-            schedules = await ScheduleService.GetSchedules(user.Id);
+            bool isLocationServiceAvailable = (await LocationService.GetCurrentLocation()) != new Location(0, 0);
+            List<UpcomingSchedulesModel> scheduleModels = [];
+
+            foreach (Schedule schedule in (await ScheduleService.GetSchedules(user.Id)) ?? Enumerable.Empty<Schedule>())
+            {
+                if (schedule.EndDate.HasValue && schedule.EndDate.Value < DateOnly.FromDateTime(DateTimeOffset.Now.DateTime))
+                {
+                    continue;
+                }
+
+                bool? isWithinPremises = null;
+
+                if (isLocationServiceAvailable && schedule is { Latitude: decimal latitude, Longitude: decimal longitude, LocationTolerance: float tolerance })
+                {
+                    isWithinPremises = await LocationService.IsWithinPremises(new Location((double)latitude, (double)longitude), (double)tolerance);
+                }
+
+                UpcomingSchedulesModel upcomingSchedulesModel = new UpcomingSchedulesModel
+                    {
+                        Schedule = schedule,
+                        IsLocationServiceAvailable = isLocationServiceAvailable,
+                        IsWithinPremise = isWithinPremises
+                    };
+
+                scheduleModels.Add(upcomingSchedulesModel);
+            }
+
+            this.scheduleModels = (IEnumerable<UpcomingSchedulesModel>)scheduleModels;
         }
+
+        StateHasChanged();
+    }
+
+    class UpcomingSchedulesModel
+    {
+        public Schedule Schedule { get; set; } = default!;
+        public bool IsLocationServiceAvailable { get; set; } = false;
+        public bool? IsWithinPremise { get; set; } = false;
+        public TimeSpan TimeRemainingBeforeSchedule { get; set; }
     }
 }
