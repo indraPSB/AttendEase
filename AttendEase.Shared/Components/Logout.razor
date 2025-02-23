@@ -1,6 +1,7 @@
 ﻿@using AttendEase.Shared.Providers
 @inject IAuthService AuthService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 <Button Type="ButtonType.Button" Color="ButtonColor.Secondary" @onclick="HandleOnLogout">Logout</Button>
 
@@ -13,5 +14,7 @@
         {
             attendEaseAuthenticationStateProvider.NotifyAuthenticationStateChanged();
         }
+
+        NavigationManager.NavigateTo("/");
     }
 }
