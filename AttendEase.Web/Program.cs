@@ -205,8 +205,8 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
                 .RuleFor(c => c.Id, f => f.Random.Guid())
                 .RuleFor(c => c.Email, f => f.Person.Email)
                 .RuleFor(c => c.Subject, f => f.PickRandom("General Feedback", "Others"))
-                .RuleFor(c => c.MessageUser, f => null)
-                .RuleFor(c => c.MessageSystem, f => f.Lorem.Paragraph())
+                .RuleFor(c => c.MessageUser, f => f.Lorem.Paragraph())
+                .RuleFor(c => c.MessageSystem, f => null)
                 .RuleFor(c => c.Status, f => f.PickRandom("Open", "Close"))
                 .RuleFor(c => c.Timestamp, f => f.Date.BetweenOffset(new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2025, 3, 1, 0, 0, 0, TimeSpan.Zero)));
 
