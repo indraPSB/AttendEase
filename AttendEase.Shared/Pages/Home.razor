@@ -2,31 +2,113 @@
 
 <PageTitle>Home</PageTitle>
 
-<AuthorizeView Roles="Admin">
-    <Authorized>
-        <h1>Admin Home Page</h1>
-    </Authorized>
-</AuthorizeView>
-
-<AuthorizeView Roles="Business">
-    <Authorized>
-        <h1>Business Home Page</h1>
-    </Authorized>
-</AuthorizeView>
-
-<AuthorizeView Roles="Standard">
-    <Authorized>
-        <h1>Standard Home Page</h1>
-    </Authorized>
-</AuthorizeView>
-
 <AuthorizeView>
     <Authorized>
-        Welcome to AttendEase, @(context?.User?.Identity?.Name ?? string.Empty)
+        <h1>Welcome to AttendEase, @(context?.User?.Identity?.Name ?? string.Empty)</h1>
     </Authorized>
     <NotAuthorized>
         <h1>Welcome to AttendEase!</h1>
 
         <Login />
     </NotAuthorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div class="d-flex flex-wrap gap-2">
+            <Card TextAlignment="Alignment.Center">
+                <CardHeader>
+                    <Icon Name="IconName.PeopleFill" Size="IconSize.x5" Class="pe-2" />User
+                </CardHeader>
+                <CardBody>
+                    <CardTitle>User Management</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">View, add, edit, and delete users.</CardSubTitle>
+                    <Button Color="ButtonColor.Secondary" To="users" Type="ButtonType.Link">Visit</Button>
+                </CardBody>
+            </Card>
+
+            <Card TextAlignment="Alignment.Center">
+                <CardHeader>
+                    <Icon Name="IconName.Calendar3" Size="IconSize.x5" Class="pe-2" />Schedule
+                </CardHeader>
+                <CardBody>
+                    <CardTitle>Schedule Management</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">View, add, edit, and delete schedules.</CardSubTitle>
+                    <Button Color="ButtonColor.Secondary" To="schedules" Type="ButtonType.Link">Visit</Button>
+                </CardBody>
+            </Card>
+
+            <Card TextAlignment="Alignment.Center">
+                <CardHeader>
+                    <Icon Name="IconName.JournalText" Size="IconSize.x5" Class="pe-2" />Assignment
+                </CardHeader>
+                <CardBody>
+                    <CardTitle>Assignment Management</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">View, add, edit, and delete assignments.</CardSubTitle>
+                    <Button Color="ButtonColor.Secondary" To="assignments" Type="ButtonType.Link">Visit</Button>
+                </CardBody>
+            </Card>
+
+            <Card TextAlignment="Alignment.Center">
+                <CardHeader>
+                    <Icon Name="IconName.ListTask" Size="IconSize.x5" Class="pe-2" />Attendance
+                </CardHeader>
+                <CardBody>
+                    <CardTitle>Attendance Management</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">View, add, edit, and delete attendance records.</CardSubTitle>
+                    <Button Color="ButtonColor.Secondary" To="attendances" Type="ButtonType.Link">Visit</Button>
+                </CardBody>
+            </Card>
+
+            <Card TextAlignment="Alignment.Center">
+                <CardHeader>
+                    <Icon Name="IconName.EnvelopeOpenFill" Size="IconSize.x5" Class="pe-2" />Contact
+                </CardHeader>
+                <CardBody>
+                    <CardTitle>Contact Management</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">View, edit, and delete contacts.</CardSubTitle>
+                    <Button Color="ButtonColor.Secondary" To="contacts" Type="ButtonType.Link">Visit</Button>
+                </CardBody>
+            </Card>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="Business">
+    <Authorized>
+        <div class="d-flex flex-wrap gap-2">
+            <Card TextAlignment="Alignment.Center">
+                <CardHeader>
+                    <Icon Name="IconName.JournalCode" Size="IconSize.x5" Class="pe-2" />API Reference
+                </CardHeader>
+                <CardBody>
+                    <CardTitle>AttendEase API Reference</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">Scalar OpenAPI interface for AttendEase API testing.</CardSubTitle>
+                    <CardText>
+                        Use API call <code>/api/auth/login</code> to request for bearer token.
+                        <br />
+                        Use header <code>Authorization: Bearer {{token}}</code> to authenticate other calls.
+                    </CardText>
+                    <Button Color="ButtonColor.Secondary" To="scalar" Type="ButtonType.Link">Visit</Button>
+                </CardBody>
+            </Card>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="Standard">
+    <Authorized>
+        <div class="d-flex flex-wrap gap-2">
+            <Card TextAlignment="Alignment.Center">
+                <CardHeader>
+                    <Icon Name="IconName.ListTask" Size="IconSize.x5" Class="pe-2" />Attendance
+                </CardHeader>
+                <CardBody>
+                    <CardTitle>Attendance Management</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">View, and mark attendance.</CardSubTitle>
+                    <Button Color="ButtonColor.Secondary" To="attendance" Type="ButtonType.Link">Visit</Button>
+                </CardBody>
+            </Card>
+        </div>
+    </Authorized>
 </AuthorizeView>
