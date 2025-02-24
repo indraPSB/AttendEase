@@ -19,4 +19,14 @@ internal class AttendanceService(ILogger<AttendanceService> logger, AttendEaseDb
 
         return AttendanceDBService.GetAttendance(request.UserId, request.ScheduleId, request.TimestampStart, request.TimestampEnd, _logger, _context, cancellationToken);
     }
+
+    public Task<bool> UpdateAttendance(Attendance attendance, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        return AttendanceDBService.UpdateAttendance(attendance, _logger, _context, cancellationToken);
+    }
 }

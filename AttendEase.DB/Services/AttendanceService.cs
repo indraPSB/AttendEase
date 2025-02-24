@@ -26,4 +26,27 @@ internal class AttendanceService
 
         return null;
     }
+
+    public static async Task<bool> UpdateAttendance<T>(Attendance attendance, ILogger<T> logger, AttendEaseDbContext context, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        try
+        {
+            // UPDATE attendance SET status = @status WHERE user_id = @userId AND schedule_id = @scheduleId AND timestamp = @timestamp AND attended  = @attended;
+            context.Attendances.Update(attendance);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in DB UpdateAttendance(Attendance) with message, '{message}'.", ex.Message);
+        }
+
+        return false;
+    }
 }

@@ -8,6 +8,8 @@ namespace AttendEase.Shared.Services;
 public interface IAttendanceService
 {
     Task<Attendance?> GetAttendance(GetAttendanceRequest id, CancellationToken cancellationToken = default);
+
+    Task<bool> UpdateAttendance(Attendance user, CancellationToken cancellationToken = default);
 }
 
 public class AttendanceService(ILogger<AttendanceService> logger, HttpClient httpClient) : IAttendanceService
@@ -56,6 +58,32 @@ public class AttendanceService(ILogger<AttendanceService> logger, HttpClient htt
         }
 
         return null;
+    }
+
+    public async Task<bool> UpdateAttendance(Attendance attendance, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"/api/attendance", attendance, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Attendance updated successfully.");
+
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Shared UpdateAttendance with message, '{message}'.", ex.Message);
+        }
+
+        return false;
     }
 }
 
