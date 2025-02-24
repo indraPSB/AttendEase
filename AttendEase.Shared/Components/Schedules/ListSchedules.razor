@@ -56,6 +56,8 @@
 @code {
     [Inject] public IScheduleService ScheduleService { get; set; } = default!;
 
+    [Parameter] public EventCallback<HashSet<Schedule>> SelectedSchedulesChanged { get; set; }
+
     private IEnumerable<Schedule> schedules = default!;
 
     private HashSet<Schedule> selectedSchedules = new();
@@ -70,9 +72,10 @@
         return await Task.FromResult(request.ApplyTo(schedules));
     }
 
-    private Task OnSelectedItemsChanged(HashSet<Schedule> schedules)
+    private async Task OnSelectedItemsChanged(HashSet<Schedule> schedules)
     {
         selectedSchedules = schedules is not null && schedules.Any() ? schedules : new();
-        return Task.CompletedTask;
+
+        await SelectedSchedulesChanged.InvokeAsync(selectedSchedules);
     }
 }
