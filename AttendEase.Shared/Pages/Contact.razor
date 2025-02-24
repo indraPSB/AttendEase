@@ -1,4 +1,6 @@
 ﻿@page "/contact"
+@using System.ComponentModel.DataAnnotations
+@using DBContact = AttendEase.DB.Models.Contact
 
 <PageTitle>Contact</PageTitle>
 
@@ -22,6 +24,103 @@
     </Callout>
 </Collapse>
 
+<EditForm EditContext="@editContext" OnValidSubmit="HandleOnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-floating mb-3">
+        <InputText id="contact-email" type="email" class="form-control" placeholder="E-Mail" @bind-Value="@contact.Email" />
+        <label for="contact-email">E-Mail</label>
+    </div>
+
+    <div class="form-floating mb-3">
+        <select class="form-select" id="contact-subject" @bind=@contact.Subject @bind:after="HandleSelectionChanged">
+            <option value="@ContactModel.GeneralFeedback" selected>@ContactModel.GeneralFeedback</option>
+            <option value="@ContactModel.ResetPassword">@ContactModel.ResetPassword</option>
+            <option value="@ContactModel.Others">@ContactModel.Others</option>
+        </select>
+        <label for="contact-subject">Suject</label>
+    </div>
+
+    @if (contact.Subject != "Reset Password")
+    {
+        <div class="form-floating mb-3">
+            <InputTextArea id="contact-message" type="text" class="form-control" placeholder="Message" @bind-Value="@contact.Message" />
+            <label for="contact-message">Message</label>
+        </div>
+    }
+
+    <ValidationMessage For="@(() => contact.Email)" class="validation-message mt-3" />
+    @((MarkupString)message)
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Login</Button>
+    </div>
+</EditForm>
+
 @code {
     private Collapse contactHelp = default!;
+    private ContactModel contact = new();
+    private EditContext? editContext;
+    private string message = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        editContext = new EditContext(contact);
+    }
+
+    public async Task HandleOnValidSubmit()
+    {
+        if (editContext?.Validate() ?? false)
+        {
+            if (contact.Subject != ContactModel.ResetPassword && string.IsNullOrEmpty(contact.Message))
+            {
+                message = "<div class='validation-message'>Message is required.</div>";
+            }
+            else
+            {
+                DBContact dbContact = new()
+                {
+                    Email = contact.Email!,
+                    Timestamp = new DateTimeOffset(DateTimeOffset.Now.DateTime, TimeSpan.Zero),
+                    Subject = contact.Subject!,
+                    MessageUser = contact.Subject == ContactModel.ResetPassword ? null : contact.Message
+                };
+
+                bool success = false; // TODO: Send contact
+
+                if (!success)
+                {
+                    message = "<div class='validation-message'>Unable to send message. Please try again later.</div>";
+                }
+            }
+        }
+        else
+        {
+            message = "<div class='validation-message'>Unable to validate form.</div>";
+        }
+
+        StateHasChanged();
+    }
+
+    private void HandleSelectionChanged()
+    {
+        if (contact.Subject == ContactModel.ResetPassword)
+        {
+            contact.Message = " ";
+        }
+    }
+
+    public class ContactModel
+    {
+        public const string GeneralFeedback = "General Feedback";
+        public const string Others = "Others";
+        public const string ResetPassword = "Reset Password";
+
+        [Required(ErrorMessage = "'Email' is required.")]
+        public string? Email { get; set; }
+        public string? Subject { get; set; } = GeneralFeedback;
+        [Required(ErrorMessage = "'Message' is required.")]
+        public string? Message { get; set; }
+    }
 }
