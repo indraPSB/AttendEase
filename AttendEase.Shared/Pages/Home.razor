@@ -4,10 +4,40 @@
 
 <AuthorizeView>
     <Authorized>
-        <h1>Welcome to AttendEase, @(context?.User?.Identity?.Name ?? string.Empty)</h1>
+        <div class="header-help">
+            <h1>Welcome to AttendEase, @(context?.User?.Identity?.Name ?? string.Empty)</h1>
+
+            <Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await homeHelp.ToggleAsync())"><Icon Name="IconName.PatchQuestionFill" Size="IconSize.x5" /></Button>
+        </div>
     </Authorized>
     <NotAuthorized>
-        <h1>Welcome to AttendEase!</h1>
+        <div class="header-help">
+            <h1>Welcome to AttendEase!</h1>
+
+            <Button Color="ButtonColor.Secondary" Outline="true" @onclick="@(async () => await homeHelp.ToggleAsync())"><Icon Name="IconName.PatchQuestionFill" Size="IconSize.x5" /></Button>
+        </div>
+
+        <Collapse @ref="homeHelp">
+            <Callout Heading="Home Page Help">
+                <Accordion>
+                    <AccordionItem Title="How to login">
+                        <Content>
+                            <ol>
+                                <li>Enter your username and password.</li>
+                                <li>Click on the "Login" button.</li>
+                            </ol>
+                        </Content>
+                    </AccordionItem>
+                    <AccordionItem Title="I have forgotten my password">
+                        <Content>
+                            <ol>
+                                <li>Navigate to <a href="contact">Contact</a> page and submit a request to reset password.</li>
+                            </ol>
+                        </Content>
+                    </AccordionItem>
+                </Accordion>
+            </Callout>
+        </Collapse>
 
         <Login />
     </NotAuthorized>
@@ -15,6 +45,24 @@
 
 <AuthorizeView Roles="Admin">
     <Authorized>
+        <Collapse @ref="homeHelp">
+            <Callout Heading="Home Page Help">
+                <Accordion>
+                    <AccordionItem Title="Admin User Dashboard">
+                        <Content>
+                            <ul>
+                                <li><a href="users">User Management</a> page allows you to view, add, edit, and delete users.</li>
+                                <li><a href="schedules">Schedule Management</a> page allows you to view, add, edit, and delete schedules.</li>
+                                <li><a href="assignments">Assignment Management</a> page allows you to view, add, edit, and delete assignments.</li>
+                                <li><a href="attendances">Attendance Management</a> page allows you to view, add, edit, and delete attendance records.</li>
+                                <li><a href="contacts">Contact Management</a> page allows you to view, edit, and delete contacts.</li>
+                            </ul>
+                        </Content>
+                    </AccordionItem>
+                </Accordion>
+            </Callout>
+        </Collapse>
+
         <div class="d-flex flex-wrap gap-2">
             <Card TextAlignment="Alignment.Center">
                 <CardHeader>
@@ -76,6 +124,27 @@
 
 <AuthorizeView Roles="Business">
     <Authorized>
+        <Collapse @ref="homeHelp">
+            <Callout Heading="Home Page Help">
+                <Accordion>
+                    <AccordionItem Title="Business User Dashboard">
+                        <Content>
+                            <ul>
+                                <li><a href="scalar">AttendEase API Reference</a> page allows you to perform API testing.</li>
+                                <li>
+                                    To get started perform the following:
+                                    <ol>
+                                        <li>Request for bearer token using <code>/api/auth/login</code> API call.</li>
+                                        <li>Use header <code>Authorization: Bearer {{token}}</code> to authenticate other calls.</li>
+                                    </ol>
+                                </li>
+                            </ul>
+                        </Content>
+                    </AccordionItem>
+                </Accordion>
+            </Callout>
+        </Collapse>
+
         <div class="d-flex flex-wrap gap-2">
             <Card TextAlignment="Alignment.Center">
                 <CardHeader>
@@ -98,6 +167,20 @@
 
 <AuthorizeView Roles="Standard">
     <Authorized>
+        <Collapse @ref="homeHelp">
+            <Callout Heading="Home Page Help">
+                <Accordion>
+                    <AccordionItem Title="Standard User Dashboard">
+                        <Content>
+                            <ol>
+                                <li><a href="attendance">Attendance Management</a> page allows you to view, and mark attendance.</li>
+                            </ol>
+                        </Content>
+                    </AccordionItem>
+                </Accordion>
+            </Callout>
+        </Collapse>
+
         <div class="d-flex flex-wrap gap-2">
             <Card TextAlignment="Alignment.Center">
                 <CardHeader>
@@ -112,3 +195,7 @@
         </div>
     </Authorized>
 </AuthorizeView>
+
+@code {
+    private Collapse homeHelp = default!;
+}
