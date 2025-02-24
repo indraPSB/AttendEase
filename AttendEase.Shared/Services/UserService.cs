@@ -129,7 +129,7 @@ public class UserService(ILogger<UserService> logger, HttpClient httpClient) : I
 
         try
         {
-            HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"/api/users/{user.Id}", user, cancellationToken);
+            HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"/api/users", user, cancellationToken);
 
             if (response.IsSuccessStatusCode)
             {
