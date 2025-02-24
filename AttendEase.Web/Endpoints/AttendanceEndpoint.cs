@@ -12,6 +12,9 @@ internal static class AttendanceEndpoint
         app.MapGet("api/attendance", GetAttendance)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business},{UserRole.Standard}" });
 
+        app.MapPut("api/attendance", UpdateAttendance)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business},{UserRole.Standard}" });
+
         return app;
     }
 
@@ -25,5 +28,15 @@ internal static class AttendanceEndpoint
         }
 
         return Results.Ok(attendance);
+    }
+
+    private static async Task<IResult> UpdateAttendance(Attendance attendance, IAttendanceService attendanceService, CancellationToken cancellationToken)
+    {
+        if (await attendanceService.UpdateAttendance(attendance, cancellationToken))
+        {
+            return Results.Ok(attendance);
+        }
+
+        return Results.BadRequest();
     }
 }
