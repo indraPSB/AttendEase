@@ -95,7 +95,6 @@
     private void OnSelectedItemsChanged(HashSet<DBUser> selectedUsers)
     {
         this.selectedUsers = selectedUsers;
-        string countMessage = $"({selectedUsers.Count}{(selectedUsers.Count == 1 ? $" - {selectedUsers.First().Name}" : string.Empty)})";
         isEditDisabled = selectedUsers.Count != 1;
         isDeleteDisabled = selectedUsers.Count < 1;
         selectedUsersCount = selectedUsers.Count;

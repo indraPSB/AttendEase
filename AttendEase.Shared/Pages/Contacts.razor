@@ -1,5 +1,6 @@
 ﻿@page "/contacts"
 @using AttendEase.Shared.Components.Contacts
+@using DBContact = AttendEase.DB.Models.Contact
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Contacts</PageTitle>
@@ -35,8 +36,30 @@
     </Callout>
 </Collapse>
 
-<ListContacts />
+<div class="my-2">
+    <Button Class="me-0 my-1" Color="ButtonColor.Primary" @onclick="OnDeleteContacts" Disabled="isDeleteDisabled">
+        Delete Contacts
+        <Badge Color="@(isDeleteDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedContactsCount</Badge>
+    </Button>
+</div>
+
+<ListContacts @ref="listContacts" SelectedContactsChanged="OnSelectedItemsChanged" />
 
 @code {
     private Collapse contactsHelp = default!;
+    private HashSet<DBContact> selectedContacts = new();
+    private ListContacts listContacts = default!;
+    private bool isDeleteDisabled = true;
+    private int selectedContactsCount = 0;
+
+    private void OnSelectedItemsChanged(HashSet<DBContact> selectedContacts)
+    {
+        this.selectedContacts = selectedContacts;
+        isDeleteDisabled = selectedContacts.Count < 1;
+        selectedContactsCount = selectedContacts.Count;
+    }
+
+    private async Task OnDeleteContacts()
+    {
+    }
 }
