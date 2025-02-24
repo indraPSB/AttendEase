@@ -49,13 +49,20 @@
                     <CardTitle>Attendance Marking Details:</CardTitle>
                     <CardText>@($"{model.attendanceStart:t}") - @($"{model.attendanceEnd:t}")</CardText>
                     <CardText>
-                        @if (model.CanMarkAttendance())
+                        @if (model.Attendance is { Attended: true })
                         {
-                            <Button Color="ButtonColor.Primary">Mark Attendance</Button>
+                            <Button Color="ButtonColor.Success">Attendance Marked</Button>
                         }
                         else
                         {
-                            <Button Color="ButtonColor.Secondary" Disabled="true">Not Attendance Window</Button>
+                            if (model.CanMarkAttendance())
+                            {
+                                <Button Color="ButtonColor.Primary" @onclick="() => MarkAttendance(model)">Mark Attendance</Button>
+                            }
+                            else
+                            {
+                                <Button Color="ButtonColor.Secondary" Disabled="true">Not Attendance Window</Button>
+                            }
                         }
                     </CardText>
                 </CardBody>
@@ -140,6 +147,18 @@
         StateHasChanged();
     }
 
+    private async Task MarkAttendance(UpcomingSchedulesModel model)
+    {
+        if (model is { Attendance: not null })
+        {
+            Attendance attendance = model.Attendance;
+            attendance.Attended = true;
+            _ = await AttendanceService.UpdateAttendance(attendance);
+
+            await UpdateLocationAsync();
+        }
+    }
+
     class UpcomingSchedulesModel
     {
         public Schedule Schedule { get; set; } = default!;
@@ -212,7 +231,7 @@
             }
 
             // Calculate the allowed window for marking attendance.
-            DateTimeOffset scheduleStart = new DateTimeOffset(DateOnly.FromDateTime(now.DateTime), Schedule.StartTime.Value, TimeSpan.Zero);
+            DateTimeOffset scheduleStart = new DateTimeOffset(DateOnly.FromDateTime(now.DateTime), Schedule.StartTime.Value, now.Offset);
             DateTimeOffset allowedStart = scheduleStart.AddMinutes(-Schedule.AttendanceStartBefore);
             DateTimeOffset allowedEnd = scheduleStart.AddMinutes(Schedule.AbsentAfter);
 
