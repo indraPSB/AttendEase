@@ -1,4 +1,8 @@
 ﻿@page "/assignments"
+@using AttendEase.DB.Contexts
+@using AttendEase.DB.Models
+@using Microsoft.EntityFrameworkCore
+@using System.Diagnostics.CodeAnalysis
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Assignments</PageTitle>
@@ -23,6 +27,171 @@
     </Callout>
 </Collapse>
 
+@if (schedules == null)
+{
+    <em>Fetching schedules...</em>
+}
+else
+{
+    <Tabs EnableFadeEffect="true" OnShowing="HandleOnShowing">
+        @foreach (var schedule in schedules)
+        {
+            <Tab Title="@schedule.Name" Name="@schedule.Id.ToString()">
+                <Content>
+                    <br />
+
+                    <h4><b>Schedule Details:</b></h4>
+                    <span><b>Days of Week:</b> @schedule.DaysOfWeek</span><br />
+                    <span><b>Date Range:</b> @schedule.StartDate - @schedule.EndDate</span><br />
+                    <span><b>Time Range:</b> @schedule.StartTime - @schedule.EndTime</span><br />
+                    <span><b>Location :</b> @schedule.Latitude,@schedule.Longitude</span>
+
+                    <hr />
+
+                    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Class="my-2" Disabled="IsSaveDisabled">Save</Button>
+
+                    <div class="row">
+                        <div class="col">
+                            <h4><b>Unassigned Users:</b></h4>
+                            <SortableList TItem="User"
+                                          Group="UserAssignments"
+                                          Name="unassignedUsersList"
+                                          Data="unassignedUsers"
+                                          Context="user"
+                                          EmptyText="No users are unassigned"
+                                          OnUpdate="OnUnassignedUsersUpdate"
+                                          OnRemove="OnUnassignedUsersRemove">
+                                <ItemTemplate>
+                                    @user.Name
+                                </ItemTemplate>
+                            </SortableList>
+                        </div>
+                        <div class="col">
+                            <h4><b>Assigned Users:</b></h4>
+                            <SortableList TItem="User"
+                                          Group="UserAssignments"
+                                          Name="assignedUsersList"
+                                          Data="assignedUsers"
+                                          Context="user"
+                                          EmptyText="No users are assigned"
+                                          OnUpdate="OnAssignedUsersUpdate"
+                                          OnRemove="OnAssignedUsersRemove">
+                                <ItemTemplate>
+                                    @user.Name
+                                </ItemTemplate>
+                            </SortableList>
+                        </div>
+                    </div>
+                </Content>
+            </Tab>
+        }
+    </Tabs>
+}
+
 @code {
+    [Inject] AttendEaseDbContext Context { get; set; } = default!; // TODO: Remove DB access from view
+
     private Collapse assignmentsHelp = default!;
+
+    List<Schedule> schedules = default!;
+    List<User> users = default!;
+    List<User> unassignedUsers = default!;
+    List<User> assignedUsers = default!;
+    bool isUserListDirty = false;
+
+    public bool IsSaveDisabled => !isUserListDirty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        schedules = await Context.Schedules.ToListAsync();
+        users = await Context.Users.ToListAsync();
+    }
+
+    private async Task HandleOnShowing(TabsEventArgs e)
+    {
+        isUserListDirty = false;
+        unassignedUsers?.Clear();
+        assignedUsers?.Clear();
+
+        _ = Guid.TryParse(e.ActiveTabName, out Guid scheduleId);
+        assignedUsers = (await Context.Schedules.Where(s => s.Id == scheduleId).Include(s => s.Users).FirstOrDefaultAsync())?.Users?.ToList() ?? [];
+
+        UserEqualityComparer userComparer = new();
+        unassignedUsers = users.Except(assignedUsers, userComparer).ToList();
+    }
+
+    private void OnUnassignedUsersUpdate(SortableListEventArgs args)
+    {
+        isUserListDirty = true;
+        User userToMove = unassignedUsers[args.OldIndex];
+
+        unassignedUsers.RemoveAt(args.OldIndex);
+
+        if (args.NewIndex < unassignedUsers.Count)
+        {
+            unassignedUsers.Insert(args.NewIndex, userToMove);
+        }
+        else
+        {
+            unassignedUsers.Add(userToMove);
+        }
+
+    }
+
+    private void OnAssignedUsersUpdate(SortableListEventArgs args)
+    {
+        isUserListDirty = true;
+        User userToMove = assignedUsers[args.OldIndex];
+
+        assignedUsers.RemoveAt(args.OldIndex);
+
+        if (args.NewIndex < assignedUsers.Count)
+        {
+            assignedUsers.Insert(args.NewIndex, userToMove);
+        }
+        else
+        {
+            assignedUsers.Add(userToMove);
+        }
+
+    }
+
+    private void OnUnassignedUsersRemove(SortableListEventArgs args)
+    {
+        isUserListDirty = true;
+        User user = unassignedUsers[args.OldIndex];
+
+        assignedUsers.Insert(args.NewIndex, user);
+
+        unassignedUsers.Remove(unassignedUsers[args.OldIndex]);
+    }
+
+    private void OnAssignedUsersRemove(SortableListEventArgs args)
+    {
+        isUserListDirty = true;
+
+        User user = assignedUsers[args.OldIndex];
+
+        unassignedUsers.Insert(args.NewIndex, user);
+
+        assignedUsers.Remove(assignedUsers[args.OldIndex]);
+    }
+
+    public class UserEqualityComparer : IEqualityComparer<User>
+    {
+        public bool Equals(User x, User y)
+        {
+            return x.Id.Equals(y.Id);
+        }
+
+        public int GetHashCode([DisallowNull] User obj)
+        {
+            return obj.Id.GetHashCode();
+        }
+    }
 }
