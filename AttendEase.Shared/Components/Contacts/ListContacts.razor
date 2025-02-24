@@ -1,5 +1,108 @@
-﻿<h3>List Contacts</h3>
+﻿@using AttendEase.DB.Contexts
+@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.Extensions.Logging
+@using DBContact = AttendEase.DB.Models.Contact
+
+<Grid TItem="DBContact" @ref="grid"
+      Class="table table-hover table-bordered table-striped"
+      DataProvider="ContactsDataProvider"
+      AllowFiltering="true"
+      AllowPaging="true"
+      PageSizeSelectorItems="@([10, 25, 50, 100])"
+      PageSizeSelectorVisible="true"
+      ItemsPerPageText="Contacts per page"
+      AllowSorting="true"
+      AllowSelection="true"
+      SelectionMode="GridSelectionMode.Multiple"
+      SelectedItemsChanged="OnSelectedItemsChanged"
+      EmptyText="No contacts to display"
+      Responsive="true">
+
+    <GridColumns>
+        <GridColumn TItem="DBContact" HeaderText="Id" PropertyName="Id" SortKeySelector="item => item.Id">
+            @context.Id
+        </GridColumn>
+        <GridColumn TItem="DBContact" HeaderText="Timestamp" PropertyName="Timestamp" SortKeySelector="item => item.Timestamp">
+            @context.Timestamp.ToString("G")
+        </GridColumn>
+        <GridColumn TItem="DBContact" HeaderText="E-Mail" PropertyName="Email" SortKeySelector="item => item.Email">
+            @context.Email
+        </GridColumn>
+        <GridColumn TItem="DBContact" HeaderText="Subject" PropertyName="Subject" SortKeySelector="item => item.Subject">
+            @context.Subject
+        </GridColumn>
+        <GridColumn TItem="DBContact" HeaderText="User Message" PropertyName="MessageUser" SortKeySelector="item => item.MessageUser">
+            @context.MessageUser
+        </GridColumn>
+        <GridColumn TItem="DBContact" HeaderText="System Message" PropertyName="MessageSystem" SortKeySelector="item => item.MessageSystem">
+            @context.MessageSystem
+        </GridColumn>
+        <GridColumn TItem="DBContact" HeaderText="Status" PropertyName="Status" SortKeySelector="item => item.Status">
+            @if (context.Status == ContactStatus.Open)
+            {
+                <Badge Color="BadgeColor.Success" IndicatorType="BadgeIndicatorType.RoundedPill">Open</Badge>
+            }
+            else if (context.Status == ContactStatus.Close)
+            {
+                <Badge Color="BadgeColor.Danger" IndicatorType="BadgeIndicatorType.RoundedPill">Close</Badge>
+            }
+            else
+            {
+                <Badge Color="BadgeColor.Secondary" IndicatorType="BadgeIndicatorType.RoundedPill">Unknown</Badge>
+            }
+        </GridColumn>
+        <GridColumn TItem="DBContact" HeaderText="Action" PropertyName="Status" Filterable="false">
+            @if (context.Subject == ContactSubject.ResetPassword)
+            {
+                <Button Type="ButtonType.Button" Color="ButtonColor.Secondary" Disabled="true">No action required</Button>
+            }
+            else if (context.Status == ContactStatus.Open)
+            {
+                <Button Type="ButtonType.Button" Color="ButtonColor.Primary">Mark as Close</Button>
+            }
+            else if (context.Status == ContactStatus.Close)
+            {
+                <Button Type="ButtonType.Button" Color="ButtonColor.Secondary">Mark as Open</Button>
+            }
+            else
+            {
+                <Button Type="ButtonType.Button" Color="ButtonColor.Secondary" Disabled="true">No action required</Button>
+            }
+        </GridColumn>
+    </GridColumns>
+</Grid>
 
 @code {
+    [Inject] public AttendEaseDbContext Context { get; set; } = default!;
 
+    [Parameter] public EventCallback<HashSet<DBContact>> SelectedContactsChanged { get; set; }
+
+    private Grid<DBContact> grid = default!;
+    private IEnumerable<DBContact> contacts = default!;
+    private HashSet<DBContact> selectedContacts = new();
+
+    public async Task RefreshContacts()
+    {
+        await grid.RefreshDataAsync();
+        StateHasChanged();
+    }
+
+    private async Task<GridDataProviderResult<DBContact>> ContactsDataProvider(GridDataProviderRequest<DBContact> request)
+    {
+        if (contacts is null)
+        {
+            contacts = await Context.Contacts.ToListAsync() ?? Enumerable.Empty<DBContact>();
+        }
+
+        return await Task.FromResult(request.ApplyTo(contacts));
+    }
+
+    private async Task OnSelectedItemsChanged(HashSet<DBContact> contacts)
+    {
+        selectedContacts = contacts is not null && contacts.Any() ? contacts : new();
+
+        await SelectedContactsChanged.InvokeAsync(selectedContacts);
+    }
 }
