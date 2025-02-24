@@ -59,6 +59,7 @@ namespace AttendEase
             });
 
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IAttendanceService, AttendanceService>();
             builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
             builder.Services.AddScoped<IUserService, UserService>();
