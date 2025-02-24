@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AttendEase.DB.Contexts;
 
-internal partial class AttendEaseDbContext : DbContext
+public partial class AttendEaseDbContext : DbContext
 {
     public AttendEaseDbContext()
     {
