@@ -1,4 +1,5 @@
 ﻿@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
 
 <div class="d-flex flex-wrap gap-2">
     @if (scheduleModels is null)
@@ -9,16 +10,17 @@
     {
         foreach (UpcomingSchedulesModel model in scheduleModels)
         {
-            <Card Style="width: 18rem;">
+            <Card TextAlignment="Alignment.Center" Style="width: 18rem;">
                 <CardHeader>@model.Schedule.Name</CardHeader>
                 <CardBody>
-                    <CardTitle>@model.Schedule.DaysOfWeek</CardTitle>
+                    <CardTitle>Schedule Details:</CardTitle>
+                    <CardSubTitle Class="mb-2 text-muted">@model.Schedule.DaysOfWeek</CardSubTitle>
                     <CardSubTitle Class="mb-2 text-muted">@model.Schedule.StartDate - @model.Schedule.EndDate</CardSubTitle>
                     <CardSubTitle Class="mb-2 text-muted">@model.Schedule.StartTime - @model.Schedule.EndTime </CardSubTitle>
                     <CardText>
                         @if (model.Schedule is { Latitude: decimal, Longitude: decimal, LocationTolerance: float })
                         {
-                            <span>@@@model.Schedule.Latitude,@model.Schedule.Longitude</span>
+                            <span><Icon Name="IconName.PinMapFill" Class="me-2" />@model.Schedule.Latitude,@model.Schedule.Longitude</span>
                             if (model.IsLocationServiceAvailable)
                             {
                                 if (model.IsWithinPremise.HasValue)
@@ -40,7 +42,20 @@
                         }
                         else
                         {
+                            <span>-</span>
                             <Badge Color="BadgeColor.Secondary" IndicatorType="BadgeIndicatorType.RoundedPill">Schedule doesn't require location tracking</Badge>
+                        }
+                    </CardText>
+                    <CardTitle>Attendance Marking Details:</CardTitle>
+                    <CardText>@($"{model.attendanceStart:t}") - @($"{model.attendanceEnd:t}")</CardText>
+                    <CardText>
+                        @if (model.CanMarkAttendance())
+                        {
+                            <Button Color="ButtonColor.Primary">Mark Attendance</Button>
+                        }
+                        else
+                        {
+                            <Button Color="ButtonColor.Secondary" Disabled="true">Not Attendance Window</Button>
                         }
                     </CardText>
                 </CardBody>
@@ -55,18 +70,20 @@
 
 @code {
     [Inject] public IAuthService AuthService { get; set; } = default!;
+    [Inject] public IAttendanceService AttendanceService { get; set; } = default!;
     [Inject] public ILocationService LocationService { get; set; } = default!;
     [Inject] public IScheduleService ScheduleService { get; set; } = default!;
 
     private IEnumerable<UpcomingSchedulesModel>? scheduleModels = default!;
-    private PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
+    private PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
 
     override protected async Task OnInitializedAsync()
     {
-        while (await timer.WaitForNextTickAsync())
+        do
         {
             await UpdateLocationAsync();
         }
+        while (await timer.WaitForNextTickAsync());
     }
 
     private async Task UpdateLocationAsync()
@@ -85,6 +102,18 @@
                     continue;
                 }
 
+                DateTimeOffset today = new DateTimeOffset(DateOnly.FromDateTime(DateTimeOffset.Now.Date), schedule.StartTime ?? new TimeOnly(), TimeSpan.Zero);
+                DateTimeOffset start = today.AddMinutes(-schedule.AttendanceStartBefore);
+                DateTimeOffset end = today.AddMinutes(schedule.AbsentAfter);
+
+                Attendance attendance = (await AttendanceService.GetAttendance(new()
+                {
+                    UserId = user.Id,
+                    ScheduleId = schedule.Id,
+                    TimestampStart = start,
+                    TimestampEnd = end
+                }))!;
+
                 bool? isWithinPremises = null;
 
                 if (isLocationServiceAvailable && schedule is { Latitude: decimal latitude, Longitude: decimal longitude, LocationTolerance: float tolerance })
@@ -92,11 +121,14 @@
                     isWithinPremises = await LocationService.IsWithinPremises(new Location((double)latitude, (double)longitude), (double)tolerance);
                 }
 
-                UpcomingSchedulesModel upcomingSchedulesModel = new UpcomingSchedulesModel
+                UpcomingSchedulesModel upcomingSchedulesModel = new()
                 {
                     Schedule = schedule,
+                    Attendance = attendance,
                     IsLocationServiceAvailable = isLocationServiceAvailable,
-                    IsWithinPremise = isWithinPremises
+                    IsWithinPremise = isWithinPremises,
+                    attendanceStart = start,
+                    attendanceEnd = end
                 };
 
                 scheduleModels.Add(upcomingSchedulesModel);
@@ -111,8 +143,15 @@
     class UpcomingSchedulesModel
     {
         public Schedule Schedule { get; set; } = default!;
+        public Attendance Attendance { get; set; } = default!;
         public bool IsLocationServiceAvailable { get; set; } = false;
-        public bool? IsWithinPremise { get; set; } = false;
-        public TimeSpan TimeRemainingBeforeSchedule { get; set; }
+        public bool? IsWithinPremise { get; set; } = null;
+        public DateTimeOffset attendanceStart { get; set; }
+        public DateTimeOffset attendanceEnd { get; set; }
+
+        public bool CanMarkAttendance()
+        {
+            return true;
+        }
     }
 }
