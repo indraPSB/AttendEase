@@ -151,7 +151,72 @@
 
         public bool CanMarkAttendance()
         {
-            return true;
+            if (Schedule is { Latitude: decimal, Longitude: decimal, LocationTolerance: float })
+            {
+                // Location tracking is required.
+
+                if (!IsWithinPremise.HasValue || !IsWithinPremise.Value)
+                {
+                    // User is not within the premises.
+
+                    return false;
+                }
+            }
+
+            DateTimeOffset now = DateTimeOffset.Now;
+            DateOnly today = DateOnly.FromDateTime(now.DateTime);
+
+            // Check if today's date is within the schedule's date range.
+            if (Schedule.StartDate.HasValue && today < Schedule.StartDate.Value)
+            {
+                return false;
+            }
+
+            if (Schedule.EndDate.HasValue && today > Schedule.EndDate.Value)
+            {
+                return false;
+            }
+
+            // Check if the schedule is applicable for the current day of week.
+            DaysOfWeek currentDay = now.DayOfWeek switch
+            {
+                DayOfWeek.Monday => DaysOfWeek.Monday,
+                DayOfWeek.Tuesday => DaysOfWeek.Tuesday,
+                DayOfWeek.Wednesday => DaysOfWeek.Wednesday,
+                DayOfWeek.Thursday => DaysOfWeek.Thursday,
+                DayOfWeek.Friday => DaysOfWeek.Friday,
+                DayOfWeek.Saturday => DaysOfWeek.Saturday,
+                DayOfWeek.Sunday => DaysOfWeek.Sunday,
+                _ => DaysOfWeek.None
+            };
+
+            if (!string.IsNullOrEmpty(Schedule.DaysOfWeek))
+            {
+                // If DaysOfWeek is null or empty, the schedule applies every day.
+
+                if (!Enum.TryParse<DaysOfWeek>(Schedule.DaysOfWeek, out DaysOfWeek scheduledDays))
+                {
+                    return false;
+                }
+                if ((scheduledDays & currentDay) == 0)
+                {
+                    return false;
+                }
+            }
+
+
+            // Ensure StartTime is specified
+            if (!Schedule.StartTime.HasValue)
+            {
+                return false;
+            }
+
+            // Calculate the allowed window for marking attendance.
+            DateTimeOffset scheduleStart = new DateTimeOffset(DateOnly.FromDateTime(now.DateTime), Schedule.StartTime.Value, TimeSpan.Zero);
+            DateTimeOffset allowedStart = scheduleStart.AddMinutes(-Schedule.AttendanceStartBefore);
+            DateTimeOffset allowedEnd = scheduleStart.AddMinutes(Schedule.AbsentAfter);
+
+            return now >= allowedStart && now <= allowedEnd;
         }
     }
 }
