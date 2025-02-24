@@ -13,10 +13,32 @@
 <Collapse @ref="contactHelp">
     <Callout Heading="Contact Us Help">
         <Accordion>
-            <AccordionItem Title="Help coming soon...">
+            <AccordionItem Title="How to send general feedback">
                 <Content>
                     <ol>
-                        <li>Help coming soon...</li>
+                        <li>Select the 'General Feedback' option.</li>
+                        <li>Enter your email address.</li>
+                        <li>Enter your message.</li>
+                        <li>Click on the 'Submit' button.</li>
+                    </ol>
+                </Content>
+            </AccordionItem>
+            <AccordionItem Title="How to reset password">
+                <Content>
+                    <ol>
+                        <li>Select the 'Reset Password' option.</li>
+                        <li>Enter your email address.</li>
+                        <li>Click on the 'Submit' button.</li>
+                    </ol>
+                </Content>
+            </AccordionItem>
+            <AccordionItem Title="How to send other matters of concern">
+                <Content>
+                    <ol>
+                        <li>Select the 'Others' option.</li>
+                        <li>Enter your email address.</li>
+                        <li>Enter your message.</li>
+                        <li>Click on the 'Submit' button.</li>
                     </ol>
                 </Content>
             </AccordionItem>
@@ -53,7 +75,7 @@
     @((MarkupString)message)
 
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Login</Button>
+        <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Submit</Button>
     </div>
 </EditForm>
 
