@@ -42,11 +42,11 @@
         <GridColumn TItem="DBContact" HeaderText="Status" PropertyName="Status" SortKeySelector="item => item.Status">
             @if (context.Status == ContactStatus.Open)
             {
-                <Badge Color="BadgeColor.Success" IndicatorType="BadgeIndicatorType.RoundedPill">Open</Badge>
+                <Badge Color="BadgeColor.Danger" IndicatorType="BadgeIndicatorType.RoundedPill">Open</Badge>
             }
             else if (context.Status == ContactStatus.Close)
             {
-                <Badge Color="BadgeColor.Danger" IndicatorType="BadgeIndicatorType.RoundedPill">Close</Badge>
+                <Badge Color="BadgeColor.Success" IndicatorType="BadgeIndicatorType.RoundedPill">Close</Badge>
             }
             else
             {
