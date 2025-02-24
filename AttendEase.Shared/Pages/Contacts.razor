@@ -1,4 +1,5 @@
 ﻿@page "/contacts"
+@using AttendEase.Shared.Components.Contacts
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Contacts</PageTitle>
@@ -22,6 +23,8 @@
         </Accordion>
     </Callout>
 </Collapse>
+
+<ListContacts />
 
 @code {
     private Collapse contactsHelp = default!;
