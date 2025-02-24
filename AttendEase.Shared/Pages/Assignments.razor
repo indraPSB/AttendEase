@@ -93,15 +93,14 @@ else
 @code {
     [Inject] AttendEaseDbContext Context { get; set; } = default!; // TODO: Remove DB access from view
 
-    private Collapse assignmentsHelp = default!;
-
-    List<Schedule> schedules = default!;
-    List<User> users = default!;
-    List<User> unassignedUsers = default!;
-    List<User> assignedUsers = default!;
-    bool isUserListDirty = false;
-
     public bool IsSaveDisabled => !isUserListDirty;
+
+    private Collapse assignmentsHelp = default!;
+    private List<Schedule> schedules = default!;
+    private List<User> users = default!;
+    private List<User> unassignedUsers = default!;
+    private List<User> assignedUsers = default!;
+    private bool isUserListDirty = false;
 
     protected override async Task OnInitializedAsync()
     {
