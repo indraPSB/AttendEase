@@ -1,5 +1,6 @@
 ﻿@page "/contact"
 @using System.ComponentModel.DataAnnotations
+@using AttendEase.Shared.Models
 @using DBContact = AttendEase.DB.Models.Contact
 
 <PageTitle>Contact</PageTitle>
@@ -56,9 +57,9 @@
 
     <div class="form-floating mb-3">
         <select class="form-select" id="contact-subject" @bind=@contact.Subject @bind:after="HandleSelectionChanged">
-            <option value="@ContactModel.GeneralFeedback" selected>@ContactModel.GeneralFeedback</option>
-            <option value="@ContactModel.ResetPassword">@ContactModel.ResetPassword</option>
-            <option value="@ContactModel.Others">@ContactModel.Others</option>
+            <option value="@ContactSubject.GeneralFeedback" selected>@ContactSubject.GeneralFeedback</option>
+            <option value="@ContactSubject.ResetPassword">@ContactSubject.ResetPassword</option>
+            <option value="@ContactSubject.Others">@ContactSubject.Others</option>
         </select>
         <label for="contact-subject">Suject</label>
     </div>
@@ -95,7 +96,7 @@
     {
         if (editContext?.Validate() ?? false)
         {
-            if (contact.Subject != ContactModel.ResetPassword && string.IsNullOrEmpty(contact.Message))
+            if (contact.Subject != ContactSubject.ResetPassword && string.IsNullOrEmpty(contact.Message))
             {
                 message = "<div class='validation-message'>Message is required.</div>";
             }
@@ -106,7 +107,7 @@
                     Email = contact.Email!,
                     Timestamp = new DateTimeOffset(DateTimeOffset.Now.DateTime, TimeSpan.Zero),
                     Subject = contact.Subject!,
-                    MessageUser = contact.Subject == ContactModel.ResetPassword ? null : contact.Message
+                    MessageUser = contact.Subject == ContactSubject.ResetPassword ? null : contact.Message
                 };
 
                 bool success = false; // TODO: Send contact
@@ -127,7 +128,7 @@
 
     private void HandleSelectionChanged()
     {
-        if (contact.Subject == ContactModel.ResetPassword)
+        if (contact.Subject == ContactSubject.ResetPassword)
         {
             contact.Message = " ";
         }
@@ -135,13 +136,9 @@
 
     public class ContactModel
     {
-        public const string GeneralFeedback = "General Feedback";
-        public const string Others = "Others";
-        public const string ResetPassword = "Reset Password";
-
         [Required(ErrorMessage = "'Email' is required.")]
         public string? Email { get; set; }
-        public string? Subject { get; set; } = GeneralFeedback;
+        public string? Subject { get; set; } = ContactSubject.GeneralFeedback;
         [Required(ErrorMessage = "'Message' is required.")]
         public string? Message { get; set; }
     }

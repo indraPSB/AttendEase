@@ -205,7 +205,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
                 .UseSeed(Seed)
                 .RuleFor(c => c.Id, f => f.Random.Guid())
                 .RuleFor(c => c.Email, f => f.Person.Email)
-                .RuleFor(c => c.Subject, f => f.PickRandom("General Feedback", "Others"))
+                .RuleFor(c => c.Subject, f => f.PickRandom(ContactSubject.GeneralFeedback, ContactSubject.Others))
                 .RuleFor(c => c.MessageUser, f => f.Lorem.Paragraph())
                 .RuleFor(c => c.MessageSystem, f => null)
                 .RuleFor(c => c.Status, f => f.PickRandom("Open", "Close"))
@@ -213,23 +213,23 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
 
             List<Contact> contacts = contactFaker.Generate(50);
             contacts[5].Email = users[5].Email;
-            contacts[5].Subject = "Reset Password";
+            contacts[5].Subject = ContactSubject.ResetPassword;
             contacts[5].MessageUser = null;
             contacts[5].MessageSystem = $"Password was reset for user '{users[5]}' on '{contacts[5].Timestamp:G}'.";
             contacts[15].Email = users[7].Email;
-            contacts[15].Subject = "Reset Password";
+            contacts[15].Subject = ContactSubject.ResetPassword;
             contacts[15].MessageUser = null;
             contacts[15].MessageSystem = $"Password was reset for user '{users[7]}' on '{contacts[15].Timestamp:G}'.";
             contacts[25].Email = users[9].Email;
-            contacts[25].Subject = "Reset Password";
+            contacts[25].Subject = ContactSubject.ResetPassword;
             contacts[25].MessageUser = null;
             contacts[25].MessageSystem = $"Password was reset for user '{users[9]}' on '{contacts[25].Timestamp:G}'.";
             contacts[35].Email = users[11].Email;
-            contacts[35].Subject = "Reset Password";
+            contacts[35].Subject = ContactSubject.ResetPassword;
             contacts[35].MessageUser = null;
             contacts[35].MessageSystem = $"Password was reset for user '{users[11]}' on '{contacts[35].Timestamp:G}'.";
             contacts[45].Email = users[13].Email;
-            contacts[45].Subject = "Reset Password";
+            contacts[45].Subject = ContactSubject.ResetPassword;
             contacts[45].MessageUser = null;
             contacts[45].MessageSystem = $"Password was reset for user '{users[13]}' on '{contacts[45].Timestamp:G}'.";
 
