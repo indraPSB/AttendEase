@@ -48,13 +48,13 @@
 </Collapse>
 
 <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
-    <Button Class="me-1 my-1" Color="ButtonColor.Primary" @onclick="OnAddSchedule">Add User</Button>
+    <Button Class="me-1 my-1" Color="ButtonColor.Primary" @onclick="OnAddSchedule">Add Schedule</Button>
     <Button Class="me-1 my-1" Color="ButtonColor.Primary" @onclick="OnEditSchedule" Disabled="isEditDisabled">
-        Edit User
+        Edit Schedule
         <Badge Color="@(isEditDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedSchedulesCount</Badge>
     </Button>
     <Button Class="me-0 my-1" Color="ButtonColor.Primary" @onclick="OnDeleteSchedules" Disabled="isDeleteDisabled">
-        Delete User
+        Delete Schedule
         <Badge Color="@(isDeleteDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedSchedulesCount</Badge>
     </Button>
 </div>
