@@ -319,8 +319,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapAuthEndpoints();
-app.MapUserEndpoints();
+app.MapAttendanceEndpoints();
 app.MapScheduleEndpoints();
+app.MapUserEndpoints();
 
 app.MapOpenApi();
 app.MapScalarApiReference("scalar", options =>
