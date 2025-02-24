@@ -15,6 +15,7 @@ using Scalar.AspNetCore;
 using System.Net;
 using System.Net.Security;
 using System.Text;
+using AttendanceWebService = AttendEase.Web.Services.AttendanceService;
 using AuthWebService = AttendEase.Web.Services.AuthService;
 using ScheduleWebService = AttendEase.Web.Services.ScheduleService;
 using UserWebService = AttendEase.Web.Services.UserService;
@@ -251,6 +252,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
 });
 
 builder.Services.AddScoped<IAuthService, AuthWebService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceWebService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IScheduleService, ScheduleWebService>();
 builder.Services.AddScoped<IUserService, UserWebService>();
