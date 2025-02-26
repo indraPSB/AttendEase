@@ -16,7 +16,7 @@
                     <CardTitle>Schedule Details:</CardTitle>
                     <CardSubTitle Class="mb-2 text-muted">@model.Schedule.DaysOfWeek</CardSubTitle>
                     <CardSubTitle Class="mb-2 text-muted">@model.Schedule.StartDate - @model.Schedule.EndDate</CardSubTitle>
-                    <CardSubTitle Class="mb-2 text-muted">@model.Schedule.StartTime - @model.Schedule.EndTime </CardSubTitle>
+                    <CardSubTitle Class="mb-2 text-muted">@model.Schedule.StartTime - @model.Schedule.EndTime</CardSubTitle>
                     <CardText>
                         @if (model.Schedule is { Latitude: decimal, Longitude: decimal, LocationTolerance: float })
                         {

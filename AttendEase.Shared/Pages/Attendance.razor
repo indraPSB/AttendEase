@@ -21,6 +21,40 @@
                     </ol>
                 </Content>
             </AccordionItem>
+            <AccordionItem Title="What is being shown on the card in upcoming schedules">
+                <Content>
+                    <Card TextAlignment="Alignment.Center" Style="width: 18rem;">
+                        <CardHeader>Schedule Name</CardHeader>
+                        <CardBody>
+                            <CardTitle>Schedule Details:</CardTitle>
+                            <CardSubTitle Class="mb-2 text-muted">Days Of Week</CardSubTitle>
+                            <CardSubTitle Class="mb-2 text-muted">Start Date - End Date</CardSubTitle>
+                            <CardSubTitle Class="mb-2 text-muted">Start Time - End Time</CardSubTitle>
+                            <CardText>
+                                <span><Icon Name="IconName.PinMapFill" Class="me-2" />Latitude,Longitude</span>
+                                <br /><em>Either</em><br />
+                                <Badge Color="BadgeColor.Success" IndicatorType="BadgeIndicatorType.RoundedPill">You are within the premises</Badge>
+                                <br /><em>Or</em><br />
+                                <Badge Color="BadgeColor.Danger" IndicatorType="BadgeIndicatorType.RoundedPill">You are not within the premises</Badge>
+                                <br /><em>Or</em><br />
+                                <Badge Color="BadgeColor.Warning" IndicatorType="BadgeIndicatorType.RoundedPill">Location service not available</Badge>
+                                <br /><em>Or</em><br />
+                                <Badge Color="BadgeColor.Secondary" IndicatorType="BadgeIndicatorType.RoundedPill">Schedule doesn't require location tracking</Badge>
+                            </CardText>
+                            <CardTitle>Attendance Marking Details:</CardTitle>
+                            <CardText>Start Time - End Time<br /><em>for the attendance marking window</em></CardText>
+                            <CardText>
+                                <em>Either</em><br />
+                                <Button Color="ButtonColor.Success" Disabled="true">Attendance Marked</Button>
+                                <br /><em>Or</em><br />
+                                <Button Color="ButtonColor.Primary">Mark Attendance</Button>
+                                <br /><em>Or</em><br />
+                                <Button Color="ButtonColor.Secondary" Disabled="true">Not Attendance Window</Button>
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </Content>
+            </AccordionItem>
         </Accordion>
     </Callout>
 </Collapse>
