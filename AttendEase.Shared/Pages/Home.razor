@@ -1,5 +1,18 @@
 ﻿@page "/"
 
+<style>
+    @@media (max-width: 992px) {
+        .mobile-uniform {
+            flex-direction: column;
+        }
+
+            .mobile-uniform > * {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+    }
+</style>
+
 <PageTitle>Home</PageTitle>
 
 <AuthorizeView>
@@ -63,7 +76,7 @@
             </Callout>
         </Collapse>
 
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2 mobile-uniform">
             <Card TextAlignment="Alignment.Center">
                 <CardHeader>
                     <Icon Name="IconName.PeopleFill" Size="IconSize.x5" Class="pe-2" />User
