@@ -325,6 +325,7 @@ app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapAttendanceEndpoints();
+app.MapContactEndpoints();
 app.MapScheduleEndpoints();
 app.MapUserEndpoints();
 
