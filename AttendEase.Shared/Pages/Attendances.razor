@@ -1,4 +1,5 @@
 ﻿@page "/attendances"
+@using AttendEase.Shared.Components.Attendances
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Attendances</PageTitle>
@@ -22,6 +23,8 @@
         </Accordion>
     </Callout>
 </Collapse>
+
+<AttendanceLayout />
 
 @code {
     private Collapse attendancesHelp = default!;
