@@ -1,5 +1,97 @@
-﻿<h3>Attendance List</h3>
+﻿@using AttendEase.DB.Contexts
+@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
+@using Microsoft.EntityFrameworkCore
+
+<Grid TItem="Attendance" @ref="grid"
+      Class="table table-hover table-bordered table-striped"
+      DataProvider="AttendancesDataProvider"
+      AllowFiltering="true"
+      AllowPaging="true"
+      PageSizeSelectorItems="@([10, 25, 50, 100])"
+      PageSizeSelectorVisible="true"
+      ItemsPerPageText="Users per page"
+      AllowSorting="true"
+      AllowSelection="true"
+      SelectionMode="GridSelectionMode.Multiple"
+      SelectedItemsChanged="OnSelectedItemsChanged"
+      EmptyText="No users to display"
+      Responsive="true">
+
+    <GridColumns>
+        <GridColumn TItem="Attendance" HeaderText="Id" PropertyName="Id" SortKeySelector="item => item.Id">
+            @context.Id
+        </GridColumn>
+        <GridColumn TItem="Attendance" HeaderText="Timestamp" PropertyName="Timestamp" SortKeySelector="item => item.Timestamp">
+            @context.Timestamp.ToString("G")
+        </GridColumn>
+        <GridColumn TItem="Attendance" HeaderText="Schedule" PropertyName="Name" SortKeySelector="item => item.Schedule!.Name">
+            @context.Schedule?.Name
+        </GridColumn>
+        @if (currentUser?.Role == UserRole.Admin)
+        {
+            <GridColumn TItem="Attendance" HeaderText="User" PropertyName="Name" SortKeySelector="item => item.User.Name">
+                @context.User.Name
+            </GridColumn>
+        }
+        <GridColumn TItem="Attendance" HeaderText="Attended" PropertyName="Attended" SortKeySelector="item => item.Attended">
+            @context.Attended
+        </GridColumn>
+    </GridColumns>
+</Grid>
 
 @code {
+    [Inject] IAuthService AuthService { get; set; } = default!;
+    [Inject] AttendEaseDbContext Context { get; set; } = default!;
 
+    [Parameter] public EventCallback<HashSet<Attendance>> SelectedAttendancesChanged { get; set; }
+
+    private User? currentUser = default!;
+    private Grid<Attendance> grid = default!;
+    private IEnumerable<Attendance> attendances = default!;
+    private HashSet<Attendance> selectedAttendances = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await AuthService.GetUser();
+    }
+
+    public async Task RefreshAttendances()
+    {
+        await grid.RefreshDataAsync();
+        StateHasChanged();
+    }
+
+    private async Task<GridDataProviderResult<Attendance>> AttendancesDataProvider(GridDataProviderRequest<Attendance> request)
+    {
+        if (attendances is null && currentUser is not null)
+        {
+            if (currentUser.Role == UserRole.Admin)
+            {
+                attendances = (await Context.Attendances
+                    .OrderByDescending(a => a.Timestamp)
+                    .Include(a => a.Schedule)
+                    .Include(a => a.User)
+                    .ToListAsync());
+            }
+            else
+            {
+                attendances = (await Context.Attendances
+                    .Where(a => a.User.Id == currentUser.Id)
+                    .OrderByDescending(a => a.Timestamp)
+                    .Include(a => a.Schedule)
+                    .Include(a => a.User)
+                    .ToListAsync());
+            }
+        }
+
+        return await Task.FromResult(request.ApplyTo(attendances ?? Enumerable.Empty<Attendance>()));
+    }
+
+    private async Task OnSelectedItemsChanged(HashSet<Attendance> attendances)
+    {
+        selectedAttendances = attendances is not null && attendances.Any() ? attendances : new();
+
+        await SelectedAttendancesChanged.InvokeAsync(selectedAttendances);
+    }
 }

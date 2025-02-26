@@ -1,4 +1,6 @@
-﻿<div class="row">
+﻿@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
+<div class="row">
     <div class="col-12 col-md-6">
         <AttendancePie />
     </div>
@@ -9,8 +11,59 @@
 
 <hr />
 
-<AttendanceList />
+@if (currentUser?.Role == UserRole.Admin)
+{
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
+        <Button Class="me-1 my-1" Color="ButtonColor.Primary" @onclick="OnEditAttendance" Disabled="isEditDisabled">
+            Edit Attendance
+            <Badge Color="@(isEditDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedAttendancesCount</Badge>
+        </Button>
+        <Button Class="me-0 my-1" Color="ButtonColor.Primary" @onclick="OnDeleteAttendances" Disabled="isDeleteDisabled">
+            Delete Attendance
+            <Badge Color="@(isDeleteDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedAttendancesCount</Badge>
+        </Button>
+    </div>
+}
+
+<AttendanceList @ref="listAttendances" SelectedAttendancesChanged="OnSelectedItemsChanged" />
 
 @code {
+    [Inject] IAuthService AuthService { get; set; } = default!;
 
+    private User? currentUser = default!;
+    private HashSet<Attendance> selectedAttendances = new();
+    private AttendanceList listAttendances = default!;
+    private bool isEditDisabled = true;
+    private bool isDeleteDisabled = true;
+    private int selectedAttendancesCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await AuthService.GetUser();
+    }
+
+    private void OnSelectedItemsChanged(HashSet<Attendance> selectedAttendances)
+    {
+        if (currentUser?.Role != UserRole.Admin)
+        {
+            this.selectedAttendances = selectedAttendances;
+            isEditDisabled = selectedAttendances.Count != 1;
+            isDeleteDisabled = selectedAttendances.Count < 1;
+            selectedAttendancesCount = selectedAttendances.Count;
+        }
+    }
+
+    private async Task OnEditAttendance()
+    {
+        if (currentUser?.Role != UserRole.Admin)
+        {
+        }
+    }
+
+    private async Task OnDeleteAttendances()
+    {
+        if (currentUser?.Role != UserRole.Admin)
+        {
+        }
+    }
 }
