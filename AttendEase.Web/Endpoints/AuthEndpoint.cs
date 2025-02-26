@@ -12,7 +12,7 @@ internal static class AuthEndpoint
         return app;
     }
 
-    private static async Task<IResult> Login(LoginRequest request, IAuthService authService, CancellationToken cancellationToken)
+    public static async Task<IResult> Login(LoginRequest request, IAuthService authService, CancellationToken cancellationToken)
     {
         if (request is { Email: not null, Password: not null } && authService is AuthService authWebService)
         {

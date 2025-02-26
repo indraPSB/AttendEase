@@ -12,7 +12,7 @@ internal static class ScheduleEndpoint
         app.MapGet("api/schedules", GetSchedules)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
 
-        app.MapGet("api/schedules{id:guid}", GetSchedule)
+        app.MapGet("api/schedules/{id:guid}", GetSchedule)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
 
         app.MapPost("api/schedules", AddSchedule)
@@ -50,7 +50,7 @@ internal static class ScheduleEndpoint
 
     public static async Task<IResult> GetSchedule(Guid id, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        Schedule? schedule = null; //await scheduleService.GetSchedule(id, cancellationToken);
+        Schedule? schedule = null; //TODO: await scheduleService.GetSchedule(id, cancellationToken);
 
         if (schedule is null)
         {
@@ -62,7 +62,7 @@ internal static class ScheduleEndpoint
 
     public static async Task<IResult> AddSchedule(Schedule schedule, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        //if (await scheduleService.AddSchedule(schedule, cancellationToken))
+        //TODO: if (await scheduleService.AddSchedule(schedule, cancellationToken))
         if (false)
         {
             return Results.Created($"/api/schedules/{schedule.Id}", schedule);
@@ -73,31 +73,34 @@ internal static class ScheduleEndpoint
 
     public static async Task<IResult> UpdateSchedule(Schedule schedule, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        //if (await scheduleService.UpdateSchedule(schedule, cancellationToken))
+        //TODO: if (await scheduleService.UpdateSchedule(schedule, cancellationToken))
         if (false)
         {
             return Results.Ok(schedule);
         }
+
         return Results.BadRequest();
     }
 
     public static async Task<IResult> DeleteSchedule(Guid id, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        //if (await scheduleService.DeleteSchedule(id, cancellationToken))
+        //TODO: if (await scheduleService.DeleteSchedule(id, cancellationToken))
         if (false)
         {
             return Results.NoContent();
         }
+
         return Results.BadRequest();
     }
 
     public static async Task<IResult> DeleteSchedules(List<Guid> ids, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        //if (await scheduleService.DeleteSchedules(ids, cancellationToken))
+        //TODO: if (await scheduleService.DeleteSchedules(ids, cancellationToken))
         if (false)
         {
             return Results.NoContent();
         }
+
         return Results.BadRequest();
     }
 
@@ -117,12 +120,13 @@ internal static class ScheduleEndpoint
     {
         if (schedule is { Users: not null })
         {
-            //if (await scheduleService.UpdateUserAssignment(schedule, cancellationToken))
+            //TODO: if (await scheduleService.UpdateUserAssignment(schedule, cancellationToken))
             if (false)
             {
                 return Results.NoContent();
             }
         }
+
         return Results.BadRequest();
     }
 }
