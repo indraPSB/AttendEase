@@ -258,6 +258,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
 
 builder.Services.AddScoped<IAuthService, AuthWebService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceWebService>();
+builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IScheduleService, ScheduleWebService>();
 builder.Services.AddScoped<IUserService, UserWebService>();
