@@ -1,7 +1,7 @@
 ﻿@using AttendEase.DB.Models
 @using AttendEase.Shared.Models
 
-<div class="d-flex flex-wrap gap-2">
+<div class="d-flex flex-wrap gap-2 mobile-uniform">
     @if (scheduleModels is null)
     {
         <em>Fetching upcoming schedules...</em>
@@ -10,7 +10,7 @@
     {
         foreach (UpcomingSchedulesModel model in scheduleModels)
         {
-            <Card TextAlignment="Alignment.Center" Style="width: 18rem;">
+            <Card TextAlignment="Alignment.Center">
                 <CardHeader>@model.Schedule.Name</CardHeader>
                 <CardBody>
                     <CardTitle>Schedule Details:</CardTitle>
@@ -21,6 +21,7 @@
                         @if (model.Schedule is { Latitude: decimal, Longitude: decimal, LocationTolerance: float })
                         {
                             <span><Icon Name="IconName.PinMapFill" Class="me-2" />@model.Schedule.Latitude,@model.Schedule.Longitude</span>
+                            <br />
                             if (model.IsLocationServiceAvailable)
                             {
                                 if (model.IsWithinPremise.HasValue)
@@ -43,6 +44,7 @@
                         else
                         {
                             <span>-</span>
+                            <br />
                             <Badge Color="BadgeColor.Secondary" IndicatorType="BadgeIndicatorType.RoundedPill">Schedule doesn't require location tracking</Badge>
                         }
                     </CardText>
