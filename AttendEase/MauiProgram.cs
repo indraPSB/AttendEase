@@ -1,9 +1,11 @@
-﻿using AttendEase.Handlers;
+﻿using AttendEase.DB.Contexts;
+using AttendEase.Handlers;
 using AttendEase.Services;
 using AttendEase.Shared.Providers;
 using AttendEase.Shared.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -33,6 +35,11 @@ namespace AttendEase
                 .Build();
 
             builder.Configuration.AddConfiguration(config);
+
+            builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
+            {
+                optionsBuilder.UseNpgsql(builder.Configuration.GetConnectionString("AttendEaseDatabase"));
+            });
 
             builder.Services.AddAuthorizationCore();
 
