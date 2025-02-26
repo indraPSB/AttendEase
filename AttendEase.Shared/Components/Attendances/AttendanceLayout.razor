@@ -5,19 +5,20 @@
 <Tabs EnableFadeEffect="true">
     <Tab Title="Overview">
         <Content>
-            @if (currentUser?.Role == UserRole.Admin)
-            {
-                <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
+                @if (currentUser?.Role == UserRole.Admin)
+                {
                     <Button Class="me-1 my-1" Color="ButtonColor.Primary" @onclick="OnEditAttendance" Disabled="isEditDisabled">
                         Edit Attendance
                         <Badge Color="@(isEditDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedAttendancesCount</Badge>
                     </Button>
-                    <Button Class="me-0 my-1" Color="ButtonColor.Primary" @onclick="OnDeleteAttendances" Disabled="isDeleteDisabled">
+                    <Button Class="me-1 my-1" Color="ButtonColor.Primary" @onclick="OnDeleteAttendances" Disabled="isDeleteDisabled">
                         Delete Attendance
                         <Badge Color="@(isDeleteDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedAttendancesCount</Badge>
                     </Button>
-                </div>
-            }
+                }
+                <Button Class="me-0 my-1" Color="ButtonColor.Primary">Generate Report</Button>
+            </div>
 
             <AttendanceList @ref="listAttendances" SelectedAttendancesChanged="OnSelectedItemsChanged" />
         </Content>
