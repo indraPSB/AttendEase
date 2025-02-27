@@ -17,7 +17,7 @@
                         <Badge Color="@(isDeleteDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedAttendancesCount</Badge>
                     </Button>
                 }
-                <Button Class="me-0 my-1" Color="ButtonColor.Primary">Generate Report</Button>
+                <Button Class="me-0 my-1" Color="ButtonColor.Primary" @onclick="DownloadFile">Generate Report</Button>
             </div>
 
             <AttendanceList @ref="listAttendances" SelectedAttendancesChanged="OnSelectedItemsChanged" />
@@ -75,5 +75,10 @@
         if (currentUser?.Role == UserRole.Admin)
         {
         }
+    }
+
+    private async Task DownloadFile()
+    {
+        await listAttendances.DownloadReport();
     }
 }

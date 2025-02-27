@@ -2,6 +2,7 @@
 @using AttendEase.DB.Models
 @using AttendEase.Shared.Models
 @using Microsoft.EntityFrameworkCore
+@using System.Text
 
 <Grid TItem="Attendance" @ref="grid"
       Class="table table-hover table-bordered table-striped"
@@ -41,6 +42,7 @@
 </Grid>
 
 @code {
+    [Inject] IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] IAuthService AuthService { get; set; } = default!;
     [Inject] AttendEaseDbContext Context { get; set; } = default!;
 
@@ -93,5 +95,19 @@
         selectedAttendances = attendances is not null && attendances.Any() ? attendances : new();
 
         await SelectedAttendancesChanged.InvokeAsync(selectedAttendances);
+    }
+
+    public async Task DownloadReport()
+    {
+        string filename = $"attendance_report_{DateTimeOffset.Now:yyMMdd_HHmmss}.csv";
+
+        StringBuilder builder = new();
+        builder.AppendLine("timestamp,schedule,user,attended,punctual");
+        foreach (var attendance in attendances)
+        {
+            builder.AppendLine($"{attendance.Timestamp},{attendance.Schedule?.Name},{attendance.User.Name},{attendance.Attended},{(TimeOnly.FromDateTime(attendance.Timestamp.DateTime) <= attendance.Schedule?.StartTime)}");
+        }
+
+        await JSRuntime.InvokeVoidAsync("downloadFileFromText", filename, builder.ToString());
     }
 }
