@@ -22,7 +22,7 @@
                 <Button Class="me-0 my-1" Color="ButtonColor.Primary" @onclick="DownloadFile">Generate Report</Button>
             </div>
 
-            <AttendanceList @ref="listAttendances" Attendances="attendances" SelectedAttendancesChanged="OnSelectedItemsChanged" />
+            <ListAttendance @ref="listAttendances" Attendances="attendances" SelectedAttendancesChanged="OnSelectedItemsChanged" />
         </Content>
     </Tab>
     <Tab Title="Trends">
@@ -43,10 +43,10 @@
                             <Content>
                                 <div class="row">
                                     <div class="col-12 col-lg-4">
-                                        <AttendancePie />
+                                        <PieAttendance />
                                     </div>
                                     <div class="col-12 col-lg-8">
-                                        <AttendanceBar Attendances="@attendancesList" />
+                                        <BarAttendance Attendances="@attendancesList" />
                                     </div>
                                 </div>
                             </Content>
@@ -65,7 +65,7 @@
     private User? currentUser = default!;
     private IEnumerable<Attendance> attendances = default!;
     private HashSet<Attendance> selectedAttendances = new();
-    private AttendanceList listAttendances = default!;
+    private ListAttendance listAttendances = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
     private int selectedAttendancesCount = 0;
