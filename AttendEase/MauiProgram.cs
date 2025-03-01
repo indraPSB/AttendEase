@@ -39,7 +39,7 @@ namespace AttendEase
             builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
             {
                 optionsBuilder.UseNpgsql(builder.Configuration.GetConnectionString("AttendEaseDatabase"));
-            });
+            }, ServiceLifetime.Transient);
 
             builder.Services.AddAuthorizationCore();
 

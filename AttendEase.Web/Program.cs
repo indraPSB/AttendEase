@@ -254,7 +254,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
 
             #endregion
         });
-});
+}, ServiceLifetime.Transient);
 
 builder.Services.AddScoped<IAuthService, AuthWebService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceWebService>();
