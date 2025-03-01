@@ -1,12 +1,14 @@
-﻿@using AttendEase.DB.Models
+﻿@using AttendEase.DB.Contexts
+@using AttendEase.DB.Models
 @using AttendEase.Shared.Components.Attendances
 @using AttendEase.Shared.Models
+@using Microsoft.EntityFrameworkCore
 
 <Tabs EnableFadeEffect="true">
     <Tab Title="Overview">
         <Content>
             <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
-                @if (currentUser?.Role == UserRole.Admin)
+                @if (isAdmin)
                 {
                     <Button Class="me-1 my-1" Color="ButtonColor.Primary" @onclick="OnEditAttendance" Disabled="isEditDisabled">
                         Edit Attendance
@@ -20,7 +22,7 @@
                 <Button Class="me-0 my-1" Color="ButtonColor.Primary" @onclick="DownloadFile">Generate Report</Button>
             </div>
 
-            <AttendanceList @ref="listAttendances" SelectedAttendancesChanged="OnSelectedItemsChanged" />
+            <AttendanceList @ref="listAttendances" Attendances="attendances" SelectedAttendancesChanged="OnSelectedItemsChanged" />
         </Content>
     </Tab>
     <Tab Title="Trends">
@@ -39,22 +41,47 @@
 
 @code {
     [Inject] IAuthService AuthService { get; set; } = default!;
+    [Inject] AttendEaseDbContext Context { get; set; } = default!;
 
     private User? currentUser = default!;
+    private IEnumerable<Attendance> attendances = default!;
     private HashSet<Attendance> selectedAttendances = new();
     private AttendanceList listAttendances = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
     private int selectedAttendancesCount = 0;
+    private bool isAdmin = false;
 
     protected override async Task OnInitializedAsync()
     {
         currentUser = await AuthService.GetUser();
+        isAdmin = currentUser?.Role == UserRole.Admin;
+
+        if (attendances is null && currentUser is not null)
+        {
+            if (isAdmin)
+            {
+                attendances = (await Context.Attendances
+                    .OrderByDescending(a => a.Timestamp)
+                    .Include(a => a.Schedule)
+                    .Include(a => a.User)
+                    .ToListAsync());
+            }
+            else
+            {
+                attendances = (await Context.Attendances
+                    .Where(a => a.User.Id == currentUser.Id)
+                    .OrderByDescending(a => a.Timestamp)
+                    .Include(a => a.Schedule)
+                    .Include(a => a.User)
+                    .ToListAsync());
+            }
+        }
     }
 
     private void OnSelectedItemsChanged(HashSet<Attendance> selectedAttendances)
     {
-        if (currentUser?.Role == UserRole.Admin)
+        if (isAdmin)
         {
             this.selectedAttendances = selectedAttendances;
             isEditDisabled = selectedAttendances.Count != 1;
@@ -65,14 +92,14 @@
 
     private async Task OnEditAttendance()
     {
-        if (currentUser?.Role == UserRole.Admin)
+        if (isAdmin)
         {
         }
     }
 
     private async Task OnDeleteAttendances()
     {
-        if (currentUser?.Role == UserRole.Admin)
+        if (isAdmin)
         {
         }
     }

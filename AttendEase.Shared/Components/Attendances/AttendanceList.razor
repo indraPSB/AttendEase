@@ -29,12 +29,9 @@
         <GridColumn TItem="Attendance" HeaderText="Schedule" PropertyName="Name" SortKeySelector="item => item.Schedule!.Name">
             @context.Schedule?.Name
         </GridColumn>
-        @if (currentUser?.Role == UserRole.Admin)
-        {
-            <GridColumn TItem="Attendance" HeaderText="User" PropertyName="Name" SortKeySelector="item => item.User.Name">
-                @context.User.Name
-            </GridColumn>
-        }
+        <GridColumn TItem="Attendance" HeaderText="User" PropertyName="Name" SortKeySelector="item => item.User.Name">
+            @context.User.Name
+        </GridColumn>
         <GridColumn TItem="Attendance" HeaderText="Attended" PropertyName="Attended" SortKeySelector="item => item.Attended">
             @context.Attended
         </GridColumn>
@@ -47,47 +44,32 @@
     [Inject] AttendEaseDbContext Context { get; set; } = default!;
 
     [Parameter] public EventCallback<HashSet<Attendance>> SelectedAttendancesChanged { get; set; }
+    [Parameter] public IEnumerable<Attendance>? Attendances { get; set; }
 
-    private User? currentUser = default!;
     private Grid<Attendance> grid = default!;
-    private IEnumerable<Attendance> attendances = default!;
     private HashSet<Attendance> selectedAttendances = new();
+    private bool isAttendancesSet = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        currentUser = await AuthService.GetUser();
+        if (Attendances is not null && !isAttendancesSet)
+        {
+            isAttendancesSet = true;
+
+            await RefreshAttendances();
+        }
     }
 
     public async Task RefreshAttendances()
     {
         await grid.RefreshDataAsync();
+
         StateHasChanged();
     }
 
     private async Task<GridDataProviderResult<Attendance>> AttendancesDataProvider(GridDataProviderRequest<Attendance> request)
     {
-        if (attendances is null && currentUser is not null)
-        {
-            if (currentUser.Role == UserRole.Admin)
-            {
-                attendances = (await Context.Attendances
-                    .OrderByDescending(a => a.Timestamp)
-                    .Include(a => a.Schedule)
-                    .Include(a => a.User)
-                    .ToListAsync());
-            }
-            else
-            {
-                attendances = (await Context.Attendances
-                    .Where(a => a.User.Id == currentUser.Id)
-                    .OrderByDescending(a => a.Timestamp)
-                    .Include(a => a.Schedule)
-                    .Include(a => a.User)
-                    .ToListAsync());
-            }
-        }
-
-        return await Task.FromResult(request.ApplyTo(attendances ?? Enumerable.Empty<Attendance>()));
+        return await Task.FromResult(request.ApplyTo(Attendances ?? Enumerable.Empty<Attendance>()));
     }
 
     private async Task OnSelectedItemsChanged(HashSet<Attendance> attendances)
@@ -103,7 +85,7 @@
 
         StringBuilder builder = new();
         builder.AppendLine("timestamp,schedule,user,attended,punctual");
-        foreach (var attendance in attendances)
+        foreach (Attendance attendance in Attendances ?? Enumerable.Empty<Attendance>())
         {
             builder.AppendLine($"{attendance.Timestamp},{attendance.Schedule?.Name},{attendance.User.Name},{attendance.Attended},{(TimeOnly.FromDateTime(attendance.Timestamp.DateTime) <= attendance.Schedule?.StartTime)}");
         }
