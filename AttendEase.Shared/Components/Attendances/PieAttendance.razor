@@ -1,5 +1,71 @@
-﻿<h3>Attendance Pie</h3>
+﻿@using AttendEase.DB.Models
+
+<PieChart @ref="pieChart" />
 
 @code {
+    [Parameter] public IEnumerable<Attendance> Attendances { get; set; } = default!;
 
+    private PieChart pieChart = default!;
+    private PieChartOptions pieChartOptions = default!;
+    private ChartData chartData = default!;
+    private bool isFirstRender = false;
+    private bool isParamSet = false;
+    private bool isInitialized = false;
+
+    private Task InitializePie()
+    {
+        isInitialized = true;
+
+        List<string> colors = ["#20c997", "#198754", "#dc3545"]; // Bootstrap colors for teal, success and danger
+        List<string> labels = ["Punctual", "Present", "Absent"];
+        List<IChartDataset> datasets = new();
+        List<double?> data = new();
+
+        // Prepare data for chart
+        data.Add(Attendances.Count(a => TimeOnly.FromDateTime(a.Timestamp.DateTime) <= a.Schedule!.StartTime));
+        data.Add(Attendances.Count(a => a.Attended && TimeOnly.FromDateTime(a.Timestamp.DateTime) > a.Schedule!.StartTime));
+        data.Add(Attendances.Count(a => !a.Attended));
+
+        // Prepare datasets, labels and options for chart
+        datasets.Add(new PieChartDataset() { Label = "Attendance", Data = data, BackgroundColor = colors });
+
+        chartData = new ChartData { Labels = labels, Datasets = datasets };
+
+        pieChartOptions = new();
+        pieChartOptions.Responsive = true;
+
+        pieChartOptions.Plugins.Title!.Display = true;
+        pieChartOptions.Plugins.Title.Color = "Grey";
+        pieChartOptions.Plugins.Title.Text = $"Attendance between {Attendances.Min(a => a.Timestamp):d} and {Attendances.Max(a => a.Timestamp):d}";
+
+        return pieChart.InitializeAsync(chartData, pieChartOptions);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isFirstRender = true;
+
+            if (isFirstRender && isParamSet && !isInitialized)
+            {
+                await InitializePie();
+            }
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Attendances is not null)
+        {
+            isParamSet = true;
+
+            if (isParamSet && isFirstRender && !isInitialized)
+            {
+                await InitializePie();
+            }
+        }
+    }
 }
