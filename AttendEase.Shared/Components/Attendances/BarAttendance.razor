@@ -22,7 +22,7 @@
 
         List<string> colors = ["#20c997", "#198754", "#dc3545"]; // Bootstrap colors for teal, success and danger
         List<string> labels = new(30);
-        List<IChartDataset> datasets = new();
+        List<IChartDataset> datasets = new(3);
         List<double?> punctual = new(30);
         List<double?> present = new(30);
         List<double?> absent = new(30);
@@ -100,7 +100,7 @@
 
         barChartOptions.Plugins.Title!.Display = true;
         barChartOptions.Plugins.Title.Color = "Grey";
-        barChartOptions.Plugins.Title.Text = $"Attendance{(Attendances.Any() ? $" for {Attendances.First().Schedule!.Name}" : string.Empty)}";
+        barChartOptions.Plugins.Title.Text = $"Attendance between {Attendances.Min(a => a.Timestamp):d} and {Attendances.Max(a => a.Timestamp):d}";
 
         return barChart.InitializeAsync(chartData, barChartOptions);
     }
