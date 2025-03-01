@@ -1,5 +1,135 @@
-﻿<h3>Attendance Bar</h3>
+﻿@using AttendEase.DB.Models
+
+<BarChart @ref="barChart" />
 
 @code {
+    [Parameter] public IEnumerable<Attendance> Attendances { get; set; } = default!;
 
+    private BarChart barChart = default!;
+    private BarChartOptions barChartOptions = default!;
+    private ChartData chartData = default!;
+    private bool isFirstRender = false;
+    private bool isParamSet = false;
+    private bool isInitialized = false;
+
+    private Task InitializeBar()
+    {
+        const int ColorPunctual = 0;
+        const int ColorPresent = 1;
+        const int ColorAbsent = 2;
+
+        isInitialized = true;
+
+        List<string> colors = ["#20c997", "#198754", "#dc3545"]; // Bootstrap colors for teal, success and danger
+        List<string> labels = new(30);
+        List<IChartDataset> datasets = new();
+        List<double?> punctual = new(30);
+        List<double?> present = new(30);
+        List<double?> absent = new(30);
+        Dictionary<DateOnly, (double Punctual, double Present, double Absent)> data = new();
+
+        // Prepare data and labels for chart
+        foreach (Attendance attendance in Attendances)
+        {
+            DateOnly key = DateOnly.FromDateTime(attendance.Timestamp.DateTime);
+            bool isPunctual = TimeOnly.FromDateTime(attendance.Timestamp.DateTime) <= attendance.Schedule!.StartTime;
+            bool isPresent = attendance.Attended && !isPunctual;
+            bool isAbsent = !attendance.Attended;
+
+            if (data.TryGetValue(key, out var value))
+            {
+                data[key] = (value.Punctual + (isPunctual ? 1 : 0), value.Present + (isPresent ? 1 : 0), value.Absent + (isAbsent ? 1 : 0));
+            }
+            else
+            {
+                data[key] = (isPunctual ? 1 : 0, isPresent ? 1 : 0, isAbsent ? 1 : 0);
+            }
+        }
+
+        foreach ((DateOnly key, var value) in data.OrderBy(d => d.Key))
+        {
+            labels.Add(key.ToString("MMM d"));
+            punctual.Add(value.Punctual);
+            present.Add(value.Present);
+            absent.Add(value.Absent);
+        }
+
+        // Prepare datasets and options for chart
+        BarChartDataset datasetPunctual = new()
+        {
+            Label = "Punctual",
+            Data = punctual,
+            BackgroundColor = new List<string> { colors[ColorPunctual] },
+            BorderColor = new List<string> { colors[ColorPunctual] },
+            BorderWidth = new List<double> { 0 },
+        };
+        datasets.Add(datasetPunctual);
+
+        BarChartDataset datasetPresent = new()
+        {
+            Label = "Present",
+            Data = present,
+            BackgroundColor = new List<string> { colors[ColorPresent] },
+            BorderColor = new List<string> { colors[ColorPresent] },
+            BorderWidth = new List<double> { 0 },
+        };
+        datasets.Add(datasetPresent);
+
+        BarChartDataset datasetAbsent = new()
+        {
+            Label = "Absent",
+            Data = absent,
+            BackgroundColor = new List<string> { colors[ColorAbsent] },
+            BorderColor = new List<string> { colors[ColorPresent] },
+            BorderWidth = new List<double> { 0 },
+        };
+        datasets.Add(datasetAbsent);
+
+        chartData = new ChartData { Labels = labels, Datasets = datasets };
+
+        barChartOptions = new();
+        barChartOptions.Responsive = true;
+        barChartOptions.Interaction = new Interaction { Mode = InteractionMode.Nearest };
+        barChartOptions.IndexAxis = "x";
+
+        barChartOptions.Scales.X!.Title = new ChartAxesTitle { Display = true, Color = "Grey", Text = "Dates", };
+        barChartOptions.Scales.Y!.Title = new ChartAxesTitle { Display = true, Color = "Grey", Text = "Total", };
+
+        barChartOptions.Scales.X.Stacked = true;
+        barChartOptions.Scales.Y.Stacked = true;
+
+        barChartOptions.Plugins.Title!.Display = true;
+        barChartOptions.Plugins.Title.Color = "Grey";
+        barChartOptions.Plugins.Title.Text = $"Attendance{(Attendances.Any() ? $" for {Attendances.First().Schedule!.Name}" : string.Empty)}";
+
+        return barChart.InitializeAsync(chartData, barChartOptions);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isFirstRender = true;
+
+            if (isFirstRender && isParamSet && !isInitialized)
+            {
+                await InitializeBar();
+            }
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Attendances is not null)
+        {
+            isParamSet = true;
+
+            if (isParamSet && isFirstRender && !isInitialized)
+            {
+                await InitializeBar();
+            }
+        }
+    }
 }

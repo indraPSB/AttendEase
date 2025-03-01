@@ -27,14 +27,33 @@
     </Tab>
     <Tab Title="Trends">
         <Content>
-            <div class="row">
-                <div class="col-12 col-lg-4">
-                    <AttendancePie />
-                </div>
-                <div class="col-12 col-lg-8">
-                    <AttendanceBar />
-                </div>
-            </div>
+            @if (attendances is null)
+            {
+                <em>Fetching attendances...</em>
+            }
+            else
+            {
+                <Tabs EnableFadeEffect="true">
+                    @foreach (var attendancesForSchedule in attendances.Where(a => a.Timestamp > DateTimeOffset.Now.AddDays(-30).Date && a.Timestamp < DateTimeOffset.Now.AddDays(1).Date).GroupBy(a => a.Schedule!.Id))
+                    {
+                        string scheduleName = attendancesForSchedule.First().Schedule!.Name;
+                        List<Attendance> attendancesList = attendancesForSchedule.ToList();
+
+                        <Tab Title="@scheduleName" Name="@attendancesForSchedule.Key.ToString()">
+                            <Content>
+                                <div class="row">
+                                    <div class="col-12 col-lg-4">
+                                        <AttendancePie />
+                                    </div>
+                                    <div class="col-12 col-lg-8">
+                                        <AttendanceBar Attendances="@attendancesList" />
+                                    </div>
+                                </div>
+                            </Content>
+                        </Tab>
+                    }
+                </Tabs>
+            }
         </Content>
     </Tab>
 </Tabs>
