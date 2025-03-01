@@ -34,7 +34,7 @@
             else
             {
                 <Tabs EnableFadeEffect="true">
-                    @foreach (var attendancesForSchedule in attendances.Where(a => a.Timestamp > DateTimeOffset.Now.AddDays(-30).Date && a.Timestamp < DateTimeOffset.Now.AddDays(1).Date).GroupBy(a => a.Schedule!.Id))
+                    @foreach (var attendancesForSchedule in attendances.Where(a => a.Timestamp > DateTimeOffset.Now.AddDays(-29).Date && a.Timestamp < DateTimeOffset.Now.AddDays(1).Date).GroupBy(a => a.Schedule!.Id))
                     {
                         string scheduleName = attendancesForSchedule.First().Schedule!.Name;
                         List<Attendance> attendancesList = attendancesForSchedule.ToList();

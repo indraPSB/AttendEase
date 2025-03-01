@@ -17,15 +17,17 @@
         const int ColorPunctual = 0;
         const int ColorPresent = 1;
         const int ColorAbsent = 2;
+        const int ColorTrend = 3;
 
         isInitialized = true;
 
-        List<string> colors = ["#20c997", "#198754", "#dc3545"]; // Bootstrap colors for teal, success and danger
-        List<string> labels = new(30);
+        List<string> colors = ["#20c997", "#198754", "#dc3545", "#ffc107"]; // Bootstrap colors for teal, success, danger and warning
+        List<string> labels = new(33);
         List<IChartDataset> datasets = new(3);
         List<double?> punctual = new(30);
         List<double?> present = new(30);
         List<double?> absent = new(30);
+        List<double?> trend = Enumerable.Range(0, 30).Select(_ => (double?)null).ToList();
         Dictionary<DateOnly, (double Punctual, double Present, double Absent)> data = new();
 
         // Prepare data and labels for chart
@@ -52,6 +54,20 @@
             punctual.Add(value.Punctual);
             present.Add(value.Present);
             absent.Add(value.Absent);
+        }
+
+        // Calculate moving averages
+        int days = 3;
+        DateOnly maxDate = data.Keys.Max();
+        double total = punctual.Sum() ?? 0D + present.Sum() ?? 0D;
+        for (int i = 0; i < days; i++)
+        {
+            double average = total / trend.Count;
+            total += average;
+
+            trend.Add(average);
+
+            labels.Add(maxDate.AddDays(i + 1).ToString("MMM d"));
         }
 
         // Prepare datasets and options for chart
@@ -84,6 +100,16 @@
             BorderWidth = new List<double> { 0 },
         };
         datasets.Add(datasetAbsent);
+
+        BarChartDataset datasetTrend = new()
+        {
+            Label = "Trend",
+            Data = trend,
+            BackgroundColor = new List<string> { colors[ColorTrend] },
+            BorderColor = new List<string> { colors[ColorTrend] },
+            BorderWidth = new List<double> { 0 },
+        };
+        datasets.Add(datasetTrend);
 
         chartData = new ChartData { Labels = labels, Datasets = datasets };
 
