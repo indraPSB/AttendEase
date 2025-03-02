@@ -19,6 +19,9 @@
         <GridColumn TItem="Schedule" HeaderText="Id" PropertyName="Id" SortKeySelector="item => item.Id">
             @context.Id
         </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Name" PropertyName="Name" SortKeySelector="item => item.Name">
+            @context.Name
+        </GridColumn>
         <GridColumn TItem="Schedule" HeaderText="Start Date" PropertyName="StartDate" SortKeySelector="item => item.StartDate">
             @context.StartDate
         </GridColumn>
