@@ -37,7 +37,7 @@ internal static class ScheduleService
         try
         {
             // SELECT * FROM schedule WHERE id = @id;
-            return await context.Schedules.SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
+            return await context.Schedules.Include(s => s.Users).SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
         }
         catch (Exception ex)
         {
