@@ -50,7 +50,7 @@ internal static class ScheduleEndpoint
 
     public static async Task<IResult> GetSchedule(Guid id, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        Schedule? schedule = null; //TODO: await scheduleService.GetSchedule(id, cancellationToken);
+        Schedule? schedule = await scheduleService.GetSchedule(id, cancellationToken);
 
         if (schedule is null)
         {
@@ -62,8 +62,7 @@ internal static class ScheduleEndpoint
 
     public static async Task<IResult> AddSchedule(Schedule schedule, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        //TODO: if (await scheduleService.AddSchedule(schedule, cancellationToken))
-        if (false)
+        if (await scheduleService.AddSchedule(schedule, cancellationToken))
         {
             return Results.Created($"/api/schedules/{schedule.Id}", schedule);
         }
@@ -73,8 +72,7 @@ internal static class ScheduleEndpoint
 
     public static async Task<IResult> UpdateSchedule(Schedule schedule, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        //TODO: if (await scheduleService.UpdateSchedule(schedule, cancellationToken))
-        if (false)
+        if (await scheduleService.UpdateSchedule(schedule, cancellationToken))
         {
             return Results.Ok(schedule);
         }
@@ -84,8 +82,7 @@ internal static class ScheduleEndpoint
 
     public static async Task<IResult> DeleteSchedule(Guid id, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        //TODO: if (await scheduleService.DeleteSchedule(id, cancellationToken))
-        if (false)
+        if (await scheduleService.DeleteSchedule(id, cancellationToken))
         {
             return Results.NoContent();
         }
@@ -95,8 +92,7 @@ internal static class ScheduleEndpoint
 
     public static async Task<IResult> DeleteSchedules(List<Guid> ids, IScheduleService scheduleService, CancellationToken cancellationToken)
     {
-        //TODO: if (await scheduleService.DeleteSchedules(ids, cancellationToken))
-        if (false)
+        if (await scheduleService.DeleteSchedules(ids, cancellationToken))
         {
             return Results.NoContent();
         }
