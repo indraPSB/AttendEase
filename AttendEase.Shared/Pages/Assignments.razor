@@ -93,6 +93,7 @@ else
 }
 
 @code {
+    [Inject] ToastService ToastService { get; set; } = default!;
     [Inject] IScheduleService ScheduleService { get; set; } = default!;
     [Inject] IUserService UserService { get; set; } = default!;
 
@@ -115,6 +116,16 @@ else
     {
         if (selectedSchedule is null)
         {
+            ToastMessage message = new()
+            {
+                Type = ToastType.Warning,
+                Title = "Schedule Not Found",
+                HelpText = $"{DateTimeOffset.Now:G}",
+                AutoHide = true,
+                Message = $"Unable to find schedule."
+            };
+            ToastService.Notify(message);
+
             return;
         }
 
@@ -124,7 +135,32 @@ else
             Users = assignedUsers.DistinctBy(u => u.Id).Select(u => new User { Id = u.Id }).ToList()
         };
 
-        _ = await ScheduleService.UpdateUserAssignment(updateSchedule);
+        bool success = await ScheduleService.UpdateUserAssignment(updateSchedule);
+
+        if (success)
+        {
+            ToastMessage message = new()
+            {
+                Type = ToastType.Success,
+                Title = "User Assignment Saved",
+                HelpText = $"{DateTimeOffset.Now:G}",
+                AutoHide = true,
+                Message = $"User assignment for '{selectedSchedule.Name}' saved successfully."
+            };
+            ToastService.Notify(message);
+        }
+        else
+        {
+            ToastMessage message = new()
+            {
+                Type = ToastType.Danger,
+                Title = "User Assignment Failed",
+                HelpText = $"{DateTimeOffset.Now:G}",
+                AutoHide = true,
+                Message = $"Failed to save user assignment for '{selectedSchedule.Name}'."
+            };
+            ToastService.Notify(message);
+        }
     }
 
     private async Task LoadData()
