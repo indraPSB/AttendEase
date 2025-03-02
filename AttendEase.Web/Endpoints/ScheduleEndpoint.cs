@@ -116,8 +116,7 @@ internal static class ScheduleEndpoint
     {
         if (schedule is { Users: not null })
         {
-            //TODO: if (await scheduleService.UpdateUserAssignment(schedule, cancellationToken))
-            if (false)
+            if (await scheduleService.UpdateUserAssignment(schedule, cancellationToken))
             {
                 return Results.NoContent();
             }
