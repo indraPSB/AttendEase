@@ -178,4 +178,46 @@ internal static class ScheduleService
 
         return null;
     }
+
+    public static async Task<bool> UpdateUserAssignment<T>(Schedule schedule, ILogger<T> logger, AttendEaseDbContext context, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+        try
+        {
+            if (schedule is { Users: not null })
+            {
+                // SELECT * FROM schedule WHERE id = @scheduleId;
+                Schedule? dbSchedule = await context.Schedules.Include(s => s.Users).SingleOrDefaultAsync(s => s.Id == schedule.Id, cancellationToken);
+
+                if (dbSchedule is { Users: not null })
+                {
+                    dbSchedule.Users.Clear();
+
+                    foreach (User user in schedule.Users)
+                    {
+                        // SELECT * FROM user WHERE id = @userId;
+                        User? dbUser = await context.Users.FindAsync(user.Id);
+
+                        if (dbUser is not null)
+                        {
+                            dbSchedule.Users.Add(dbUser);
+                        }
+                    }
+
+                    await context.SaveChangesAsync(cancellationToken);
+
+                    return true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in DB UpdateUserAssignment with message, '{message}'.", ex.Message);
+        }
+
+        return false;
+    }
 }
