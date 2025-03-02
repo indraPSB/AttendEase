@@ -19,6 +19,8 @@ public interface IScheduleService
     Task<bool> DeleteSchedules(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<Schedule>?> GetSchedules(Guid userId, CancellationToken cancellationToken = default);
+
+    Task<bool> UpdateUserAssignment(Schedule schedule, CancellationToken cancellationToken = default);
 }
 
 public class ScheduleService(ILogger<ScheduleService> logger, HttpClient httpClient) : IScheduleService
@@ -233,5 +235,31 @@ public class ScheduleService(ILogger<ScheduleService> logger, HttpClient httpCli
         }
 
         return null;
+    }
+
+    public async Task<bool> UpdateUserAssignment(Schedule schedule, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.PutAsJsonAsync("/api/schedules/user", schedule, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("User assignment updated successfully.");
+
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Shared UpdateUserAssignment with message, '{message}'.", ex.Message);
+        }
+
+        return false;
     }
 }
