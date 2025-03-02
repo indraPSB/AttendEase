@@ -85,4 +85,14 @@ internal class ScheduleService(ILogger<ScheduleService> logger, AttendEaseDbCont
 
         return ScheduleDBService.GetSchedules(userId, _logger, _context, cancellationToken);
     }
+
+    public Task<bool> UpdateUserAssignment(Schedule schedule, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        return ScheduleDBService.UpdateUserAssignment(schedule, _logger, _context, cancellationToken);
+    }
 }
