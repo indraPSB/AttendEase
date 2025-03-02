@@ -15,9 +15,18 @@ else
     <ol>
         @foreach (var user in Users)
         {
-            <li>@user.Name</li>
+            if (user.Id == currentUser?.Id)
+            {
+                <li class="text-danger-emphasis">@user.Name (current user cannot be deleted and will be ignored)</li>
+            }
+            else
+            {
+                <li>@user.Name</li>
+            }
         }
     </ol>
+
+    @((MarkupString)message)
 
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
         <Button Color="ButtonColor.Primary" @onclick="OnDelete">Delete</Button>
@@ -25,30 +34,38 @@ else
 }
 
 @code {
+    [Inject] public IAuthService AuthService { get; set; } = default!;
+
     [Parameter] public EventCallback<DeleteUsersModel> DeletedUsers { get; set; }
     [Parameter] public IEnumerable<User> Users { get; set; } = default!;
 
+    private User? currentUser = default!;
     private DeleteUsersModel deleteUsersModel = new();
     private string message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await AuthService.GetUser();
+    }
 
     private async Task OnDelete()
     {
         bool success = Users.Count() == 1
-            ? await UserService.DeleteUser(Users.First().Id)
-            : await UserService.DeleteUsers(Users.Select(u => u.Id));
+            ? await UserService.DeleteUser(Users.Where(u => u.Id != currentUser?.Id).First().Id)
+            : await UserService.DeleteUsers(Users.Where(u => u.Id != currentUser?.Id).Select(u => u.Id));
 
         if (success)
         {
             DeleteUsersModel usersModel = new()
             {
-                Users = Users
+                Users = Users.Where(u => u.Id != currentUser?.Id)
             };
 
             await DeletedUsers.InvokeAsync(usersModel);
         }
         else
         {
-            message = "Failed to delete users";
+            message = "<div class='validation-message'>Failed to delete users.</div>";
         }
     }
 
