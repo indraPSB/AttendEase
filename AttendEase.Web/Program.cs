@@ -166,6 +166,7 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
             IEnumerator<Attendance> attendanceEnumerator = attendanceFaker.GenerateForever().GetEnumerator();
             DateOnly date = new(2025, 1, 1);
             DateOnly endDate = new(2025, 3, 9);
+            Random random = new(Seed);
 
             while (true)
             {
@@ -206,12 +207,14 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
                         attendanceEnumerator.MoveNext();
 
                         TimeOnly time = schedule.StartTime ?? new(0, 0, 0);
+                        DateTimeOffset timestamp = new(date, time, TimeSpan.Zero);
+                        bool hasAttended = random.NextDouble() < 0.9; // 90% chance of attendance
                         Attendance attendance = attendanceEnumerator.Current;
-                        attendance.Timestamp = new DateTimeOffset(date, time, TimeSpan.Zero);
+                        attendance.Timestamp = hasAttended ? (random.NextDouble() < 0.6 ? timestamp.AddMinutes(-random.Next(1, schedule.AttendanceStartBefore)) : timestamp.AddMinutes(random.Next(1, schedule.AbsentAfter))) : timestamp; // 60% chance of early attendance
                         attendance.Id = GenerateGuidV7(attendance.Id, attendance.Timestamp.ToUnixTimeMilliseconds());
                         attendance.UserId = user.Id;
                         attendance.ScheduleId = schedule.Id;
-                        attendance.Attended = true;
+                        attendance.Attended = hasAttended;
                         attendance.Schedule = schedule;
                         attendance.User = user;
 
