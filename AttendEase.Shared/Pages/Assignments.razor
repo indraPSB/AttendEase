@@ -51,7 +51,7 @@ else
                     <hr />
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center my-2">
-                        <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Disabled="IsSaveDisabled">Save User Assignment</Button>
+                        <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Disabled="IsSaveDisabled" @onclick="OnSave">Save User Assignment</Button>
                     </div>
 
                     <div class="row">
@@ -103,11 +103,28 @@ else
     private List<User> users = default!;
     private List<User> unassignedUsers = default!;
     private List<User> assignedUsers = default!;
+    private Schedule? selectedSchedule = default!;
     private bool isUserListDirty = false;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+    }
+
+    private async Task OnSave()
+    {
+        if (selectedSchedule is null)
+        {
+            return;
+        }
+
+        Schedule updateSchedule = new()
+        {
+            Id = selectedSchedule.Id,
+            Users = assignedUsers.DistinctBy(u => u.Id).Select(u => new User { Id = u.Id }).ToList()
+        };
+
+        _ = await ScheduleService.UpdateUserAssignment(updateSchedule);
     }
 
     private async Task LoadData()
@@ -128,7 +145,8 @@ else
         assignedUsers?.Clear();
 
         _ = Guid.TryParse(e.ActiveTabName, out Guid scheduleId);
-        assignedUsers = (await ScheduleService.GetSchedule(scheduleId))?.Users?.ToList() ?? [];
+        selectedSchedule = await ScheduleService.GetSchedule(scheduleId);
+        assignedUsers = selectedSchedule?.Users?.ToList() ?? [];
 
         UserEqualityComparer userComparer = new();
         unassignedUsers = users.Except(assignedUsers, userComparer).ToList();
