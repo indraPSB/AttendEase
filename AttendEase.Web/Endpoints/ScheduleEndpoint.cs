@@ -57,6 +57,11 @@ internal static class ScheduleEndpoint
             return Results.NotFound();
         }
 
+        foreach (User user in schedule.Users)
+        {
+            user.Schedules = null!;
+        }
+
         return Results.Ok(schedule);
     }
 
