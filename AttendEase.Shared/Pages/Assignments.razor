@@ -93,7 +93,8 @@ else
 }
 
 @code {
-    [Inject] AttendEaseDbContext Context { get; set; } = default!; // TODO: Remove DB access from view
+    [Inject] IScheduleService ScheduleService { get; set; } = default!;
+    [Inject] IUserService UserService { get; set; } = default!;
 
     public bool IsSaveDisabled => !isUserListDirty;
 
@@ -111,8 +112,13 @@ else
 
     private async Task LoadData()
     {
-        schedules = await Context.Schedules.ToListAsync();
-        users = await Context.Users.ToListAsync();
+        Task<IEnumerable<Schedule>?> getSchedules = ScheduleService.GetSchedules();
+        Task<IEnumerable<User>?> getUsers = UserService.GetUsers();
+
+        await Task.WhenAll(getSchedules, getUsers);
+
+        schedules = (await getSchedules)?.ToList() ?? [];
+        users = (await getUsers)?.ToList() ?? [];
     }
 
     private async Task HandleOnShowing(TabsEventArgs e)
@@ -122,7 +128,7 @@ else
         assignedUsers?.Clear();
 
         _ = Guid.TryParse(e.ActiveTabName, out Guid scheduleId);
-        assignedUsers = (await Context.Schedules.Where(s => s.Id == scheduleId).Include(s => s.Users).FirstOrDefaultAsync())?.Users?.ToList() ?? [];
+        assignedUsers = (await ScheduleService.GetSchedule(scheduleId))?.Users?.ToList() ?? [];
 
         UserEqualityComparer userComparer = new();
         unassignedUsers = users.Except(assignedUsers, userComparer).ToList();
@@ -143,7 +149,6 @@ else
         {
             unassignedUsers.Add(userToMove);
         }
-
     }
 
     private void OnAssignedUsersUpdate(SortableListEventArgs args)
@@ -161,7 +166,6 @@ else
         {
             assignedUsers.Add(userToMove);
         }
-
     }
 
     private void OnUnassignedUsersRemove(SortableListEventArgs args)
@@ -177,7 +181,6 @@ else
     private void OnAssignedUsersRemove(SortableListEventArgs args)
     {
         isUserListDirty = true;
-
         User user = assignedUsers[args.OldIndex];
 
         unassignedUsers.Insert(args.NewIndex, user);
@@ -187,14 +190,19 @@ else
 
     public class UserEqualityComparer : IEqualityComparer<User>
     {
-        public bool Equals(User x, User y)
+        public bool Equals(User? user1, User? user2)
         {
-            return x.Id.Equals(y.Id);
+            if (user1 is null || user2 is null)
+            {
+                return false;
+            }
+
+            return user1.Id.Equals(user2.Id);
         }
 
-        public int GetHashCode([DisallowNull] User obj)
+        public int GetHashCode([DisallowNull] User user)
         {
-            return obj.Id.GetHashCode();
+            return user.Id.GetHashCode();
         }
     }
 }
