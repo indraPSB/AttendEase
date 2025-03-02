@@ -19,9 +19,9 @@ else
             <label for="edit-schedule-name">Name</label>
         </div>
 
-        <Switch Id="edit-schedule-set-dates" Class="mb-3" Label="Set Dates" @bind-Value="@editScheduleModel.SetDates" />
+        <Switch Id="edit-schedule-set-dates" Class="mb-3" Label="@(editScheduleModel.Repeat ? "Repeat (Indefinitely)" : "Repeat (Set Dates)")" @bind-Value="@editScheduleModel.Repeat" />
 
-        @if (editScheduleModel.SetDates)
+        @if (!editScheduleModel.Repeat)
         {
             <div class="form-floating mb-3">
                 <DateInput TValue="DateOnly" Id="edit-schedule-start-date" Class="form-control" Placeholder="StartDate" @bind-Value="@editScheduleModel.StartDate" />
@@ -122,16 +122,6 @@ else
             <label for="edit-schedule-absent-after">Absent After</label>
         </div>
 
-        <div class="form-floating mb-3">
-            <div id="add-schedule-repeat" class="form-control d-flex flex-wrap gap-2" style="height: max-content">
-                <label class="form-check">
-                    <input type="checkbox" class="form-check-input" @bind="@editScheduleModel.Repeat" />
-                    <span class="form-check-label" style="vertical-align: middle;"></span>
-                </label>
-            </div>
-            <label for="add-schedule-repeat">Repeat</label>
-        </div>
-
         <ValidationMessage For="@(() => editScheduleModel.Name)" class="validation-message mt-3" />
         <ValidationMessage For="@(() => editScheduleModel.StartTime)" />
         <ValidationMessage For="@(() => editScheduleModel.EndTime)" />
@@ -166,7 +156,6 @@ else
         editScheduleModel = new EditScheduleModel
         {
             Name = Schedule.Name,
-            SetDates = Schedule.StartDate is not null && Schedule.EndDate is not null,
             StartDate = Schedule.StartDate ?? DateOnly.FromDateTime(DateTime.Now),
             EndDate = Schedule.EndDate ?? DateOnly.FromDateTime(DateTime.Now),
             StartTime = Schedule.StartTime ?? new TimeOnly(),
@@ -190,8 +179,8 @@ else
             if (editScheduleModel is { SetLocation: true, Latitude: not null, Longitude: not null, LocationTolerance: not null } || !editScheduleModel.SetLocation)
             {
                 Schedule.Name = editScheduleModel.Name!;
-                Schedule.StartDate = editScheduleModel.SetDates ? editScheduleModel.StartDate : null;
-                Schedule.EndDate = editScheduleModel.SetDates ? editScheduleModel.EndDate : null;
+                Schedule.StartDate = editScheduleModel.Repeat ? null : editScheduleModel.StartDate;
+                Schedule.EndDate = editScheduleModel.Repeat ? null : editScheduleModel.EndDate;
                 Schedule.StartTime = editScheduleModel.StartTime;
                 Schedule.EndTime = editScheduleModel.EndTime;
                 Schedule.DaysOfWeek = editScheduleModel.DaysOfWeek.ToString();
@@ -259,8 +248,6 @@ else
     {
         [Required(ErrorMessage = "'Name' is required.")]
         public string? Name { get; set; }
-
-        public bool SetDates { get; set; } = true;
 
         public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
