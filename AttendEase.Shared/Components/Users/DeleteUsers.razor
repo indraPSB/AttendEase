@@ -1,6 +1,5 @@
 ﻿@using AttendEase.DB.Models
 @using AttendEase.Shared.Models
-@using System.ComponentModel.DataAnnotations
 @inject IUserService UserService
 
 @if (Users is null)
@@ -72,6 +71,7 @@ else
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+
         if (Users is not null)
         {
             deleteUsersModel.Users = Users;

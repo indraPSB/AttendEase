@@ -1,5 +1,66 @@
-﻿<h3>Delete Schedules</h3>
+﻿@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
+@inject IScheduleService ScheduleService
+
+@if (Schedules is null)
+{
+    <Alert Color="AlertColor.Warning">
+        No schedules were found
+    </Alert>
+}
+else
+{
+    <span>The following schedules will be deleted:</span>
+    <ol>
+        @foreach (var schedule in Schedules)
+        {
+            <li>@schedule.Name</li>
+        }
+    </ol>
+
+    @((MarkupString)message)
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <Button Color="ButtonColor.Primary" @onclick="OnDelete">Delete</Button>
+    </div>
+}
 
 @code {
+    [Parameter] public EventCallback<DeleteSchedulesModel> DeletedSchedules { get; set; }
+    [Parameter] public IEnumerable<Schedule> Schedules { get; set; } = default!;
 
+    private DeleteSchedulesModel deleteSchedulesModel = new();
+    private string message = string.Empty;
+
+    private async Task OnDelete()
+    {
+        bool success = Schedules.Count() == 1
+            ? await ScheduleService.DeleteSchedule(Schedules.First().Id)
+            : await ScheduleService.DeleteSchedules(Schedules.Select(s => s.Id));
+
+        if (success)
+        {
+            DeleteSchedulesModel schedulesModel = new()
+            {
+                Schedules = Schedules
+            };
+
+            await DeletedSchedules.InvokeAsync(schedulesModel);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Schedules is not null)
+        {
+            deleteSchedulesModel.Schedules = Schedules;
+        }
+    }
+
+    public class DeleteSchedulesModel
+    {
+        public IEnumerable<Schedule> Schedules { get; set; } = default!;
+    }
 }

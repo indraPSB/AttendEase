@@ -73,7 +73,7 @@
     </BodyTemplate>
 </Modal>
 
-<Modal @ref="deleteUserModal" title="Delete Users" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
+<Modal @ref="deleteUsersModal" title="Delete Users" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
     <BodyTemplate>
         <DeleteUsers />
     </BodyTemplate>
@@ -83,11 +83,11 @@
     [Inject] ToastService ToastService { get; set; } = default!;
 
     private HashSet<DBUser> selectedUsers = new();
-    private ListUsers listUsers = default!;
     private Collapse usersHelp = default!;
+    private ListUsers listUsers = default!;
     private Modal addUserModal = default!;
     private Modal editUserModal = default!;
-    private Modal deleteUserModal = default!;
+    private Modal deleteUsersModal = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
     private int selectedUsersCount = 0;
@@ -174,7 +174,8 @@
                 { "Users", selectedUsers },
                 { "DeletedUsers", EventCallback.Factory.Create<DeleteUsers.DeleteUsersModel>(this, OnDeletedUsers) }
             };
-            await deleteUserModal.ShowAsync<DeleteUsers>("Delete Users", parameters: parameters);
+
+            await deleteUsersModal.ShowAsync<DeleteUsers>("Delete Users", parameters: parameters);
         }
         else
         {

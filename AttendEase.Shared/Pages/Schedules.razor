@@ -73,6 +73,12 @@
     </BodyTemplate>
 </Modal>
 
+<Modal @ref="deleteSchedulesModal" title="Delete Schedules" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
+    <BodyTemplate>
+        <DeleteSchedules />
+    </BodyTemplate>
+</Modal>
+
 @code {
     [Inject] ToastService ToastService { get; set; } = default!;
 
@@ -81,6 +87,7 @@
     private ListSchedules listSchedules = default!;
     private Modal addScheduleModal = default!;
     private Modal editScheduleModal = default!;
+    private Modal deleteSchedulesModal = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
     private int selectedSchedulesCount = 0;
@@ -160,6 +167,49 @@
 
     private async Task OnDeleteSchedules()
     {
+        if (selectedSchedules.Count > 0)
+        {
+            Dictionary<string, object>? parameters = new()
+            {
+                { "Schedules", selectedSchedules },
+                { "DeletedSchedules", EventCallback.Factory.Create<DeleteSchedules.DeleteSchedulesModel>(this, OnDeletedSchedules) }
+            };
+
+            await deleteSchedulesModal.ShowAsync<DeleteSchedules>("Delete Schedules", parameters: parameters);
+        }
+        else
+        {
+            ToastMessage message = new()
+            {
+                Type = ToastType.Warning,
+                Title = "Cannot Edit Schedule",
+                HelpText = $"{DateTimeOffset.Now:G}",
+                AutoHide = true,
+                Message = "Exactly one schedule must be selected to be edited."
+            };
+            ToastService.Notify(message);
+        }
+    }
+
+    private async Task OnDeletedSchedules(DeleteSchedules.DeleteSchedulesModel schedules)
+    {
+        int count = schedules.Schedules.Count();
+        ToastMessage message = new()
+        {
+            Type = ToastType.Success,
+            Title = "Schedule Deleted",
+            HelpText = $"{DateTimeOffset.Now:G}",
+            AutoHide = true,
+            Message = count == 1
+                ? $"Schedule '{schedules.Schedules.First().Name}' deleted successfully."
+                : $"'{count}' schedule{(count == 1 ? " " : "s ")}deleted successfully."
+        };
+        ToastService.Notify(message);
+
+        await listSchedules.RefreshSchedules();
+
+        //await deleteScheduleModal.HideAsync();
+    }
 
     private async Task OnHiding()
     {
