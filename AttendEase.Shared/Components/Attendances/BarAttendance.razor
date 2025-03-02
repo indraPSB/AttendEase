@@ -22,12 +22,11 @@
         isInitialized = true;
 
         List<string> colors = ["#20c997", "#198754", "#dc3545", "#ffc107"]; // Bootstrap colors for teal, success, danger and warning
-        List<string> labels = new(33);
-        List<IChartDataset> datasets = new(3);
-        List<double?> punctual = new(30);
-        List<double?> present = new(30);
-        List<double?> absent = new(30);
-        List<double?> trend = Enumerable.Range(0, 30).Select(_ => (double?)null).ToList();
+        List<string> labels = new();
+        List<IChartDataset> datasets = new();
+        List<double?> punctual = new();
+        List<double?> present = new();
+        List<double?> absent = new();
         Dictionary<DateOnly, (double Punctual, double Present, double Absent)> data = new();
 
         // Prepare data and labels for chart
@@ -57,17 +56,21 @@
         }
 
         // Calculate moving averages
-        int days = 3;
-        DateOnly maxDate = data.Keys.Max();
-        double total = punctual.Sum() ?? 0D + present.Sum() ?? 0D;
-        for (int i = 0; i < days; i++)
+        List<double?> trend = Enumerable.Range(0, punctual.Count).Select(_ => (double?)null).ToList();
+        int window = 3;
+        if (punctual.Count >= window)
         {
-            double average = total / trend.Count;
-            total += average;
+            DateOnly maxDate = data.Keys.Max();
 
-            trend.Add(average);
+            for (int i = 0; i < window; i++)
+            {
+                double total = (punctual.TakeLast(window - i).Sum() ?? 0D) + (present.TakeLast(window).Sum() ?? 0D) + (trend.Where(t => t.HasValue).Sum() ?? 0D);
+                double average = total / window;
 
-            labels.Add(maxDate.AddDays(i + 1).ToString("MMM d"));
+                trend.Add(average);
+
+                labels.Add(maxDate.AddDays(i + 1).ToString("MMM d"));
+            }
         }
 
         // Prepare datasets and options for chart
