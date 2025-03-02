@@ -49,6 +49,8 @@ else
 
     private async Task OnDelete()
     {
+        message = string.Empty;
+
         bool success = Users.Count() == 1
             ? await UserService.DeleteUser(Users.Where(u => u.Id != currentUser?.Id).First().Id)
             : await UserService.DeleteUsers(Users.Where(u => u.Id != currentUser?.Id).Select(u => u.Id));

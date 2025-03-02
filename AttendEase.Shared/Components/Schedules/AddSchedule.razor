@@ -40,44 +40,44 @@
         <div id="add-schedule-days-of-week" class="form-control d-flex flex-wrap gap-2" style="height: max-content">
             <label class="form-check">
                 <input type="checkbox" class="form-check-input"
-                       @onchange="e => OnDayChanged(e, DaysOfWeek.Monday)"
-                       checked="@IsDaySelected(DaysOfWeek.Monday)" />
+                @onchange="e => OnDayChanged(e, DaysOfWeek.Monday)"
+                checked="@IsDaySelected(DaysOfWeek.Monday)" />
                 <span class="form-check-label" style="vertical-align: middle;">Mon</span>
             </label>
             <label class="form-check">
                 <input type="checkbox" class="form-check-input"
-                       @onchange="e => OnDayChanged(e, DaysOfWeek.Tuesday)"
-                       checked="@IsDaySelected(DaysOfWeek.Tuesday)" />
+                @onchange="e => OnDayChanged(e, DaysOfWeek.Tuesday)"
+                checked="@IsDaySelected(DaysOfWeek.Tuesday)" />
                 <span class="form-check-label" style="vertical-align: middle;">Tue</span>
             </label>
             <label class="form-check">
                 <input type="checkbox" class="form-check-input"
-                       @onchange="e => OnDayChanged(e, DaysOfWeek.Wednesday)"
-                       checked="@IsDaySelected(DaysOfWeek.Wednesday)" />
+                @onchange="e => OnDayChanged(e, DaysOfWeek.Wednesday)"
+                checked="@IsDaySelected(DaysOfWeek.Wednesday)" />
                 <span class="form-check-label" style="vertical-align: middle;">Wed</span>
             </label>
             <label class="form-check">
                 <input type="checkbox" class="form-check-input"
-                       @onchange="e => OnDayChanged(e, DaysOfWeek.Thursday)"
-                       checked="@IsDaySelected(DaysOfWeek.Thursday)" />
+                @onchange="e => OnDayChanged(e, DaysOfWeek.Thursday)"
+                checked="@IsDaySelected(DaysOfWeek.Thursday)" />
                 <span class="form-check-label" style="vertical-align: middle;">Thu</span>
             </label>
             <label class="form-check">
                 <input type="checkbox" class="form-check-input"
-                       @onchange="e => OnDayChanged(e, DaysOfWeek.Friday)"
-                       checked="@IsDaySelected(DaysOfWeek.Friday)" />
+                @onchange="e => OnDayChanged(e, DaysOfWeek.Friday)"
+                checked="@IsDaySelected(DaysOfWeek.Friday)" />
                 <span class="form-check-label" style="vertical-align: middle;">Fri</span>
             </label>
             <label class="form-check">
                 <input type="checkbox" class="form-check-input"
-                       @onchange="e => OnDayChanged(e, DaysOfWeek.Saturday)"
-                       checked="@IsDaySelected(DaysOfWeek.Saturday)" />
+                @onchange="e => OnDayChanged(e, DaysOfWeek.Saturday)"
+                checked="@IsDaySelected(DaysOfWeek.Saturday)" />
                 <span class="form-check-label" style="vertical-align: middle;">Sat</span>
             </label>
             <label class="form-check">
                 <input type="checkbox" class="form-check-input"
-                       @onchange="e => OnDayChanged(e, DaysOfWeek.Sunday)"
-                       checked="@IsDaySelected(DaysOfWeek.Sunday)" />
+                @onchange="e => OnDayChanged(e, DaysOfWeek.Sunday)"
+                checked="@IsDaySelected(DaysOfWeek.Sunday)" />
                 <span class="form-check-label" style="vertical-align: middle;">Sun</span>
             </label>
         </div>
@@ -148,35 +148,48 @@
 
     public async Task HandleOnValidSubmit()
     {
+        message = string.Empty;
+
         if (editContext?.Validate() ?? false)
         {
             if (addScheduleModel is { SetLocation: true, Latitude: not null, Longitude: not null, LocationTolerance: not null } || !addScheduleModel.SetLocation)
             {
-                Schedule schedule = new()
+                if (!addScheduleModel.Repeat && addScheduleModel.StartDate > addScheduleModel.EndDate)
                 {
-                    Name = addScheduleModel.Name!,
-                    StartDate = addScheduleModel.Repeat ? null : addScheduleModel.StartDate,
-                    EndDate = addScheduleModel.Repeat ? null : addScheduleModel.EndDate,
-                    StartTime = addScheduleModel.StartTime,
-                    EndTime = addScheduleModel.EndTime,
-                    DaysOfWeek = addScheduleModel.DaysOfWeek.ToString(),
-                    Latitude = addScheduleModel.SetLocation ? addScheduleModel.Latitude : null,
-                    Longitude = addScheduleModel.SetLocation ? addScheduleModel.Longitude : null,
-                    LocationTolerance = addScheduleModel.SetLocation ? addScheduleModel.LocationTolerance : null,
-                    AttendanceStartBefore = addScheduleModel.AttendanceStartBefore,
-                    AbsentAfter = addScheduleModel.AbsentAfter,
-                    Repeat = addScheduleModel.Repeat
-                };
-
-                bool success = await ScheduleService.AddSchedule(schedule);
-
-                if (success)
+                    message = "<div class='validation-message'>'StartDate' must be less than or equal to 'EndDate'.</div>";
+                }
+                else if (addScheduleModel.StartTime > addScheduleModel.EndTime)
                 {
-                    await AddedSchedule.InvokeAsync(addScheduleModel);
+                    message = "<div class='validation-message'>'StartTime' must be less than 'EndTime'.</div>";
                 }
                 else
                 {
-                    message = "<div class='validation-message'>Unable to add schedule.</div>";
+                    Schedule schedule = new()
+                    {
+                        Name = addScheduleModel.Name!,
+                        StartDate = addScheduleModel.Repeat ? null : addScheduleModel.StartDate,
+                        EndDate = addScheduleModel.Repeat ? null : addScheduleModel.EndDate,
+                        StartTime = addScheduleModel.StartTime,
+                        EndTime = addScheduleModel.EndTime,
+                        DaysOfWeek = addScheduleModel.DaysOfWeek.ToString(),
+                        Latitude = addScheduleModel.SetLocation ? addScheduleModel.Latitude : null,
+                        Longitude = addScheduleModel.SetLocation ? addScheduleModel.Longitude : null,
+                        LocationTolerance = addScheduleModel.SetLocation ? addScheduleModel.LocationTolerance : null,
+                        AttendanceStartBefore = addScheduleModel.AttendanceStartBefore,
+                        AbsentAfter = addScheduleModel.AbsentAfter,
+                        Repeat = addScheduleModel.Repeat
+                    };
+
+                    bool success = await ScheduleService.AddSchedule(schedule);
+
+                    if (success)
+                    {
+                        await AddedSchedule.InvokeAsync(addScheduleModel);
+                    }
+                    else
+                    {
+                        message = "<div class='validation-message'>Unable to add schedule.</div>";
+                    }
                 }
             }
             else

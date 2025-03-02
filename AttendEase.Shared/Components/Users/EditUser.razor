@@ -72,6 +72,8 @@ else
 
     public async Task HandleOnValidSubmit()
     {
+        message = string.Empty;
+
         if (editContext?.Validate() ?? false)
         {
             User.Name = editUserModel.Name!;

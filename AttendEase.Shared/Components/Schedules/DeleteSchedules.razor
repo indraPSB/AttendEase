@@ -34,6 +34,8 @@ else
 
     private async Task OnDelete()
     {
+        message = string.Empty;
+
         bool success = Schedules.Count() == 1
             ? await ScheduleService.DeleteSchedule(Schedules.First().Id)
             : await ScheduleService.DeleteSchedules(Schedules.Select(s => s.Id));

@@ -174,32 +174,45 @@ else
 
     private async Task HandleOnValidSubmit()
     {
+        message = string.Empty;
+
         if (editContext?.Validate() ?? false)
         {
             if (editScheduleModel is { SetLocation: true, Latitude: not null, Longitude: not null, LocationTolerance: not null } || !editScheduleModel.SetLocation)
             {
-                Schedule.Name = editScheduleModel.Name!;
-                Schedule.StartDate = editScheduleModel.Repeat ? null : editScheduleModel.StartDate;
-                Schedule.EndDate = editScheduleModel.Repeat ? null : editScheduleModel.EndDate;
-                Schedule.StartTime = editScheduleModel.StartTime;
-                Schedule.EndTime = editScheduleModel.EndTime;
-                Schedule.DaysOfWeek = editScheduleModel.DaysOfWeek.ToString();
-                Schedule.Latitude = editScheduleModel.SetLocation ? editScheduleModel.Latitude : null;
-                Schedule.Longitude = editScheduleModel.SetLocation ? editScheduleModel.Longitude : null;
-                Schedule.LocationTolerance = editScheduleModel.SetLocation ? editScheduleModel.LocationTolerance : null;
-                Schedule.AttendanceStartBefore = editScheduleModel.AttendanceStartBefore;
-                Schedule.AbsentAfter = editScheduleModel.AbsentAfter;
-                Schedule.Repeat = editScheduleModel.Repeat;
-
-                bool success = await ScheduleService.UpdateSchedule(Schedule);
-
-                if (success)
+                if (!editScheduleModel.Repeat && editScheduleModel.StartDate > editScheduleModel.EndDate)
                 {
-                    await EditedSchedule.InvokeAsync(editScheduleModel);
+                    message = "<div class='validation-message'>'StartDate' must be less than or equal to 'EndDate'.</div>";
+                }
+                else if (editScheduleModel.StartTime > editScheduleModel.EndTime)
+                {
+                    message = "<div class='validation-message'>'StartTime' must be less than 'EndTime'.</div>";
                 }
                 else
                 {
-                    message = "<div class='validation-message'>Unable to edit schedule.</div>";
+                    Schedule.Name = editScheduleModel.Name!;
+                    Schedule.StartDate = editScheduleModel.Repeat ? null : editScheduleModel.StartDate;
+                    Schedule.EndDate = editScheduleModel.Repeat ? null : editScheduleModel.EndDate;
+                    Schedule.StartTime = editScheduleModel.StartTime;
+                    Schedule.EndTime = editScheduleModel.EndTime;
+                    Schedule.DaysOfWeek = editScheduleModel.DaysOfWeek.ToString();
+                    Schedule.Latitude = editScheduleModel.SetLocation ? editScheduleModel.Latitude : null;
+                    Schedule.Longitude = editScheduleModel.SetLocation ? editScheduleModel.Longitude : null;
+                    Schedule.LocationTolerance = editScheduleModel.SetLocation ? editScheduleModel.LocationTolerance : null;
+                    Schedule.AttendanceStartBefore = editScheduleModel.AttendanceStartBefore;
+                    Schedule.AbsentAfter = editScheduleModel.AbsentAfter;
+                    Schedule.Repeat = editScheduleModel.Repeat;
+
+                    bool success = await ScheduleService.UpdateSchedule(Schedule);
+
+                    if (success)
+                    {
+                        await EditedSchedule.InvokeAsync(editScheduleModel);
+                    }
+                    else
+                    {
+                        message = "<div class='validation-message'>Unable to edit schedule.</div>";
+                    }
                 }
             }
             else
