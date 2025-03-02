@@ -1,7 +1,7 @@
 ﻿@using AttendEase.DB.Models
 @using Microsoft.Extensions.Logging
 
-<Grid TItem="Schedule"
+<Grid TItem="Schedule" @ref="grid"
       Class="table table-hover table-bordered table-striped"
       DataProvider="SchedulesDataProvider"
       AllowFiltering="true"
@@ -60,9 +60,16 @@
 
     [Parameter] public EventCallback<HashSet<Schedule>> SelectedSchedulesChanged { get; set; }
 
+    private Grid<Schedule> grid = default!;
     private IEnumerable<Schedule> schedules = default!;
-
     private HashSet<Schedule> selectedSchedules = new();
+
+    public async Task RefreshSchedules()
+    {
+        await grid.RefreshDataAsync();
+
+        StateHasChanged();
+    }
 
     private async Task<GridDataProviderResult<Schedule>> SchedulesDataProvider(GridDataProviderRequest<Schedule> request)
     {

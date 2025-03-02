@@ -1,5 +1,254 @@
-﻿<h3>Add Schedule</h3>
+﻿@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
+@using System.ComponentModel.DataAnnotations
+@inject IScheduleService ScheduleService
+
+<EditForm EditContext="@editContext" OnValidSubmit="HandleOnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-floating mb-3">
+        <InputText id="add-schedule-name" type="text" class="form-control" placeholder="Name" @bind-Value="@addScheduleModel.Name" />
+        <label for="add-schedule-name">Name</label>
+    </div>
+
+    <Switch Id=" add-schedule-set-dates" Class="mb-3" Label="Set Dates" @bind-Value="@addScheduleModel.SetDates" />
+
+    @if (addScheduleModel.SetDates)
+    {
+        <div class="form-floating mb-3">
+            <DateInput TValue="DateOnly" Id="add-schedule-start-date" Class="form-control" Placeholder="StartDate" @bind-Value="@addScheduleModel.StartDate" />
+            <label for="add-schedule-start-date">Start Date</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <DateInput TValue="DateOnly" Id="add-schedule-end-date" Class="form-control" Placeholder="EndDate" @bind-Value="@addScheduleModel.EndDate" />
+            <label for="add-schedule-end-date">End Date</label>
+        </div>
+    }
+
+    <div class="form-floating mb-3">
+        <TimeInput TValue="TimeOnly" Id="add-schedule-start-time" Class="form-control" Placeholder="StartTime" @bind-Value="@addScheduleModel.StartTime" />
+        <label for="add-schedule-start-time">Start Time</label>
+    </div>
+
+    <div class="form-floating mb-3">
+        <TimeInput TValue="TimeOnly" Id=" add-schedule-end-time" Class="form-control" Placeholder="EndTime" @bind-Value="@addScheduleModel.EndTime" />
+        <label for="add-schedule-end-time">End Time</label>
+    </div>
+
+    <div class="form-floating mb-3" style="">
+        <div id="add-schedule-days-of-week" class="form-control d-flex flex-wrap gap-2" style="height: max-content">
+            <label class="form-check">
+                <input type="checkbox" class="form-check-input"
+                       @onchange="e => OnDayChanged(e, DaysOfWeek.Monday)"
+                       checked="@IsDaySelected(DaysOfWeek.Monday)" />
+                <span class="form-check-label" style="vertical-align: middle;">Mon</span>
+            </label>
+            <label class="form-check">
+                <input type="checkbox" class="form-check-input"
+                       @onchange="e => OnDayChanged(e, DaysOfWeek.Tuesday)"
+                       checked="@IsDaySelected(DaysOfWeek.Tuesday)" />
+                <span class="form-check-label" style="vertical-align: middle;">Tue</span>
+            </label>
+            <label class="form-check">
+                <input type="checkbox" class="form-check-input"
+                       @onchange="e => OnDayChanged(e, DaysOfWeek.Wednesday)"
+                       checked="@IsDaySelected(DaysOfWeek.Wednesday)" />
+                <span class="form-check-label" style="vertical-align: middle;">Wed</span>
+            </label>
+            <label class="form-check">
+                <input type="checkbox" class="form-check-input"
+                       @onchange="e => OnDayChanged(e, DaysOfWeek.Thursday)"
+                       checked="@IsDaySelected(DaysOfWeek.Thursday)" />
+                <span class="form-check-label" style="vertical-align: middle;">Thu</span>
+            </label>
+            <label class="form-check">
+                <input type="checkbox" class="form-check-input"
+                       @onchange="e => OnDayChanged(e, DaysOfWeek.Friday)"
+                       checked="@IsDaySelected(DaysOfWeek.Friday)" />
+                <span class="form-check-label" style="vertical-align: middle;">Fri</span>
+            </label>
+            <label class="form-check">
+                <input type="checkbox" class="form-check-input"
+                       @onchange="e => OnDayChanged(e, DaysOfWeek.Saturday)"
+                       checked="@IsDaySelected(DaysOfWeek.Saturday)" />
+                <span class="form-check-label" style="vertical-align: middle;">Sat</span>
+            </label>
+            <label class="form-check">
+                <input type="checkbox" class="form-check-input"
+                       @onchange="e => OnDayChanged(e, DaysOfWeek.Sunday)"
+                       checked="@IsDaySelected(DaysOfWeek.Sunday)" />
+                <span class="form-check-label" style="vertical-align: middle;">Sun</span>
+            </label>
+        </div>
+        <label for="add-schedule-days-of-week">Days Of Week (@addScheduleModel.DaysOfWeek)</label>
+    </div>
+
+    <Switch Id=" add-schedule-set-location" Class="mb-3" Label="Set Location" @bind-Value="@addScheduleModel.SetLocation" />
+
+    @if (addScheduleModel.SetLocation)
+    {
+        <div class="form-floating mb-3">
+            <InputNumber id=" add-schedule-latitude" class="form-control" placeholder="Latitude" @bind-Value="@addScheduleModel.Latitude" />
+            <label for="add-schedule-latitude">Latitude</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputNumber id=" add-schedule-longitude" class="form-control" placeholder="Longitude" @bind-Value="@addScheduleModel.Longitude" />
+            <label for="add-schedule-longitude">Longitude</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputNumber id=" add-schedule-location-tolerance" class="form-control" placeholder="LocationTolerance" @bind-Value="@addScheduleModel.LocationTolerance" min="0" />
+            <label for="add-schedule-location-tolerance">Location Tolerance (Meters)</label>
+        </div>
+    }
+
+    <div class="form-floating mb-3">
+        <InputNumber id=" add-schedule-attendance-start-before" class="form-control" placeholder="AttendanceStartBefore" @bind-Value="@addScheduleModel.AttendanceStartBefore" min="0" />
+        <label for="add-schedule-attendance-start-before">Attendance Start Before (Minutes)</label>
+    </div>
+
+    <div class="form-floating mb-3">
+        <InputNumber id=" add-schedule-absent-after" class="form-control" placeholder="AbsentAfter" @bind-Value="@addScheduleModel.AbsentAfter" min="0" />
+        <label for="add-schedule-absent-after">Absent After (Minutes)</label>
+    </div>
+
+    <div class="form-floating mb-3">
+        <div id="add-schedule-repeat" class="form-control d-flex flex-wrap gap-2" style="height: max-content">
+            <label class="form-check">
+                <input type="checkbox" class="form-check-input" @bind="@addScheduleModel.Repeat" />
+            </label>
+        </div>
+        <label for="add-schedule-repeat">Repeat</label>
+    </div>
+
+    <ValidationMessage For="@(() => addScheduleModel.Name)" class="validation-message mt-3" />
+    <ValidationMessage For="@(() => addScheduleModel.StartTime)" />
+    <ValidationMessage For="@(() => addScheduleModel.EndTime)" />
+    <ValidationMessage For="@(() => addScheduleModel.AttendanceStartBefore)" />
+    <ValidationMessage For="@(() => addScheduleModel.AbsentAfter)" />
+    @((MarkupString)message)
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Add</Button>
+        <Button Type="ButtonType.Reset" Color="ButtonColor.Secondary" Class="mt-3" @onclick="Reset">Reset</Button>
+    </div>
+</EditForm>
 
 @code {
+    [Parameter] public EventCallback<AddScheduleModel> AddedSchedule { get; set; }
 
+    private AddScheduleModel addScheduleModel = new();
+    private EditContext? editContext;
+    private string message = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Reset();
+    }
+
+    private void Reset()
+    {
+        addScheduleModel = new();
+        editContext = new EditContext(addScheduleModel);
+    }
+
+    public async Task HandleOnValidSubmit()
+    {
+        if (editContext?.Validate() ?? false)
+        {
+            Schedule schedule = new()
+            {
+                Name = addScheduleModel.Name!,
+                StartDate = addScheduleModel.SetDates ? addScheduleModel.StartDate : null,
+                EndDate = addScheduleModel.SetDates ? addScheduleModel.EndDate : null,
+                StartTime = addScheduleModel.StartTime,
+                EndTime = addScheduleModel.EndTime,
+                DaysOfWeek = addScheduleModel.DaysOfWeek.ToString(),
+                Latitude = addScheduleModel.SetLocation ? addScheduleModel.Latitude : null,
+                Longitude = addScheduleModel.SetLocation ? addScheduleModel.Longitude : null,
+                LocationTolerance = addScheduleModel.SetLocation ? addScheduleModel.LocationTolerance : null,
+                AttendanceStartBefore = addScheduleModel.AttendanceStartBefore,
+                AbsentAfter = addScheduleModel.AbsentAfter,
+                Repeat = addScheduleModel.Repeat
+            };
+
+            bool success = await ScheduleService.AddSchedule(schedule);
+
+            if (success)
+            {
+                await AddedSchedule.InvokeAsync(addScheduleModel);
+            }
+            else
+            {
+                message = "<div class='validation-message'>Unable to add schedule.</div>";
+            }
+        }
+        else
+        {
+            message = "<div class='validation-message'>Unable to validate form.</div>";
+        }
+
+        StateHasChanged();
+    }
+
+    private bool IsDaySelected(DaysOfWeek day)
+    {
+        return (addScheduleModel.DaysOfWeek & day) == day;
+    }
+
+    private void OnDayChanged(ChangeEventArgs e, DaysOfWeek day)
+    {
+        bool isChecked = e.Value is bool @bool && @bool;
+
+        if (isChecked)
+        {
+            addScheduleModel.DaysOfWeek |= day;
+        }
+        else
+        {
+            addScheduleModel.DaysOfWeek &= ~day;
+        }
+    }
+
+    public class AddScheduleModel
+    {
+        [Required(ErrorMessage = "'Name' is required.")]
+        public string? Name { get; set; }
+
+        public bool SetDates { get; set; } = true;
+
+        public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+
+        public DateOnly EndDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+
+        [Required(ErrorMessage = "'StartTime' is required.")]
+        public TimeOnly StartTime { get; set; }
+
+        [Required(ErrorMessage = "'EndTime' is required.")]
+        public TimeOnly EndTime { get; set; }
+
+        public DaysOfWeek DaysOfWeek { get; set; } = DaysOfWeek.Everyday;
+
+        public bool SetLocation { get; set; } = true;
+
+        public decimal? Latitude { get; set; }
+
+        public decimal? Longitude { get; set; }
+
+        [Range(0, int.MaxValue, ErrorMessage = "'LocationTolerance' must be greater than or equal to 0.")]
+        public float? LocationTolerance { get; set; } = 50;
+
+        [Required(ErrorMessage = "'AttendanceStartBefore' is required.")]
+        [Range(0, int.MaxValue, ErrorMessage = "'AttendanceStartBefore' must be greater than or equal to 0.")]
+        public int AttendanceStartBefore { get; set; } = 15;
+
+        [Required(ErrorMessage = "'AbsentAfter' is required.")]
+        [Range(0, int.MaxValue, ErrorMessage = "'AbsentAfter' must be greater than or equal to 0.")]
+        public int AbsentAfter { get; set; } = 15;
+
+        public bool Repeat { get; set; } = true;
+    }
 }

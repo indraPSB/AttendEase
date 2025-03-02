@@ -61,10 +61,19 @@
 
 <ListSchedules @ref="listSchedules" SelectedSchedulesChanged="OnSelectedItemsChanged" />
 
+<Modal @ref="addScheduleModal" title="Add New Schedule" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
+    <BodyTemplate>
+        <AddSchedule AddedSchedule="OnAddedSchedule" />
+    </BodyTemplate>
+</Modal>
+
 @code {
+    [Inject] ToastService ToastService { get; set; } = default!;
+
     private Collapse schedulesHelp = default!;
     private HashSet<Schedule> selectedSchedules = new();
     private ListSchedules listSchedules = default!;
+    private Modal addScheduleModal = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
     private int selectedSchedulesCount = 0;
@@ -79,6 +88,24 @@
 
     private async Task OnAddSchedule()
     {
+        await addScheduleModal.ShowAsync();
+    }
+
+    private async Task OnAddedSchedule(AddSchedule.AddScheduleModel schedule)
+    {
+        ToastMessage message = new()
+        {
+            Type = ToastType.Success,
+            Title = "Schedule Added",
+            HelpText = $"{DateTimeOffset.Now:G}",
+            AutoHide = true,
+            Message = $"Schedule '{schedule.Name}' added successfully."
+        };
+        ToastService.Notify(message);
+
+        await listSchedules.RefreshSchedules();
+
+        //await addScheduleModal.HideAsync();
     }
 
     private async Task OnEditSchedule()
@@ -87,5 +114,9 @@
 
     private async Task OnDeleteSchedules()
     {
+
+    private async Task OnHiding()
+    {
+        await listSchedules.RefreshSchedules();
     }
 }
