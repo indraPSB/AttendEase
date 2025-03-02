@@ -178,6 +178,31 @@ builder.Services.AddDbContext<AttendEaseDbContext>(optionsBuilder =>
                 {
                     foreach (Schedule schedule in user.Schedules)
                     {
+                        // Check if the schedule is applicable for the current day of week.
+                        DaysOfWeek currentDay = date.DayOfWeek switch
+                        {
+                            DayOfWeek.Monday => DaysOfWeek.Monday,
+                            DayOfWeek.Tuesday => DaysOfWeek.Tuesday,
+                            DayOfWeek.Wednesday => DaysOfWeek.Wednesday,
+                            DayOfWeek.Thursday => DaysOfWeek.Thursday,
+                            DayOfWeek.Friday => DaysOfWeek.Friday,
+                            DayOfWeek.Saturday => DaysOfWeek.Saturday,
+                            DayOfWeek.Sunday => DaysOfWeek.Sunday,
+                            _ => DaysOfWeek.None
+                        };
+
+                        if (!string.IsNullOrEmpty(schedule.DaysOfWeek))
+                        {
+                            if (!Enum.TryParse(schedule.DaysOfWeek, out DaysOfWeek scheduledDays))
+                            {
+                                continue;
+                            }
+                            if ((scheduledDays & currentDay) == 0)
+                            {
+                                continue;
+                            }
+                        }
+
                         attendanceEnumerator.MoveNext();
 
                         TimeOnly time = schedule.StartTime ?? new(0, 0, 0);
