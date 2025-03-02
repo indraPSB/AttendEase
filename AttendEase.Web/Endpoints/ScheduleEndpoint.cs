@@ -59,6 +59,7 @@ internal static class ScheduleEndpoint
 
         foreach (User user in schedule.Users)
         {
+            user.Password = null!;
             user.Schedules = null!;
         }
 
