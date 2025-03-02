@@ -87,7 +87,7 @@
         builder.AppendLine("timestamp,schedule,user,attended,punctual");
         foreach (Attendance attendance in Attendances ?? Enumerable.Empty<Attendance>())
         {
-            builder.AppendLine($"{attendance.Timestamp},{attendance.Schedule?.Name},{attendance.User.Name},{attendance.Attended},{(TimeOnly.FromDateTime(attendance.Timestamp.DateTime) <= attendance.Schedule?.StartTime)}");
+            builder.AppendLine($"{attendance.Timestamp},{attendance.Schedule?.Name},{attendance.User.Name},{attendance.Attended},{(attendance.Attended && TimeOnly.FromDateTime(attendance.Timestamp.DateTime) <= attendance.Schedule?.StartTime)}");
         }
 
         await JSRuntime.InvokeVoidAsync("downloadFileFromText", filename, builder.ToString());

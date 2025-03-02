@@ -33,7 +33,7 @@
         foreach (Attendance attendance in Attendances)
         {
             DateOnly key = DateOnly.FromDateTime(attendance.Timestamp.DateTime);
-            bool isPunctual = TimeOnly.FromDateTime(attendance.Timestamp.DateTime) <= attendance.Schedule!.StartTime;
+            bool isPunctual = attendance.Attended && TimeOnly.FromDateTime(attendance.Timestamp.DateTime) <= attendance.Schedule!.StartTime;
             bool isPresent = attendance.Attended && !isPunctual;
             bool isAbsent = !attendance.Attended;
 

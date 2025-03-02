@@ -22,7 +22,7 @@
         List<double?> data = new();
 
         // Prepare data for chart
-        data.Add(Attendances.Count(a => TimeOnly.FromDateTime(a.Timestamp.DateTime) <= a.Schedule!.StartTime));
+        data.Add(Attendances.Count(a => a.Attended && TimeOnly.FromDateTime(a.Timestamp.DateTime) <= a.Schedule!.StartTime));
         data.Add(Attendances.Count(a => a.Attended && TimeOnly.FromDateTime(a.Timestamp.DateTime) > a.Schedule!.StartTime));
         data.Add(Attendances.Count(a => !a.Attended));
 
