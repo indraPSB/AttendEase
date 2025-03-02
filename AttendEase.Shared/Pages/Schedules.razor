@@ -67,6 +67,12 @@
     </BodyTemplate>
 </Modal>
 
+<Modal @ref="editScheduleModal" title="Edit Schedule" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
+    <BodyTemplate>
+        <EditSchedule />
+    </BodyTemplate>
+</Modal>
+
 @code {
     [Inject] ToastService ToastService { get; set; } = default!;
 
@@ -74,6 +80,7 @@
     private HashSet<Schedule> selectedSchedules = new();
     private ListSchedules listSchedules = default!;
     private Modal addScheduleModal = default!;
+    private Modal editScheduleModal = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
     private int selectedSchedulesCount = 0;
@@ -110,6 +117,45 @@
 
     private async Task OnEditSchedule()
     {
+        if (selectedSchedules.Count == 1)
+        {
+            Schedule schedule = selectedSchedules.First();
+            Dictionary<string, object>? parameters = new()
+            {
+                { "Schedule", schedule },
+                { "EditedSchedule", EventCallback.Factory.Create<EditSchedule.EditScheduleModel>(this, OnEditedSchedule) }
+            };
+            await editScheduleModal.ShowAsync<EditSchedule>($"Edit Schedule '{schedule.Name}'", parameters: parameters);
+        }
+        else
+        {
+            ToastMessage message = new()
+            {
+                Type = ToastType.Warning,
+                Title = "Cannot Edit Schedule",
+                HelpText = $"{DateTimeOffset.Now:G}",
+                AutoHide = true,
+                Message = "Exactly one schedule must be selected to be edited."
+            };
+            ToastService.Notify(message);
+        }
+    }
+
+    private async Task OnEditedSchedule(EditSchedule.EditScheduleModel schedule)
+    {
+        ToastMessage message = new()
+        {
+            Type = ToastType.Success,
+            Title = "Schedule Edited",
+            HelpText = $"{DateTimeOffset.Now:G}",
+            AutoHide = true,
+            Message = $"Schedule '{schedule.Name}' edited successfully."
+        };
+        ToastService.Notify(message);
+
+        await listSchedules.RefreshSchedules();
+
+        //await editScheduleModal.HideAsync();
     }
 
     private async Task OnDeleteSchedules()

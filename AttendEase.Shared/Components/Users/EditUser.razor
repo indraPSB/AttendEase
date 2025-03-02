@@ -97,14 +97,13 @@ else
         StateHasChanged();
     }
 
-    override protected void OnParametersSet()
+    protected override void OnParametersSet()
     {
         base.OnParametersSet();
+
         if (User is not null)
         {
-            editUserModel.Name = User.Name;
-            editUserModel.Email = User.Email;
-            editUserModel.Role = User.Role;
+            Reset();
         }
     }
 

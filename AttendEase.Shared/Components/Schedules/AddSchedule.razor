@@ -11,7 +11,7 @@
         <label for="add-schedule-name">Name</label>
     </div>
 
-    <Switch Id=" add-schedule-set-dates" Class="mb-3" Label="Set Dates" @bind-Value="@addScheduleModel.SetDates" />
+    <Switch Id="add-schedule-set-dates" Class="mb-3" Label="Set Dates" @bind-Value="@addScheduleModel.SetDates" />
 
     @if (addScheduleModel.SetDates)
     {
@@ -32,7 +32,7 @@
     </div>
 
     <div class="form-floating mb-3">
-        <TimeInput TValue="TimeOnly" Id=" add-schedule-end-time" Class="form-control" Placeholder="EndTime" @bind-Value="@addScheduleModel.EndTime" />
+        <TimeInput TValue="TimeOnly" Id="add-schedule-end-time" Class="form-control" Placeholder="EndTime" @bind-Value="@addScheduleModel.EndTime" />
         <label for="add-schedule-end-time">End Time</label>
     </div>
 
@@ -118,6 +118,7 @@
         <div id="add-schedule-repeat" class="form-control d-flex flex-wrap gap-2" style="height: max-content">
             <label class="form-check">
                 <input type="checkbox" class="form-check-input" @bind="@addScheduleModel.Repeat" />
+                <span class="form-check-label" style="vertical-align: middle;"></span>
             </label>
         </div>
         <label for="add-schedule-repeat">Repeat</label>
@@ -159,31 +160,38 @@
     {
         if (editContext?.Validate() ?? false)
         {
-            Schedule schedule = new()
+            if (addScheduleModel is { SetLocation: true, Latitude: not null, Longitude: not null, LocationTolerance: not null } || !addScheduleModel.SetLocation)
             {
-                Name = addScheduleModel.Name!,
-                StartDate = addScheduleModel.SetDates ? addScheduleModel.StartDate : null,
-                EndDate = addScheduleModel.SetDates ? addScheduleModel.EndDate : null,
-                StartTime = addScheduleModel.StartTime,
-                EndTime = addScheduleModel.EndTime,
-                DaysOfWeek = addScheduleModel.DaysOfWeek.ToString(),
-                Latitude = addScheduleModel.SetLocation ? addScheduleModel.Latitude : null,
-                Longitude = addScheduleModel.SetLocation ? addScheduleModel.Longitude : null,
-                LocationTolerance = addScheduleModel.SetLocation ? addScheduleModel.LocationTolerance : null,
-                AttendanceStartBefore = addScheduleModel.AttendanceStartBefore,
-                AbsentAfter = addScheduleModel.AbsentAfter,
-                Repeat = addScheduleModel.Repeat
-            };
+                Schedule schedule = new()
+                {
+                    Name = addScheduleModel.Name!,
+                    StartDate = addScheduleModel.SetDates ? addScheduleModel.StartDate : null,
+                    EndDate = addScheduleModel.SetDates ? addScheduleModel.EndDate : null,
+                    StartTime = addScheduleModel.StartTime,
+                    EndTime = addScheduleModel.EndTime,
+                    DaysOfWeek = addScheduleModel.DaysOfWeek.ToString(),
+                    Latitude = addScheduleModel.SetLocation ? addScheduleModel.Latitude : null,
+                    Longitude = addScheduleModel.SetLocation ? addScheduleModel.Longitude : null,
+                    LocationTolerance = addScheduleModel.SetLocation ? addScheduleModel.LocationTolerance : null,
+                    AttendanceStartBefore = addScheduleModel.AttendanceStartBefore,
+                    AbsentAfter = addScheduleModel.AbsentAfter,
+                    Repeat = addScheduleModel.Repeat
+                };
 
-            bool success = await ScheduleService.AddSchedule(schedule);
+                bool success = await ScheduleService.AddSchedule(schedule);
 
-            if (success)
-            {
-                await AddedSchedule.InvokeAsync(addScheduleModel);
+                if (success)
+                {
+                    await AddedSchedule.InvokeAsync(addScheduleModel);
+                }
+                else
+                {
+                    message = "<div class='validation-message'>Unable to add schedule.</div>";
+                }
             }
             else
             {
-                message = "<div class='validation-message'>Unable to add schedule.</div>";
+                message = "<div class='validation-message'>'Latitude', 'Longitude' or 'LocationTolerance' is required when 'SetLocation' is true.</div>";
             }
         }
         else
