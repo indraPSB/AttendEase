@@ -75,7 +75,7 @@
 </Grid>
 
 @code {
-    [Inject] public AttendEaseDbContext Context { get; set; } = default!;
+    [Inject] public IContactService ContactService { get; set; } = default!;
 
     [Parameter] public EventCallback<HashSet<DBContact>> SelectedContactsChanged { get; set; }
 
@@ -94,7 +94,7 @@
     {
         if (contacts is null)
         {
-            contacts = await Context.Contacts.ToListAsync() ?? Enumerable.Empty<DBContact>();
+            contacts = await ContactService.GetContacts() ?? Enumerable.Empty<DBContact>();
         }
 
         return await Task.FromResult(request.ApplyTo(contacts));
