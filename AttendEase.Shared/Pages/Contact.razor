@@ -73,6 +73,7 @@
     }
 
     <ValidationMessage For="@(() => contact.Email)" class="validation-message mt-3" />
+    <ValidationMessage For="@(() => contact.Message)" />
     @((MarkupString)message)
 
     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -81,6 +82,8 @@
 </EditForm>
 
 @code {
+    [Inject] IContactService ContactService { get; set; } = default!;
+
     private Collapse contactHelp = default!;
     private ContactModel contact = new();
     private EditContext? editContext;
@@ -110,7 +113,7 @@
                     MessageUser = contact.Subject == ContactSubject.ResetPassword ? null : contact.Message
                 };
 
-                bool success = false; // TODO: Send contact
+                bool success = await ContactService.AddContact(dbContact);
 
                 if (!success)
                 {
@@ -130,7 +133,11 @@
     {
         if (contact.Subject == ContactSubject.ResetPassword)
         {
-            contact.Message = " ";
+            contact.Message = "No message required.";
+        }
+        else
+        {
+            contact.Message = null;
         }
     }
 
