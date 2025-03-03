@@ -82,6 +82,7 @@
 </EditForm>
 
 @code {
+    [Inject] ToastService ToastService { get; set; } = default!;
     [Inject] IContactService ContactService { get; set; } = default!;
 
     private Collapse contactHelp = default!;
@@ -115,7 +116,21 @@
 
                 bool success = await ContactService.AddContact(dbContact);
 
-                if (!success)
+                if (success)
+                {
+                    ToastMessage message = new()
+                    {
+                        Type = ToastType.Success,
+                        Title = "Contact Submitted",
+                        HelpText = $"{DateTimeOffset.Now:G}",
+                        AutoHide = true,
+                        Message = contact.Subject == ContactSubject.ResetPassword
+                            ? "Thank you for contacting us. We will send you an email with instructions to reset your password."
+                            : "Thank you for contacting us. We will get back to you as soon as possible."
+                    };
+                    ToastService.Notify(message);
+                }
+                else
                 {
                     message = "<div class='validation-message'>Unable to send message. Please try again later.</div>";
                 }
