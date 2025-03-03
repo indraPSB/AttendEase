@@ -32,7 +32,7 @@ internal static class ContactEndpoint
 
     public static async Task<IResult> GetContacts(IContactService contactService, CancellationToken cancellationToken)
     {
-        IEnumerable<Contact>? contacts = null; //TODO: await contactService.GetContacts(cancellationToken);
+        IEnumerable<Contact>? contacts = await contactService.GetContacts(cancellationToken);
 
         if (contacts is null)
         {
@@ -44,7 +44,7 @@ internal static class ContactEndpoint
 
     public static async Task<IResult> GetContact(Guid id, IContactService contactService, CancellationToken cancellationToken)
     {
-        Contact? contact = null; //TODO: await contactService.GetContact(id, cancellationToken);
+        Contact? contact = await contactService.GetContact(id, cancellationToken);
 
         if (contact is null)
         {
@@ -56,9 +56,7 @@ internal static class ContactEndpoint
 
     public static async Task<IResult> AddContact(Contact contact, IContactService contactService, CancellationToken cancellationToken)
     {
-        //TODO: if (await contactService.AddContact(contact, cancellationToken))
-
-        if (false)
+        if (await contactService.AddContact(contact, cancellationToken))
         {
             return Results.Created($"/api/contacts/{contact.Id}", contact);
         }
@@ -68,8 +66,7 @@ internal static class ContactEndpoint
 
     public static async Task<IResult> UpdateContact(Contact contact, IContactService contactService, CancellationToken cancellationToken)
     {
-        //TODO: if (await contactService.UpdateContact(contact, cancellationToken))
-        if (false)
+        if (await contactService.UpdateContact(contact, cancellationToken))
         {
             return Results.Ok(contact);
         }
@@ -79,8 +76,7 @@ internal static class ContactEndpoint
 
     public static async Task<IResult> DeleteContact(Guid id, IContactService contactService, CancellationToken cancellationToken)
     {
-        //TODO: if (await contactService.DeleteContact(id, cancellationToken))
-        if (false)
+        if (await contactService.DeleteContact(id, cancellationToken))
         {
             return Results.NoContent();
         }
@@ -90,8 +86,7 @@ internal static class ContactEndpoint
 
     public static async Task<IResult> DeleteContacts(List<Guid> ids, IContactService contactService, CancellationToken cancellationToken)
     {
-        //TODO: if (await contactService.DeleteContacts(ids, cancellationToken))
-        if (false)
+        if (await contactService.DeleteContacts(ids, cancellationToken))
         {
             return Results.NoContent();
         }
