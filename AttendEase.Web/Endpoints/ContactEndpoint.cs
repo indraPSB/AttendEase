@@ -15,8 +15,7 @@ internal static class ContactEndpoint
         app.MapGet("api/contacts/{id:guid}", GetContact)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
 
-        app.MapPost("api/contacts", AddContact)
-            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business},{UserRole.Standard}" });
+        app.MapPost("api/contacts", AddContact);
 
         app.MapPut("api/contacts", UpdateContact)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
