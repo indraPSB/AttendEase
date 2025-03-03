@@ -24,7 +24,7 @@
         <GridColumn TItem="DBContact" HeaderText="Id" PropertyName="Id" SortKeySelector="item => item.Id">
             @context.Id
         </GridColumn>
-        <GridColumn TItem="DBContact" HeaderText="Timestamp" PropertyName="Timestamp" SortKeySelector="item => item.Timestamp">
+        <GridColumn TItem="DBContact" HeaderText="Timestamp" PropertyName="Timestamp" SortKeySelector="item => item.Timestamp" IsDefaultSortColumn="true" SortDirection="SortDirection.Descending">
             @context.Timestamp.ToString("G")
         </GridColumn>
         <GridColumn TItem="DBContact" HeaderText="E-Mail" PropertyName="Email" SortKeySelector="item => item.Email">
