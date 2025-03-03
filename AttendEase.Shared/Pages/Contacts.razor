@@ -43,7 +43,7 @@
     </Button>
 </div>
 
-<ListContacts @ref="listContacts" SelectedContactsChanged="OnSelectedItemsChanged" />
+<ListContacts @ref="listContacts" SelectedContactsChanged="OnSelectedItemsChanged" StatusChanged="OnStatusChanged" />
 
 <Modal @ref="deleteContactsModal" Size="ModalSize.Small" Title="Delete Contacts">
     <BodyTemplate>
@@ -112,6 +112,21 @@
         await listContacts.RefreshContacts();
 
         //await deleteContactsModal.HideAsync();
+    }
+
+    private async Task OnStatusChanged(DBContact contact)
+    {
+        ToastMessage message = new()
+        {
+            Type = ToastType.Success,
+            Title = "Contact Status Updated",
+            HelpText = $"{DateTimeOffset.Now:G}",
+            AutoHide = true,
+            Message = $"Contact status updated successfully to '{contact.Status}'."
+        };
+        ToastService.Notify(message);
+
+        await listContacts.RefreshContacts();
     }
 
     private async Task OnHiding()
