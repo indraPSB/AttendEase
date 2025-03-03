@@ -45,10 +45,19 @@
 
 <ListContacts @ref="listContacts" SelectedContactsChanged="OnSelectedItemsChanged" />
 
+<Modal @ref="deleteContactsModal" Size="ModalSize.Small" Title="Delete Contacts">
+    <BodyTemplate>
+        <DeleteContacts />
+    </BodyTemplate>
+</Modal>
+
 @code {
+    [Inject] ToastService ToastService { get; set; } = default!;
+
     private Collapse contactsHelp = default!;
     private HashSet<DBContact> selectedContacts = new();
     private ListContacts listContacts = default!;
+    private Modal deleteContactsModal = default!;
     private bool isDeleteDisabled = true;
     private int selectedContactsCount = 0;
 
@@ -61,5 +70,52 @@
 
     private async Task OnDeleteContacts()
     {
+        if (selectedContacts.Count > 0)
+        {
+            Dictionary<string, object>? parameters = new()
+            {
+                { "Contacts", selectedContacts },
+                { "DeletedContacts", EventCallback.Factory.Create<DeleteContacts.DeleteContactsModel>(this, OnDeletedContacts) }
+            };
+
+            await deleteContactsModal.ShowAsync<DeleteContacts>("Delete Contacts", parameters: parameters);
+        }
+        else
+        {
+            ToastMessage message = new()
+            {
+                Type = ToastType.Warning,
+                Title = "Cannot Delete Contacts",
+                HelpText = $"{DateTimeOffset.Now:G}",
+                AutoHide = true,
+                Message = "At least one contact must be selected to be deleted."
+            };
+            ToastService.Notify(message);
+        }
+    }
+
+    private async Task OnDeletedContacts(DeleteContacts.DeleteContactsModel contacts)
+    {
+        int count = contacts.Contacts.Count();
+        ToastMessage message = new()
+        {
+            Type = ToastType.Success,
+            Title = "Contact Deleted",
+            HelpText = $"{DateTimeOffset.Now:G}",
+            AutoHide = true,
+            Message = count == 1
+                ? $"Contact '{contacts.Contacts.First().Subject}' deleted successfully."
+                : $"'{count}' contact{(count == 1 ? " " : "s ")}deleted successfully."
+        };
+        ToastService.Notify(message);
+
+        await listContacts.RefreshContacts();
+
+        //await deleteContactsModal.HideAsync();
+    }
+
+    private async Task OnHiding()
+    {
+        await listContacts.RefreshContacts();
     }
 }

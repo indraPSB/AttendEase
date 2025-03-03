@@ -1,5 +1,71 @@
-﻿<h3>Delete Contacts</h3>
+﻿@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
+@inject IContactService ContactService
+
+@if (Contacts is null)
+{
+    <Alert Color="AlertColor.Warning">
+        No contacts were found
+    </Alert>
+}
+else
+{
+    <span>The following contacts will be deleted:</span>
+    <ol>
+        @foreach (var contact in Contacts)
+        {
+            <li>@contact.Subject:<br />&nbsp;&nbsp;@(contact.MessageUser is null ? (contact.MessageSystem is null ? string.Empty : new string(contact.MessageSystem.Take(20).ToArray())) : new string(contact.MessageUser.Take(20).ToArray()))...</li>
+        }
+    </ol>
+
+    @((MarkupString)message)
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <Button Color="ButtonColor.Primary" @onclick="OnDelete">Delete</Button>
+    </div>
+}
 
 @code {
+    [Parameter] public EventCallback<DeleteContactsModel> DeletedContacts { get; set; }
+    [Parameter] public IEnumerable<Contact> Contacts { get; set; } = default!;
 
+    private DeleteContactsModel deleteContactsModel = new();
+    private string message = string.Empty;
+
+    private async Task OnDelete()
+    {
+        message = string.Empty;
+        bool success = Contacts.Count() == 1
+            ? await ContactService.DeleteContact(Contacts.First().Id)
+            : await ContactService.DeleteContacts(Contacts.Select(c => c.Id));
+
+        if (success)
+        {
+            DeleteContactsModel contactsModel = new()
+            {
+                Contacts = Contacts
+            };
+
+            await DeletedContacts.InvokeAsync(contactsModel);
+        }
+        else
+        {
+            message = "<div class='validation-message'>Failed to delete contacts.</div>";
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Contacts is not null)
+        {
+            deleteContactsModel.Contacts = Contacts;
+        }
+    }
+
+    public class DeleteContactsModel
+    {
+        public IEnumerable<Contact> Contacts { get; set; } = default!;
+    }
 }
