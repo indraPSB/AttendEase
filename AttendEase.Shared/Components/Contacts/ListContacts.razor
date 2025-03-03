@@ -60,11 +60,11 @@
             }
             else if (context.Status == ContactStatus.Open)
             {
-                <Button Type="ButtonType.Button" Color="ButtonColor.Primary">Mark as Close</Button>
+                <Button Type="ButtonType.Button" Color="ButtonColor.Primary" @onclick="@(() => MarkAsClose(context))">Mark as Close</Button>
             }
             else if (context.Status == ContactStatus.Close)
             {
-                <Button Type="ButtonType.Button" Color="ButtonColor.Secondary">Mark as Open</Button>
+                <Button Type="ButtonType.Button" Color="ButtonColor.Secondary" @onclick="@(() => MarkAsOpen(context))">Mark as Open</Button>
             }
             else
             {
@@ -105,5 +105,23 @@
         selectedContacts = contacts is not null && contacts.Any() ? contacts : new();
 
         await SelectedContactsChanged.InvokeAsync(selectedContacts);
+    }
+
+    private async Task MarkAsClose(DBContact contact)
+    {
+        contact.Status = ContactStatus.Close;
+
+        await ContactService.UpdateContact(contact);
+
+        await RefreshContacts();
+    }
+
+    private async Task MarkAsOpen(DBContact contact)
+    {
+        contact.Status = ContactStatus.Open;
+
+        await ContactService.UpdateContact(contact);
+
+        await RefreshContacts();
     }
 }
