@@ -6,6 +6,7 @@ using AttendEase.Shared.Services;
 using AttendEase.Web.Components;
 using AttendEase.Web.Endpoints;
 using AttendEase.Web.Services;
+using AttendEase.Web.Services.BackgroundServices;
 using Bogus;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -291,6 +292,9 @@ builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IScheduleService, ScheduleWebService>();
 builder.Services.AddScoped<IUserService, UserWebService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AttendEaseAuthenticationStateProvider>();
+
+builder.Services.AddHostedService<AttendanceBackgroundService>()
+    .AddSingleton(serviceProvider => serviceProvider.GetServices<IHostedService>().OfType<AttendanceBackgroundService>().First());
 
 builder.Services.AddBlazorBootstrap();
 
