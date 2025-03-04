@@ -12,7 +12,7 @@ internal static class AttendanceEndpoint
         app.MapGet("api/attendances", GetAttendances)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
 
-        app.MapGet("api/attendances/{id:guid}", GetAttendance)
+        app.MapGet("api/attendances/user", GetAttendance)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business},{UserRole.Standard}" });
 
         app.MapPut("api/attendances", UpdateAttendance)

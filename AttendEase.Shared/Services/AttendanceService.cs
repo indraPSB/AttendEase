@@ -9,7 +9,7 @@ public interface IAttendanceService
 {
     Task<IEnumerable<Attendance>?> GetAttendances(CancellationToken cancellationToken = default);
 
-    Task<Attendance?> GetAttendance(GetAttendanceRequest id, CancellationToken cancellationToken = default);
+    Task<Attendance?> GetAttendance(GetAttendanceRequest request, CancellationToken cancellationToken = default);
 
     Task<bool> UpdateAttendance(Attendance user, CancellationToken cancellationToken = default);
 
@@ -76,7 +76,7 @@ public class AttendanceService(ILogger<AttendanceService> logger, HttpClient htt
                 ["timestampStart"] = request.TimestampStart.ToString("o"),
                 ["timestampEnd"] = request.TimestampEnd.ToString("o")
             };
-            string url = QueryHelpers.AddQueryString("/api/attendances", queryParams);
+            string url = QueryHelpers.AddQueryString("/api/attendances/user", queryParams);
             HttpResponseMessage response = await _httpClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
