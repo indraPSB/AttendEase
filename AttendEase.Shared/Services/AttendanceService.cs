@@ -16,6 +16,8 @@ public interface IAttendanceService
     Task<bool> DeleteAttendance(Guid id, CancellationToken cancellationToken = default);
 
     Task<bool> DeleteAttendances(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<Attendance>?> GetAttendances(Guid userId, CancellationToken cancellationToken = default);
 }
 
 public class AttendanceService(ILogger<AttendanceService> logger, HttpClient httpClient) : IAttendanceService
@@ -177,6 +179,41 @@ public class AttendanceService(ILogger<AttendanceService> logger, HttpClient htt
         }
 
         return false;
+    }
+
+    public async Task<IEnumerable<Attendance>?> GetAttendances(Guid userId, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync($"/api/attendances/user/{userId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                IEnumerable<Attendance>? attendances = await response.Content.ReadFromJsonAsync<IEnumerable<Attendance>>(cancellationToken);
+
+                if (attendances is null)
+                {
+                    _logger.LogWarning("No attendances found.");
+                }
+                else
+                {
+                    _logger.LogInformation("Attendances retrieved successfully.");
+                }
+
+                return attendances;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Shared GetAttendances(Guid) with message, '{message}'.", ex.Message);
+        }
+
+        return null;
     }
 }
 

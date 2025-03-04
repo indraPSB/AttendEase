@@ -24,6 +24,9 @@ internal static class AttendanceEndpoint
         app.MapPost("api/attendances/delete", DeleteAttendances)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
 
+        app.MapGet("api/attendances/user/{userId:guid}", GetAttendancesForUser)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business},{UserRole.Standard}" });
+
         return app;
     }
 
@@ -34,6 +37,21 @@ internal static class AttendanceEndpoint
         if (attendances is null)
         {
             return Results.NotFound();
+        }
+
+        foreach (Attendance attendance in attendances)
+        {
+            if (attendance.Schedule is not null)
+            {
+                attendance.Schedule.Attendances = null!;
+                attendance.Schedule.Users = null!;
+            }
+
+            if (attendance.User is not null)
+            {
+                attendance.User.Attendances = null!;
+                attendance.User.Schedules = null!;
+            }
         }
 
         return Results.Ok(attendances);
@@ -79,5 +97,32 @@ internal static class AttendanceEndpoint
         }
 
         return Results.BadRequest();
+    }
+
+    public static async Task<IResult> GetAttendancesForUser(Guid userId, IAttendanceService attendanceService, CancellationToken cancellationToken)
+    {
+        IEnumerable<Attendance>? attendances = await attendanceService.GetAttendances(userId, cancellationToken);
+
+        if (attendances is null)
+        {
+            return Results.NotFound();
+        }
+
+        foreach (Attendance attendance in attendances)
+        {
+            if (attendance.Schedule is not null)
+            {
+                attendance.Schedule.Attendances = null!;
+                attendance.Schedule.Users = null!;
+            }
+
+            if (attendance.User is not null)
+            {
+                attendance.User.Attendances = null!;
+                attendance.User.Schedules = null!;
+            }
+        }
+
+        return Results.Ok(attendances);
     }
 }

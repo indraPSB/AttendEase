@@ -17,7 +17,10 @@ internal class AttendanceService
         try
         {
             // SELECT * FROM attendance;
-            return await context.Attendances.ToListAsync(cancellationToken);
+            return await context.Attendances
+                .Include(a => a.Schedule)
+                .Include(a => a.User)
+                .ToListAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -126,5 +129,29 @@ internal class AttendanceService
         }
 
         return false;
+    }
+
+    public static async Task<IEnumerable<Attendance>?> GetAttendances<T>(Guid userId, ILogger<T> logger, AttendEaseDbContext context, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        try
+        {
+            // SELECT * FROM attendance WHERE user_id = @userId;
+            return await context.Attendances
+                .Where(a => a.UserId == userId)
+                .Include(a => a.Schedule)
+                .Include(a => a.User)
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error in DB GetAttendances with message, '{message}'.", ex.Message);
+        }
+
+        return null;
     }
 }

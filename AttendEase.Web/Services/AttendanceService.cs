@@ -60,4 +60,15 @@ internal class AttendanceService(ILogger<AttendanceService> logger, AttendEaseDb
 
         return AttendanceDBService.DeleteAttendances(ids, _logger, _context, cancellationToken);
     }
+
+    public Task<IEnumerable<Attendance>?> GetAttendances(Guid userId, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+
+        }
+
+        return AttendanceDBService.GetAttendances(userId, _logger, _context, cancellationToken);
+    }
 }
