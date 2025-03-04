@@ -20,7 +20,7 @@
                     <CardText>
                         @if (model.Schedule is { Latitude: decimal, Longitude: decimal, LocationTolerance: float })
                         {
-                            <span><Icon Name="IconName.PinMapFill" Class="me-2" />@model.Schedule.Latitude,@model.Schedule.Longitude</span>
+                            <span><Icon Name="IconName.PinMapFill" Class="me-2" />@model.Schedule.LocationName</span>
                             <br />
                             if (model.IsLocationServiceAvailable)
                             {
