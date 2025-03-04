@@ -164,13 +164,8 @@ else
 
     private async Task LoadData()
     {
-        Task<IEnumerable<Schedule>?> getSchedules = ScheduleService.GetSchedules();
-        Task<IEnumerable<User>?> getUsers = UserService.GetUsers();
-
-        await Task.WhenAll(getSchedules, getUsers);
-
-        schedules = (await getSchedules)?.ToList() ?? [];
-        users = (await getUsers)?.ToList() ?? [];
+        schedules = (await ScheduleService.GetSchedules())?.ToList() ?? [];
+        users = (await UserService.GetUsers())?.ToList() ?? [];
     }
 
     private async Task HandleOnShowing(TabsEventArgs e)
