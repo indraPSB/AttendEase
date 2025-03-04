@@ -1,9 +1,24 @@
-﻿namespace AttendEase.Web.Services.BackgroundServices;
+﻿using AttendEase.DB.Contexts;
 
-internal class AttendanceBackgroundService : BackgroundService
+namespace AttendEase.Web.Services.BackgroundServices;
+
+internal class AttendanceBackgroundService(ILogger<AttendanceBackgroundService> logger, IServiceScopeFactory serviceScopeFactory) : BackgroundService
 {
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    private readonly ILogger<AttendanceBackgroundService> _logger = logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(55));
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        throw new NotImplementedException();
+        while (await _timer.WaitForNextTickAsync(stoppingToken))
+        {
+            using IServiceScope scope = _serviceScopeFactory.CreateScope();
+            AttendEaseDbContext? context = scope.ServiceProvider.GetService<AttendEaseDbContext>();
+
+            if (context is not null)
+            {
+                _logger.LogInformation("AttendanceBackgroundService is running.");
+            }
+        }
     }
 }
