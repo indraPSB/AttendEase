@@ -90,6 +90,7 @@ internal partial class AttendEaseDbContext : DbContext
             entity.Property(e => e.Latitude)
                 .HasPrecision(10, 8)
                 .HasColumnName("latitude");
+            entity.Property(e => e.LocationName).HasColumnName("location_name");
             entity.Property(e => e.LocationTolerance).HasColumnName("location_tolerance");
             entity.Property(e => e.Longitude)
                 .HasPrecision(11, 8)
