@@ -109,9 +109,7 @@
         };
         ToastService.Notify(message);
 
-        await listContacts.RefreshContacts();
-
-        //await deleteContactsModal.HideAsync();
+        await deleteContactsModal.HideAsync();
     }
 
     private async Task OnStatusChanged(DBContact contact)
