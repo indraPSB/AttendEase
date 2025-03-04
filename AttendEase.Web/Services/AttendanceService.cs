@@ -10,6 +10,17 @@ internal class AttendanceService(ILogger<AttendanceService> logger, AttendEaseDb
     private readonly ILogger<AttendanceService> _logger = logger;
     private readonly AttendEaseDbContext _context = context;
 
+    public Task<IEnumerable<Attendance>?> GetAttendances(CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+
+        }
+
+        return AttendanceDBService.GetAttendances(_logger, _context, cancellationToken);
+    }
+
     public Task<Attendance?> GetAttendance(GetAttendanceRequest request, CancellationToken cancellationToken = default)
     {
         if (cancellationToken == default)
@@ -28,5 +39,25 @@ internal class AttendanceService(ILogger<AttendanceService> logger, AttendEaseDb
         }
 
         return AttendanceDBService.UpdateAttendance(attendance, _logger, _context, cancellationToken);
+    }
+
+    public Task<bool> DeleteAttendance(Guid id, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        return AttendanceDBService.DeleteAttendance(id, _logger, _context, cancellationToken);
+    }
+
+    public Task<bool> DeleteAttendances(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken == default)
+        {
+            cancellationToken = CancellationToken.None;
+        }
+
+        return AttendanceDBService.DeleteAttendances(ids, _logger, _context, cancellationToken);
     }
 }
