@@ -11,24 +11,14 @@ internal class UserService(ILogger<UserService> logger, AttendEaseDbContext cont
     private readonly ILogger<UserService> _logger = logger;
     private readonly AttendEaseDbContext _context = context;
 
-    public async Task<IEnumerable<User>?> GetUsers(CancellationToken cancellationToken = default)
+    public Task<IEnumerable<User>?> GetUsers(CancellationToken cancellationToken = default)
     {
         if (cancellationToken == default)
         {
             cancellationToken = CancellationToken.None;
         }
 
-        IEnumerable<User>? users = await UserDBService.GetUsers(_logger, _context, cancellationToken);
-
-        if (users is not null)
-        {
-            foreach (User user in users)
-            {
-                user.Password = null!;
-            }
-        }
-
-        return users;
+        return UserDBService.GetUsers(_logger, _context, cancellationToken);
     }
 
     public async Task<User?> GetUser(Guid id, CancellationToken cancellationToken = default)

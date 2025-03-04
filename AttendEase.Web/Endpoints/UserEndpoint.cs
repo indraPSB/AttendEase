@@ -39,6 +39,14 @@ internal static class UserEndpoint
             return Results.NotFound();
         }
 
+        if (users is not null)
+        {
+            foreach (User user in users)
+            {
+                user.Password = null!;
+            }
+        }
+
         return Results.Ok(users);
     }
 
