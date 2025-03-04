@@ -15,9 +15,6 @@ internal static class AttendanceEndpoint
         app.MapGet("api/attendances/{id:guid}", GetAttendance)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business},{UserRole.Standard}" });
 
-        app.MapPost("api/attendances", AddAttendance)
-            .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
-
         app.MapPut("api/attendances", UpdateAttendance)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business},{UserRole.Standard}" });
 
@@ -32,7 +29,7 @@ internal static class AttendanceEndpoint
 
     public static async Task<IResult> GetAttendances(IAttendanceService attendanceService, CancellationToken cancellationToken)
     {
-        IEnumerable<Attendance>? attendances = null; //TODO: await attendanceService.GetAttendances(cancellationToken);
+        IEnumerable<Attendance>? attendances = await attendanceService.GetAttendances(cancellationToken);
 
         if (attendances is null)
         {
@@ -54,17 +51,6 @@ internal static class AttendanceEndpoint
         return Results.Ok(attendance);
     }
 
-    public static async Task<IResult> AddAttendance(Attendance attendance, IAttendanceService attendanceService, CancellationToken cancellationToken)
-    {
-        //TODO: if (await attendanceService.AddAttendance(attendance, cancellationToken))
-        if (false)
-        {
-            return Results.Ok(attendance);
-        }
-
-        return Results.BadRequest();
-    }
-
     public static async Task<IResult> UpdateAttendance(Attendance attendance, IAttendanceService attendanceService, CancellationToken cancellationToken)
     {
         if (await attendanceService.UpdateAttendance(attendance, cancellationToken))
@@ -77,8 +63,7 @@ internal static class AttendanceEndpoint
 
     public static async Task<IResult> DeleteAttendance(Guid id, IAttendanceService attendanceService, CancellationToken cancellationToken)
     {
-        //TODO: if (await attendanceService.DeleteAttendance(id, cancellationToken))
-        if (false)
+        if (await attendanceService.DeleteAttendance(id, cancellationToken))
         {
             return Results.Ok();
         }
@@ -88,8 +73,7 @@ internal static class AttendanceEndpoint
 
     public static async Task<IResult> DeleteAttendances(IEnumerable<Guid> ids, IAttendanceService attendanceService, CancellationToken cancellationToken)
     {
-        //TODO: if (await attendanceService.DeleteAttendances(ids, cancellationToken))
-        if (false)
+        if (await attendanceService.DeleteAttendances(ids, cancellationToken))
         {
             return Results.Ok();
         }
