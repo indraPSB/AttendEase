@@ -97,6 +97,11 @@ else
         @if (editScheduleModel.SetLocation)
         {
             <div class="form-floating mb-3">
+                <InputText id="edit-schedule-location-name" type="text" class="form-control" placeholder="Location Name" @bind-Value="@editScheduleModel.LocationName" />
+                <label for="edit-schedule-location-name">Location Name</label>
+            </div>
+
+            <div class="form-floating mb-3">
                 <InputNumber id="edit-schedule-latitude" class="form-control" @bind-Value="@editScheduleModel.Latitude" />
                 <label for="edit-schedule-latitude">Latitude</label>
             </div>
@@ -164,6 +169,7 @@ else
             SetLocation = Schedule.Latitude is not null && Schedule.Longitude is not null && Schedule.LocationTolerance is not null,
             Latitude = Schedule.Latitude,
             Longitude = Schedule.Longitude,
+            LocationName = Schedule.LocationName,
             LocationTolerance = Schedule.LocationTolerance,
             AttendanceStartBefore = Schedule.AttendanceStartBefore,
             AbsentAfter = Schedule.AbsentAfter,
@@ -198,6 +204,7 @@ else
                     Schedule.DaysOfWeek = editScheduleModel.DaysOfWeek.ToString();
                     Schedule.Latitude = editScheduleModel.SetLocation ? editScheduleModel.Latitude : null;
                     Schedule.Longitude = editScheduleModel.SetLocation ? editScheduleModel.Longitude : null;
+                    Schedule.LocationName = editScheduleModel.SetLocation ? editScheduleModel.LocationName : null;
                     Schedule.LocationTolerance = editScheduleModel.SetLocation ? editScheduleModel.LocationTolerance : null;
                     Schedule.AttendanceStartBefore = editScheduleModel.AttendanceStartBefore;
                     Schedule.AbsentAfter = editScheduleModel.AbsentAfter;
@@ -279,6 +286,8 @@ else
         public decimal? Latitude { get; set; }
 
         public decimal? Longitude { get; set; }
+
+        public string? LocationName { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "'LocationTolerance' must be greater than or equal to 0.")]
         public float? LocationTolerance { get; set; } = 50;

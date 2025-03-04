@@ -89,6 +89,11 @@
     @if (addScheduleModel.SetLocation)
     {
         <div class="form-floating mb-3">
+            <InputText id="add-schedule-location-name" type="text" class="form-control" placeholder="Location Name" @bind-Value="@addScheduleModel.LocationName" />
+            <label for="add-schedule-location-name">Location Name</label>
+        </div>
+
+        <div class="form-floating mb-3">
             <InputNumber id=" add-schedule-latitude" class="form-control" placeholder="Latitude" @bind-Value="@addScheduleModel.Latitude" />
             <label for="add-schedule-latitude">Latitude</label>
         </div>
@@ -174,6 +179,7 @@
                         DaysOfWeek = addScheduleModel.DaysOfWeek.ToString(),
                         Latitude = addScheduleModel.SetLocation ? addScheduleModel.Latitude : null,
                         Longitude = addScheduleModel.SetLocation ? addScheduleModel.Longitude : null,
+                        LocationName = addScheduleModel.SetLocation ? addScheduleModel.LocationName : null,
                         LocationTolerance = addScheduleModel.SetLocation ? addScheduleModel.LocationTolerance : null,
                         AttendanceStartBefore = addScheduleModel.AttendanceStartBefore,
                         AbsentAfter = addScheduleModel.AbsentAfter,
@@ -247,6 +253,8 @@
 
         public decimal? Longitude { get; set; }
 
+        public string? LocationName { get; set; }
+        
         [Range(0, int.MaxValue, ErrorMessage = "'LocationTolerance' must be greater than or equal to 0.")]
         public float? LocationTolerance { get; set; } = 50;
 

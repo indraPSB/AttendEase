@@ -37,6 +37,9 @@
         <GridColumn TItem="Schedule" HeaderText="Days Of Week" PropertyName="DaysOfWeek" SortKeySelector="item => item.DaysOfWeek">
             @context.DaysOfWeek
         </GridColumn>
+        <GridColumn TItem="Schedule" HeaderText="Location Name" PropertyName="LocationName" SortKeySelector="item => item.LocationName">
+            @context.LocationName
+        </GridColumn>
         <GridColumn TItem="Schedule" HeaderText="Latitude" PropertyName="Latitude" SortKeySelector="item => item.Latitude">
             @context.Latitude
         </GridColumn>
