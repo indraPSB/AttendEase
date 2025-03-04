@@ -15,17 +15,22 @@ else
         <DataAnnotationsValidator />
 
         <div class="form-floating mb-3">
-            <InputText id="add-user-name" type="text" class="form-control" placeholder="Name" @bind-Value="@editUserModel.Name" />
-            <label for="add-user-name">Name</label>
+            <InputText id="edit-user-name" type="text" class="form-control" placeholder="Name" @bind-Value="@editUserModel.Name" />
+            <label for="edit-user-name">Name</label>
         </div>
 
         <div class="form-floating mb-3">
-            <InputText id="add-user-email" type="email" class="form-control" placeholder="E-Mail" @bind-Value="@editUserModel.Email" />
-            <label for="add-user-email">E-Mail</label>
+            <InputText id="edit-user-password" type="password" class="form-control" placeholder="Password" @bind-Value="@editUserModel.Password" />
+            <label for="edit-user-password">Password</label>
         </div>
 
         <div class="form-floating mb-3">
-            <InputSelect class="form-select" id="add-user-role" @bind-Value="@editUserModel.Role">
+            <InputText id="edit-user-email" type="email" class="form-control" placeholder="E-Mail" @bind-Value="@editUserModel.Email" />
+            <label for="edit-user-email">E-Mail</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputSelect class="form-select" id="edit-user-role" @bind-Value="@editUserModel.Role">
                 <option value="@UserRole.Admin">Admin</option>
                 <option value="@UserRole.Business">Business</option>
                 <option value="@UserRole.Standard">Standard</option>
@@ -64,6 +69,7 @@ else
         editUserModel = new()
         {
             Name = User.Name,
+            Password = User.Password,
             Email = User.Email,
             Role = User.Role
         };
@@ -77,6 +83,7 @@ else
         if (editContext?.Validate() ?? false)
         {
             User.Name = editUserModel.Name!;
+            User.Password = editUserModel.Password!;
             User.Email = editUserModel.Email!;
             User.Role = editUserModel.Role!;
 
@@ -113,6 +120,9 @@ else
     {
         [Required(ErrorMessage = "'Name' is required.")]
         public string? Name { get; set; }
+
+        [Required(ErrorMessage = "'Password' is required.")]
+        public string? Password { get; set; }
 
         [Required(ErrorMessage = "'Email' is required.")]
         public string? Email { get; set; }

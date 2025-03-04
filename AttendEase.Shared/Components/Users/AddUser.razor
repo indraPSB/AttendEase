@@ -10,6 +10,11 @@
         <InputText id="add-user-name" type="text" class="form-control" placeholder="Name" @bind-Value="@addUserModel.Name" />
         <label for="add-user-name">Name</label>
     </div>
+    
+    <div class="form-floating mb-3">
+        <InputText id="add-user-password" type="password" class="form-control" placeholder="Password" @bind-Value="@addUserModel.Password" />
+        <label for="add-user-password">Password</label>
+    </div>
 
     <div class="form-floating mb-3">
         <InputText id="add-user-email" type="email" class="form-control" placeholder="E-Mail" @bind-Value="@addUserModel.Email" />
@@ -64,6 +69,7 @@
             User user = new()
             {
                 Name = addUserModel.Name!,
+                Password = addUserModel.Password!,
                 Email = addUserModel.Email!,
                 Role = addUserModel.Role!
             };
@@ -92,6 +98,9 @@
         [Required(ErrorMessage = "'Name' is required.")]
         public string? Name { get; set; }
 
+        [Required(ErrorMessage = "'Password' is required.")]
+        public string? Password { get; set; }
+        
         [Required(ErrorMessage = "'Email' is required.")]
         public string? Email { get; set; }
 
