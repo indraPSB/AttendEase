@@ -16,7 +16,10 @@ internal class AttendanceService
 
         try
         {
-            // SELECT * FROM attendance;
+            // SELECT *
+            // FROM attendance
+            // JOIN schedule ON attendance.schedule_id = schedule.id
+            // JOIN user ON attendance.user_id = user.id;
             return await context.Attendances
                 .Include(a => a.Schedule)
                 .Include(a => a.User)
@@ -140,7 +143,11 @@ internal class AttendanceService
 
         try
         {
-            // SELECT * FROM attendance WHERE user_id = @userId;
+            // SELECT *
+            // FROM attendance
+            // JOIN schedule ON attendance.schedule_id = schedule.id
+            // JOIN user ON attendance.user_id = user.id
+            // WHERE user_id = @userId;
             return await context.Attendances
                 .Where(a => a.UserId == userId)
                 .Include(a => a.Schedule)

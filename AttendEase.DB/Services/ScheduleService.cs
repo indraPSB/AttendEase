@@ -36,7 +36,7 @@ internal static class ScheduleService
 
         try
         {
-            // SELECT * FROM schedule WHERE id = @id;
+            // SELECT * FROM schedule JOIN user ON schedule.id = user.id WHERE schedule.id = @id;
             return await context.Schedules.Include(s => s.Users).SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
         }
         catch (Exception ex)
@@ -189,7 +189,7 @@ internal static class ScheduleService
         {
             if (schedule is { Users: not null })
             {
-                // SELECT * FROM schedule WHERE id = @scheduleId;
+                // SELECT * FROM schedule JOIN user ON schedule.id = user.id WHERE schedule.id = @scheduleId;
                 Schedule? dbSchedule = await context.Schedules.Include(s => s.Users).SingleOrDefaultAsync(s => s.Id == schedule.Id, cancellationToken);
 
                 if (dbSchedule is { Users: not null })
