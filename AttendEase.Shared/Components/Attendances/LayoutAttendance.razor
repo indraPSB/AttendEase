@@ -18,7 +18,11 @@
                         <Badge Color="@(isDeleteDisabled ? BadgeColor.Danger : BadgeColor.Success)">@selectedAttendancesCount</Badge>
                     </Button>
                 }
-                <Button Class="me-0 my-1" Color="ButtonColor.Primary" @onclick="DownloadFile">Generate Report</Button>
+
+                @if (FormFactor.GetFormFactor() == "Web")
+                {
+                    <Button Class="me-0 my-1" Color="ButtonColor.Primary" @onclick="DownloadFile">Generate Report</Button>
+                }
             </div>
 
             <ListAttendance @ref="listAttendances" Attendances="attendances" SelectedAttendancesChanged="OnSelectedItemsChanged" />
@@ -58,6 +62,7 @@
 </Tabs>
 
 @code {
+    [Inject] IFormFactor FormFactor { get; set; } = default!;
     [Inject] IAuthService AuthService { get; set; } = default!;
     [Inject] IAttendanceService AttendanceService { get; set; } = default!;
 

@@ -38,8 +38,15 @@
             <AccordionItem Title="How to generate report">
                 <Content>
                     <ol>
-                        <li>Click on the "Overview" tab.</li>
-                        <li>Click on the "Generate Report" button to download the report in CSV format.</li>
+                        @if (FormFactor.GetFormFactor() == "Web")
+                        {
+                            <li>Click on the "Overview" tab.</li>
+                            <li>Click on the "Generate Report" button to download the report in CSV format.</li>
+                        }
+                        else
+                        {
+                            <li>Report generation is only supported in web version.</li>
+                        }
                     </ol>
                 </Content>
             </AccordionItem>
@@ -50,5 +57,7 @@
 <LayoutAttendance />
 
 @code {
+    [Inject] IFormFactor FormFactor { get; set; } = default!;
+
     private Collapse attendancesHelp = default!;
 }
