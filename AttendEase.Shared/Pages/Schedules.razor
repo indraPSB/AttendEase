@@ -178,10 +178,10 @@
             ToastMessage message = new()
             {
                 Type = ToastType.Warning,
-                Title = "Cannot Edit Schedule",
+                Title = "Cannot Delete Schedule",
                 HelpText = $"{DateTimeOffset.Now:G}",
                 AutoHide = true,
-                Message = "Exactly one schedule must be selected to be edited."
+                Message = "Exactly one schedule must be selected to be deleted."
             };
             ToastService.Notify(message);
         }
@@ -190,6 +190,7 @@
     private async Task OnDeletedSchedules(DeleteSchedules.DeleteSchedulesModel schedules)
     {
         int count = schedules.Schedules.Count();
+
         ToastMessage message = new()
         {
             Type = ToastType.Success,
