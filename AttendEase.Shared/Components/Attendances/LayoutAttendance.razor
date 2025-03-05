@@ -61,9 +61,15 @@
     </Tab>
 </Tabs>
 
+<Modal @ref="editAttendanceModal" title="Edit Attendance" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
+    <BodyTemplate>
+        <EditAttendance />
+    </BodyTemplate>
+</Modal>
+
 <Modal @ref="deleteAttendancesModal" title="Delete Attendances" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
     <BodyTemplate>
-        <DeleteAttendances DeletedAttendances="OnDeletedAttendances" Attendances="selectedAttendances" />
+        <DeleteAttendances />
     </BodyTemplate>
 </Modal>
 
@@ -77,6 +83,7 @@
     private IEnumerable<Attendance> attendances = default!;
     private HashSet<Attendance> selectedAttendances = new();
     private ListAttendance listAttendances = default!;
+    private Modal editAttendanceModal = default!;
     private Modal deleteAttendancesModal = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
@@ -116,6 +123,46 @@
     {
         if (isAdmin)
         {
+            if (selectedAttendances.Count == 1)
+            {
+                Attendance attendance = selectedAttendances.First();
+                Dictionary<string, object>? parameters = new()
+                {
+                    { "Attendance", attendance },
+                    { "EditedAttendance", EventCallback.Factory.Create<EditAttendance.EditAttendanceModel>(this, OnEditedAttendance) }
+                };
+
+                await editAttendanceModal.ShowAsync<EditAttendance>($"Edit Attendance for '{attendance.Schedule!.Name}'", parameters: parameters);
+            }
+            else
+            {
+                ToastMessage message = new()
+                {
+                    Type = ToastType.Warning,
+                    Title = "No Attendance Selected",
+                    HelpText = $"{DateTimeOffset.Now:G}",
+                    AutoHide = true,
+                    Message = "Please select one attendance to edit."
+                };
+            }
+        }
+    }
+
+    private async Task OnEditedAttendance(EditAttendance.EditAttendanceModel attendance)
+    {
+        if (isAdmin)
+        {
+            ToastMessage message = new()
+            {
+                Type = ToastType.Success,
+                Title = "Attendance Edited",
+                HelpText = $"{DateTimeOffset.Now:G}",
+                AutoHide = true,
+                Message = "The attendance has been edited."
+            };
+            ToastService.Notify(message);
+
+            await editAttendanceModal.HideAsync();
         }
     }
 
@@ -131,7 +178,7 @@
                     { "DeletedAttendances", EventCallback.Factory.Create<DeleteAttendances.DeleteAttendancesModel>(this, OnDeletedAttendances) }
                 };
 
-                await deleteAttendancesModal.ShowAsync();
+                await deleteAttendancesModal.ShowAsync<DeleteAttendances>("Delete Attendances", parameters: parameters);
             }
             else
             {

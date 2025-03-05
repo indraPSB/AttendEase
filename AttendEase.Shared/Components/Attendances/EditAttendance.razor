@@ -1,5 +1,110 @@
-﻿<h3>Edit Attendance</h3>
+﻿@using AttendEase.DB.Models
+
+@if (Attendance is null)
+{
+    <Alert Color="AlertColor.Warning">
+        No attendance was found
+    </Alert>
+}
+else
+{
+    <EditForm EditContext="@editContext" OnValidSubmit="HandleOnValidSubmit">
+        <DataAnnotationsValidator />
+
+        <div class="form-floating mb-3">
+            <DateInput TValue="DateOnly" Id="edit-attendance-date" Class="form-control" Placeholder="Date" @bind-Value="@editAttendanceModel.Date" />
+            <label for="edit-attendance-date">Date</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <TimeInput TValue="TimeOnly" Id="edit-attendance-time" Class="form-control" Placeholder="Time" @bind-Value="@editAttendanceModel.Time" />
+            <label for="edit-attendance-time">Time</label>
+        </div>
+
+        <div class="form-check mb-3">
+            <InputCheckbox id="edit-attendance-is-present" class="form-check-input" @bind-Value="@editAttendanceModel.IsPresent" />
+            <label for="edit-attendance-is-present" class="form-check-label">Is Present</label>
+        </div>
+
+        @((MarkupString)message)
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Class="mt-3">Edit</Button>
+            <Button Type="ButtonType.Reset" Color="ButtonColor.Secondary" Class="mt-3" @onclick="Reset">Reset</Button>
+        </div>
+    </EditForm>
+}
 
 @code {
+    [Inject] public IAttendanceService AttendanceService { get; set; } = default!;
 
+    [Parameter] public EventCallback<EditAttendanceModel> EditedAttendance { get; set; }
+    [Parameter] public Attendance Attendance { get; set; } = default!;
+
+    private EditAttendanceModel editAttendanceModel = new();
+    private EditContext editContext = default!;
+    private string message = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Reset();
+    }
+
+    private void Reset()
+    {
+        editAttendanceModel = new EditAttendanceModel
+        {
+            Date = DateOnly.FromDateTime(Attendance.Timestamp.DateTime),
+            Time = TimeOnly.FromDateTime(Attendance.Timestamp.DateTime),
+            IsPresent = Attendance.Attended
+        };
+        editContext = new EditContext(editAttendanceModel);
+    }
+
+    public async Task HandleOnValidSubmit()
+    {
+        if (editContext?.Validate() ?? false)
+        {
+            Attendance.Timestamp = new DateTimeOffset(editAttendanceModel.Date, editAttendanceModel.Time, TimeSpan.Zero);
+            Attendance.Attended = editAttendanceModel.IsPresent;
+
+            bool success = await AttendanceService.UpdateAttendance(Attendance);
+
+            if (success)
+            {
+                await EditedAttendance.InvokeAsync(editAttendanceModel);
+            }
+            else
+            {
+                message = "<div class='validation-message'>Unable to edit attendance.</div>";
+            }
+        }
+        else
+        {
+            message = "<div class='validation-message'>Unable to validate form.</div>";
+        }
+
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Attendance is not null)
+        {
+            Reset();
+        }
+    }
+
+    public class EditAttendanceModel
+    {
+        public DateOnly Date { get; set; }
+
+        public TimeOnly Time { get; set; }
+
+        public bool IsPresent { get; set; }
+    }
 }

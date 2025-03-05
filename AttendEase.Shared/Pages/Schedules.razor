@@ -130,6 +130,7 @@
                 { "Schedule", schedule },
                 { "EditedSchedule", EventCallback.Factory.Create<EditSchedule.EditScheduleModel>(this, OnEditedSchedule) }
             };
+
             await editScheduleModal.ShowAsync<EditSchedule>($"Edit Schedule '{schedule.Name}'", parameters: parameters);
         }
         else
