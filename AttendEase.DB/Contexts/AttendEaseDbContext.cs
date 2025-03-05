@@ -48,7 +48,7 @@ internal partial class AttendEaseDbContext : DbContext
 
             entity.HasOne(d => d.Schedule).WithMany(p => p.Attendances)
                 .HasForeignKey(d => d.ScheduleId)
-                .OnDelete(DeleteBehavior.SetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("attendance_schedule_id_fkey");
 
             entity.HasOne(d => d.User).WithMany(p => p.Attendances)
