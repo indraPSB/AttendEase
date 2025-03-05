@@ -1,7 +1,6 @@
 ﻿using AttendEase.DB.Models;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace AttendEase.Shared.Services;
 
@@ -69,15 +68,7 @@ public class AttendanceService(ILogger<AttendanceService> logger, HttpClient htt
 
         try
         {
-            Dictionary<string, string?> queryParams = new()
-            {
-                ["userId"] = request.UserId.ToString(),
-                ["scheduleId"] = request.ScheduleId.ToString(),
-                ["timestampStart"] = request.TimestampStart.ToString("o"),
-                ["timestampEnd"] = request.TimestampEnd.ToString("o")
-            };
-            string url = QueryHelpers.AddQueryString("/api/attendances/user", queryParams);
-            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/attendances/user", request, cancellationToken);
 
             if (response.IsSuccessStatusCode)
             {

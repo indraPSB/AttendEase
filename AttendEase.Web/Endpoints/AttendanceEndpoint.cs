@@ -12,7 +12,7 @@ internal static class AttendanceEndpoint
         app.MapGet("api/attendances", GetAttendances)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business}" });
 
-        app.MapGet("api/attendances/user", GetAttendance)
+        app.MapPost("api/attendances/user", GetAttendance)
             .RequireAuthorization(new AuthorizeAttribute { Roles = $"{UserRole.Admin},{UserRole.Business},{UserRole.Standard}" });
 
         app.MapPut("api/attendances", UpdateAttendance)
@@ -57,7 +57,7 @@ internal static class AttendanceEndpoint
         return Results.Ok(attendances);
     }
 
-    public static async Task<IResult> GetAttendance([AsParameters] GetAttendanceRequest request, IAttendanceService attendanceService, CancellationToken cancellationToken)
+    public static async Task<IResult> GetAttendance(GetAttendanceRequest request, IAttendanceService attendanceService, CancellationToken cancellationToken)
     {
         Attendance? attendance = await attendanceService.GetAttendance(request, cancellationToken);
 
