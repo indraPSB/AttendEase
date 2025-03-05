@@ -1,8 +1,6 @@
-﻿using AttendEase.DB.Contexts;
-using AttendEase.DB.Models;
+﻿using AttendEase.DB.Models;
 using AttendEase.Shared.Models;
 using AttendEase.Shared.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace AttendEase.Web.Services.BackgroundServices;
 
