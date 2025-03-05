@@ -1,5 +1,6 @@
 ﻿@page "/assignments"
 @using AttendEase.DB.Models
+@using AttendEase.Shared.Models
 @using Microsoft.EntityFrameworkCore
 @using System.Diagnostics.CodeAnalysis
 @attribute [Authorize(Roles = "Admin")]
@@ -165,7 +166,7 @@ else
     private async Task LoadData()
     {
         schedules = (await ScheduleService.GetSchedules())?.ToList() ?? [];
-        users = (await UserService.GetUsers())?.ToList() ?? [];
+        users = (await UserService.GetUsers())?.Where(u => u.Role == UserRole.Standard).ToList() ?? [];
     }
 
     private async Task HandleOnShowing(TabsEventArgs e)
