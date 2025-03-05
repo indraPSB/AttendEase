@@ -1,5 +1,68 @@
-﻿<h3>Delete Attendances</h3>
+﻿@using AttendEase.DB.Models
+@using AttendEase.Shared.Models
+@inject IAttendanceService AttendanceService
+
+@if (Attendances is null)
+{
+    <Alert Color="AlertColor.Warning">
+        No attendances were found
+    </Alert>
+}
+else
+{
+    <span>The following attendances will be deleted:</span>
+    <ol>
+        @foreach (var attendance in Attendances)
+        {
+            <li>@attendance.Schedule!.Name for @attendance.User.Name</li>
+        }
+    </ol>
+
+    @((MarkupString)message)
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <Button Color="ButtonColor.Primary" @onclick="OnDelete">Delete</Button>
+    </div>
+}
 
 @code {
+    [Parameter] public EventCallback<DeleteAttendancesModel> DeletedAttendances { get; set; }
+    [Parameter] public IEnumerable<Attendance> Attendances { get; set; } = default!;
 
+    private DeleteAttendancesModel deleteAttendancesModel = new();
+    private string message = string.Empty;
+
+    private async Task OnDelete()
+    {
+        message = string.Empty;
+
+        bool success = Attendances.Count() == 1
+            ? await AttendanceService.DeleteAttendance(Attendances.First().Id)
+            : await AttendanceService.DeleteAttendances(Attendances.Select(a => a.Id));
+
+        if (success)
+        {
+            DeleteAttendancesModel attendancesModel = new()
+            {
+                Attendances = Attendances
+            };
+
+            await DeletedAttendances.InvokeAsync(attendancesModel);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Attendances is not null)
+        {
+            deleteAttendancesModel.Attendances = Attendances;
+        }
+    }
+
+    public class DeleteAttendancesModel
+    {
+        public IEnumerable<Attendance> Attendances { get; set; } = default!;
+    }
 }

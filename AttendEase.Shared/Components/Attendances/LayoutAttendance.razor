@@ -61,7 +61,14 @@
     </Tab>
 </Tabs>
 
+<Modal @ref="deleteAttendancesModal" title="Delete Attendances" IsScrollable="true" CloseOnEscape="true" OnHiding="OnHiding">
+    <BodyTemplate>
+        <DeleteAttendances DeletedAttendances="OnDeletedAttendances" Attendances="selectedAttendances" />
+    </BodyTemplate>
+</Modal>
+
 @code {
+    [Inject] ToastService ToastService { get; set; } = default!;
     [Inject] IFormFactor FormFactor { get; set; } = default!;
     [Inject] IAuthService AuthService { get; set; } = default!;
     [Inject] IAttendanceService AttendanceService { get; set; } = default!;
@@ -70,6 +77,7 @@
     private IEnumerable<Attendance> attendances = default!;
     private HashSet<Attendance> selectedAttendances = new();
     private ListAttendance listAttendances = default!;
+    private Modal deleteAttendancesModal = default!;
     private bool isEditDisabled = true;
     private bool isDeleteDisabled = true;
     private int selectedAttendancesCount = 0;
@@ -115,7 +123,53 @@
     {
         if (isAdmin)
         {
+            if (selectedAttendances.Count > 0)
+            {
+                Dictionary<string, object>? parameters = new()
+                {
+                    { "Attendances", selectedAttendances },
+                    { "DeletedAttendances", EventCallback.Factory.Create<DeleteAttendances.DeleteAttendancesModel>(this, OnDeletedAttendances) }
+                };
+
+                await deleteAttendancesModal.ShowAsync();
+            }
+            else
+            {
+                ToastMessage message = new()
+                {
+                    Type = ToastType.Warning,
+                    Title = "No Attendances Selected",
+                    HelpText = $"{DateTimeOffset.Now:G}",
+                    AutoHide = true,
+                    Message = "Please select one or more attendances to delete."
+                };
+            }
         }
+    }
+
+    private async Task OnDeletedAttendances(DeleteAttendances.DeleteAttendancesModel model)
+    {
+        if (isAdmin)
+        {
+            int count = model.Attendances.Count();
+
+            ToastMessage message = new()
+            {
+                Type = ToastType.Success,
+                Title = count == 1 ? "Attendance Deleted" : "Attendances Deleted",
+                HelpText = $"{DateTimeOffset.Now:G}",
+                AutoHide = true,
+                Message = count == 1 ? "The attendance has been deleted." : $"'{count}' attendances have been deleted."
+            };
+            ToastService.Notify(message);
+
+            await deleteAttendancesModal.HideAsync();
+        }
+    }
+
+    private async Task OnHiding()
+    {
+        await listAttendances.RefreshAttendances();
     }
 
     private async Task DownloadFile()
