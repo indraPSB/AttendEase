@@ -29,14 +29,17 @@ else
             <label for="edit-user-email">E-Mail</label>
         </div>
 
-        <div class="form-floating mb-3">
-            <InputSelect class="form-select" id="edit-user-role" @bind-Value="@editUserModel.Role">
-                <option value="@UserRole.Admin">Admin</option>
-                <option value="@UserRole.Business">Business</option>
-                <option value="@UserRole.Standard">Standard</option>
-            </InputSelect>
-            <label for="list-users-page-size">Role</label>
-        </div>
+        @if (currentUser?.Id != User.Id)
+        {
+            <div class="form-floating mb-3">
+                <InputSelect class="form-select" id="edit-user-role" @bind-Value="@editUserModel.Role">
+                    <option value="@UserRole.Admin">Admin</option>
+                    <option value="@UserRole.Business">Business</option>
+                    <option value="@UserRole.Standard">Standard</option>
+                </InputSelect>
+                <label for="list-users-page-size">Role</label>
+            </div>
+        }
 
         <ValidationMessage For="@(() => editUserModel.Name)" class="validation-message mt-3" />
         <ValidationMessage For="@(() => editUserModel.Email)" />
@@ -51,12 +54,20 @@ else
 }
 
 @code {
+    [Inject] public IAuthService AuthService { get; set; } = default!;
+
     [Parameter] public EventCallback<EditUserModel> EditedUser { get; set; }
     [Parameter] public User User { get; set; } = default!;
 
+    private User? currentUser = default!;
     private EditUserModel editUserModel = new();
     private EditContext? editContext;
     private string message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await AuthService.GetUser();
+    }
 
     protected override void OnInitialized()
     {
