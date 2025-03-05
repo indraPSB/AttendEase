@@ -10,7 +10,7 @@ internal class AttendanceBackgroundService(ILogger<AttendanceBackgroundService> 
 {
     private readonly ILogger<AttendanceBackgroundService> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
-    private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(5));
+    private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(55));
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
