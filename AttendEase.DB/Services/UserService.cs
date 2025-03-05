@@ -57,7 +57,7 @@ internal static class UserService
         try
         {
             // SELECT * FROM user WHERE email = @email AND password = @password;
-            return await context.Users.SingleOrDefaultAsync(u => u.Email == email && u.Password == password, cancellationToken);
+            return await context.Users.SingleOrDefaultAsync(u => u.Email.ToUpper() == email.ToUpper() && u.Password == password, cancellationToken);
         }
         catch (Exception ex)
         {
