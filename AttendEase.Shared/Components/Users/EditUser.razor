@@ -93,20 +93,29 @@ else
 
         if (editContext?.Validate() ?? false)
         {
-            User.Name = editUserModel.Name!;
-            User.Password = editUserModel.Password!;
-            User.Email = editUserModel.Email!;
-            User.Role = editUserModel.Role!;
+            bool doesEmailExist = (await UserService.GetUsers())?.Any(u => string.Compare(u.Email, editUserModel.Email, ignoreCase: true) == 0) ?? true;
 
-            bool success = await UserService.UpdateUser(User);
-
-            if (success)
+            if (doesEmailExist)
             {
-                await EditedUser.InvokeAsync(editUserModel);
+                message = "<div class='validation-message'>Email already exists or try again later.</div>";
             }
             else
             {
-                message = "<div class='validation-message'>Unable to edit user.</div>";
+                User.Name = editUserModel.Name!;
+                User.Password = editUserModel.Password!;
+                User.Email = editUserModel.Email!;
+                User.Role = editUserModel.Role!;
+
+                bool success = await UserService.UpdateUser(User);
+
+                if (success)
+                {
+                    await EditedUser.InvokeAsync(editUserModel);
+                }
+                else
+                {
+                    message = "<div class='validation-message'>Unable to edit user.</div>";
+                }
             }
         }
         else
