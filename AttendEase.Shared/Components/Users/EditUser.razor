@@ -93,7 +93,7 @@ else
 
         if (editContext?.Validate() ?? false)
         {
-            bool doesEmailExist = (await UserService.GetUsers())?.Any(u => string.Compare(u.Email, editUserModel.Email, ignoreCase: true) == 0) ?? true;
+            bool doesEmailExist = (await UserService.GetUsers())?.Any(u => string.Compare(u.Email, editUserModel.Email, ignoreCase: true) == 0 && u.Id != User.Id) ?? true;
 
             if (doesEmailExist)
             {
