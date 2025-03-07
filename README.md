@@ -45,7 +45,7 @@ The project was carefully managed using a Gantt chart. All development phases in
   * ASP.NET Core minimal API & Blazor Interactive Server web projects.
   * Handles services registration in `Program.cs` file.
   * Defines API endpoints structure in `Endpoints` folder.
-  * Defines the index page in `Components\App.razor` file.
+  * Defines the index page in `Components/App.razor` file.
 
 
 ## Getting Started
@@ -55,12 +55,12 @@ The project was carefully managed using a Gantt chart. All development phases in
   git clone https://github.com/indraPSB/AttendEase.git
   ```
 
-* Running the database in Docker:
+* Running the database from Docker:
   ```bash
   docker pull postgres:17.2
   docker run --name postgres-server -p 5432:5432 -e POSTGRES_DB=postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -d postgres:17.2
   ```
-  > Change the `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` environment variables as required.
+  > Change the `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` environment variables as required. Pulling is optional as run will pull when image is not found.
 
 * Modify the following files to match your environment:
    * `AttendEase.Web/appsettings.json` or ideally copy settings to `AttendEase.Web/appsettings.Development.json`
@@ -90,3 +90,20 @@ The project was carefully managed using a Gantt chart. All development phases in
   ```
   > The web project is configured to run on `https://localhost:7200`. Change as required from `AttendEase.Web/Properties/launchSettings.json` (debug) or `AttendEase.Web/appsettings.json` (release).
   * The web project must be running before launching the mobile project.
+
+
+## Publish Application
+
+* Publish the web project to Docker:
+  ```bash
+  dotnet publish -f net9.0 -r linux-x64 -c Release --no-self-contained -p:PublishReadyToRun=true -p:PublishProfile=DefaultContainer
+  ```
+  > The publish profile is configured to run on `https://localhost:7200`. Change as required from `AttendEase.Web/Properties/launchSettings.json` (debug) or `AttendEase.Web/appsettings.json` (release).
+
+* Run the web project from Docker:
+  ```bash
+  docker run --name attendease-server -p 7200:8080 -e ConnectionStrings__AttendEaseDatabase="Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres" -e JwtBearer__Issuer="https://localhost:7200" -e JwtBearer__Audience="https://localhost:7200" -e JwtBearer__IssuerSigningKey="Some512BitsStringNeedsToBeSuppliedHereForJWTBearerAuthentication" -d attendease-web:latest
+  ```
+  > Change the connection string and JWT settings as required. Note that within the Docker container, the server is running on port 8080.
+
+* The Android emulator is managed by Android Device Manager (ADM). The ADM can be found in `C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\Extensions\Xamarin\AndroidDeviceManager\AndroidDevices.exe`. The MAUI project must have ran at least once for the app to be published within the emulator. After running the web app, run the AttendEase app from within the emulator.
