@@ -23,3 +23,26 @@ The project was carefully managed using a Gantt chart. All development phases in
 * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 * [Windows Subsystem for Linux (WSL)](https://learn.microsoft.com/en-us/windows/wsl/install)
+
+
+## Project Structure
+
+* AttendEase
+  * .NET Multi-platform App UI (MAUI) mobile development project.
+  * Handles services registration in `MauiProgram.cs` file.
+  * Currently tested for Android (API 35) & Windows (WinUI3) platforms.
+  * For iOS and MacOS, Apple hardware is required for development.
+
+* AttendEase.DB
+  * Entity Framework (EF) Core database project.
+  * ORM to interact with a PostgreSQL database.
+
+* AttendEase.Shared
+  * Razor Class Library (RCL) project.
+  * Contains shared components, pages, services, and utilities.
+
+* AttendEase.Web
+  * ASP.NET Core minimal API & Blazor Interactive Server web projects.
+  * Handles services registration in `Program.cs` file.
+  * Defines API endpoints structure in `Endpoints` folder.
+  * Defines the index page in `Components\App.razor` file.
